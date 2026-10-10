@@ -27,11 +27,11 @@ export const BiometricHeader: React.FC = () => {
   const bmiBadge = getBmiBadge(weights.bmi);
 
   return (
-    <header className="sticky top-0 z-30 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800 shadow-lg px-3 py-2.5">
+    <header className="sticky top-0 z-30 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800 shadow-lg px-2.5 sm:px-4 py-2 sm:py-2.5 w-full overflow-hidden">
       {/* Top Primary Input Row */}
-      <div className="grid grid-cols-12 gap-2 items-center max-w-4xl mx-auto">
-        {/* Weight Control (5 cols) */}
-        <div className="col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
+      <div className="grid grid-cols-12 gap-1.5 sm:gap-2 items-center max-w-4xl mx-auto w-full">
+        {/* Weight Control (Full width on mobile, 5 cols on sm+) */}
+        <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
           <div className="flex items-center justify-between px-1 mb-1">
             <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               <Scale className="w-3.5 h-3.5 text-cyan-400" />
@@ -39,7 +39,8 @@ export const BiometricHeader: React.FC = () => {
             </span>
             <button
               onClick={() => setKeypadTarget('weight')}
-              className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono underline uppercase"
+              className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono underline uppercase touch-manipulation"
+              title="Open Keypad"
             >
               Keypad
             </button>
@@ -49,13 +50,15 @@ export const BiometricHeader: React.FC = () => {
             {/* Quick -5 / -1 buttons */}
             <button
               onClick={() => adjustWeight(-5)}
-              className="w-8 h-10 bg-slate-800 active:bg-slate-700 text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-8 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="-5 kg"
             >
               -5
             </button>
             <button
               onClick={() => adjustWeight(-1)}
-              className="w-8 h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-sm font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-8 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-sm font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="-1 kg"
             >
               -1
             </button>
@@ -63,7 +66,8 @@ export const BiometricHeader: React.FC = () => {
             {/* Display / Direct Keypad Click */}
             <button
               onClick={() => setKeypadTarget('weight')}
-              className="flex-1 h-10 bg-slate-950/80 hover:border-cyan-500/50 active:bg-slate-900 border border-slate-700/60 rounded-lg flex items-baseline justify-center gap-0.5 px-1 shadow-inner"
+              className="flex-[2.5] sm:flex-1 h-10 bg-slate-950/80 hover:border-cyan-500/50 active:bg-slate-900 border border-slate-700/60 rounded-lg flex items-baseline justify-center gap-0.5 px-1 shadow-inner touch-manipulation transition-colors"
+              title="Click to edit weight"
             >
               <span className="text-xl font-mono font-extrabold text-cyan-300">
                 {patient.tbwKg.toFixed(1)}
@@ -74,21 +78,23 @@ export const BiometricHeader: React.FC = () => {
             {/* Quick +1 / +5 buttons */}
             <button
               onClick={() => adjustWeight(1)}
-              className="w-8 h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-sm font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-8 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-sm font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="+1 kg"
             >
               +1
             </button>
             <button
               onClick={() => adjustWeight(5)}
-              className="w-8 h-10 bg-slate-800 active:bg-slate-700 text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-8 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="+5 kg"
             >
               +5
             </button>
           </div>
         </div>
 
-        {/* Height Control (4 cols) */}
-        <div className="col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
+        {/* Height Control (7 cols on mobile, 4 cols on sm+) */}
+        <div className="col-span-7 sm:col-span-4 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
           <div className="flex items-center justify-between px-1 mb-1">
             <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               <Ruler className="w-3.5 h-3.5 text-cyan-400" />
@@ -96,7 +102,8 @@ export const BiometricHeader: React.FC = () => {
             </span>
             <button
               onClick={() => setKeypadTarget('height')}
-              className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono underline uppercase"
+              className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono underline uppercase touch-manipulation"
+              title="Open Keypad"
             >
               Keypad
             </button>
@@ -105,14 +112,16 @@ export const BiometricHeader: React.FC = () => {
           <div className="flex items-center justify-between gap-1">
             <button
               onClick={() => adjustHeight(-1)}
-              className="w-7 h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-7 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="-1 cm"
             >
               -1
             </button>
 
             <button
               onClick={() => setKeypadTarget('height')}
-              className="flex-1 h-10 bg-slate-950/80 hover:border-cyan-500/50 active:bg-slate-900 border border-slate-700/60 rounded-lg flex items-baseline justify-center gap-0.5 px-1 shadow-inner"
+              className="flex-[2] sm:flex-1 h-10 bg-slate-950/80 hover:border-cyan-500/50 active:bg-slate-900 border border-slate-700/60 rounded-lg flex items-baseline justify-center gap-0.5 px-1 shadow-inner touch-manipulation transition-colors"
+              title="Click to edit height"
             >
               <span className="text-xl font-mono font-extrabold text-cyan-300">
                 {patient.heightCm}
@@ -122,15 +131,16 @@ export const BiometricHeader: React.FC = () => {
 
             <button
               onClick={() => adjustHeight(1)}
-              className="w-7 h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none"
+              className="flex-1 sm:w-7 sm:flex-none h-10 bg-slate-800 active:bg-slate-700 text-slate-200 font-mono text-xs font-bold rounded-lg border border-slate-700/50 flex items-center justify-center select-none touch-manipulation"
+              title="+1 cm"
             >
               +1
             </button>
           </div>
         </div>
 
-        {/* Sex Toggle (3 cols) */}
-        <div className="col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
+        {/* Sex Toggle (5 cols on mobile, 3 cols on sm+) */}
+        <div className="col-span-5 sm:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-col justify-between shadow-inner">
           <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-1 mb-1">
             <User className="w-3.5 h-3.5 text-cyan-400" />
             Sex
@@ -139,7 +149,7 @@ export const BiometricHeader: React.FC = () => {
           <div className="grid grid-cols-2 gap-1 h-10">
             <button
               onClick={() => setPatientMetrics({ sex: 'male' })}
-              className={`rounded-lg font-bold text-xs transition-colors flex items-center justify-center select-none ${
+              className={`rounded-lg font-bold text-xs transition-colors flex items-center justify-center select-none touch-manipulation ${
                 patient.sex === 'male'
                   ? 'bg-cyan-500 text-slate-950 shadow-glow-cyan'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -149,7 +159,7 @@ export const BiometricHeader: React.FC = () => {
             </button>
             <button
               onClick={() => setPatientMetrics({ sex: 'female' })}
-              className={`rounded-lg font-bold text-xs transition-colors flex items-center justify-center select-none ${
+              className={`rounded-lg font-bold text-xs transition-colors flex items-center justify-center select-none touch-manipulation ${
                 patient.sex === 'female'
                   ? 'bg-cyan-500 text-slate-950 shadow-glow-cyan'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -162,7 +172,7 @@ export const BiometricHeader: React.FC = () => {
       </div>
 
       {/* Reactive Biometrics Pill Strip */}
-      <div className="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+      <div className="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar w-full min-w-0">
         {/* BMI */}
         <div className="flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1 shrink-0">
           <span className="text-[10px] font-bold text-slate-400 uppercase">BMI</span>
@@ -203,7 +213,7 @@ export const BiometricHeader: React.FC = () => {
 
       {/* Expandable Quick Biometric Presets */}
       {showPresets && (
-        <div className="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar animate-fade-in">
+        <div className="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full min-w-0 animate-fade-in">
           <span className="text-[10px] text-slate-500 uppercase font-semibold shrink-0">Quick Profiles:</span>
           <button
             onClick={() => {

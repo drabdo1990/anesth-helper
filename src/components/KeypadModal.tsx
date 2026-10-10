@@ -26,15 +26,28 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
   onConfirm,
 }) => {
   const [valueStr, setValueStr] = useState<string>(initialValue.toString());
+  const [isPristine, setIsPristine] = useState<boolean>(true);
 
-  // Re-sync with the current value each time the keypad opens (the component stays mounted)
+  // Re-sync with the current value each time the keypad opens
   useEffect(() => {
-    if (isOpen) setValueStr(initialValue.toString());
+    if (isOpen) {
+      setValueStr(initialValue.toString());
+      setIsPristine(true);
+    }
   }, [isOpen, initialValue]);
 
-  if (!isOpen) return null;
-
   const handleDigit = (digit: string) => {
+    if (isPristine) {
+      setIsPristine(false);
+      if (digit === '.') {
+        if (!allowDecimal) return;
+        setValueStr('0.');
+      } else {
+        setValueStr(digit);
+      }
+      return;
+    }
+
     if (valueStr.length >= 5) return;
     if (digit === '.') {
       if (!allowDecimal || valueStr.includes('.')) return;
@@ -49,10 +62,12 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
   };
 
   const handleBackspace = () => {
+    setIsPristine(false);
     setValueStr((prev) => (prev.length > 1 ? prev.slice(0, -1) : ''));
   };
 
   const handleClear = () => {
+    setIsPristine(false);
     setValueStr('');
   };
 
@@ -65,17 +80,49 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
     onClose();
   };
 
+  // Keyboard support for desktop / laptop users
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handleDigit(e.key);
+      } else if (e.key === '.') {
+        handleDigit('.');
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      } else if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'Enter') {
+        handleConfirm();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, valueStr, isPristine]);
+
+  if (!isOpen) return null;
+
   // Portal to <body>: the sticky header's backdrop-filter would otherwise become the
   // containing block for this fixed overlay, clipping it to the header's height.
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-xs bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 flex flex-col gap-4">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-xs max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 flex flex-col gap-3 sm:gap-4"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold tracking-wider text-slate-300 uppercase">{title}</span>
+        <div className="flex items-start justify-between">
+          <div>
+            <span className="text-sm font-semibold tracking-wider text-slate-200 uppercase block">{title}</span>
+            <span className="text-[10px] text-slate-400 font-mono">Range: {min} – {max} {unit}</span>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 touch-target flex items-center justify-center"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 touch-target flex items-center justify-center"
+            title="Close"
           >
             <X className="w-5 h-5" />
           </button>

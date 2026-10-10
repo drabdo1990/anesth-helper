@@ -25,9 +25,10 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden w-full max-w-full">
       {/* Top Application Bar */}
-      <div className="bg-[#090d16] border-b border-slate-800/80 px-4 py-2 flex items-center justify-between">
+      <div className="bg-[#090d16] border-b border-slate-800/80 px-3 sm:px-4 py-2">
+        <div className="max-w-4xl mx-auto flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
             <Activity className="w-4 h-4 stroke-[2.8]" />
@@ -56,6 +57,7 @@ export const App: React.FC = () => {
               <span>Offline Ready</span>
             </div>
           )}
+        </div>
         </div>
       </div>
 
