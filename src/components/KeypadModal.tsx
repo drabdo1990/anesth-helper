@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Delete, Check } from 'lucide-react';
 
 interface KeypadModalProps {
@@ -25,6 +26,11 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
   onConfirm,
 }) => {
   const [valueStr, setValueStr] = useState<string>(initialValue.toString());
+
+  // Re-sync with the current value each time the keypad opens (the component stays mounted)
+  useEffect(() => {
+    if (isOpen) setValueStr(initialValue.toString());
+  }, [isOpen, initialValue]);
 
   if (!isOpen) return null;
 
@@ -59,7 +65,9 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
     onClose();
   };
 
-  return (
+  // Portal to <body>: the sticky header's backdrop-filter would otherwise become the
+  // containing block for this fixed overlay, clipping it to the header's height.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-xs bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 flex flex-col gap-4">
         {/* Header */}
@@ -136,6 +144,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
