@@ -5,6 +5,9 @@ export type Sex = 'male' | 'female';
 export const MIN_HEIGHT_CM = 30;
 export const MAX_HEIGHT_CM = 250;
 export const MAX_WEIGHT_KG = 500;
+export const DEVINE_BASELINE_HEIGHT_CM = 152.4;
+
+export const isDevineBaselineMet = (heightCm: number): boolean => heightCm >= DEVINE_BASELINE_HEIGHT_CM;
 
 export interface BiometricInput {
   tbwKg: number;

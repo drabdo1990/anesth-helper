@@ -5,6 +5,7 @@ import {
   calculateDevineIbw,
   calculateJanmahasatianLbw,
   computeBiometrics,
+  isDevineBaselineMet,
 } from '../biometrics';
 import { calculateDose, calculateVolumeMl, checkAbsoluteMax } from '../dosing';
 import { formatMcg, formatMg, formatMl } from '../format';
@@ -41,6 +42,12 @@ describe('biometrics', () => {
     expect(calculateDevineIbw('female', 162)).toBeCloseTo(45.5 + 0.905 * 9.6, 3);
     expect(calculateDevineIbw('male', 140)).toBe(50);
     expect(calculateDevineIbw('female', 140)).toBe(45.5);
+  });
+
+  it('detects whether height meets the Devine baseline floor of 152.4 cm', () => {
+    expect(isDevineBaselineMet(152.4)).toBe(true);
+    expect(isDevineBaselineMet(170)).toBe(true);
+    expect(isDevineBaselineMet(150)).toBe(false);
   });
 
   it('ABW40 = IBW + 0.4 x (TBW - IBW) only when TBW > IBW', () => {

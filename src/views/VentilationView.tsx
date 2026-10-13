@@ -80,9 +80,11 @@ export const VentilationView: React.FC = () => {
   const heightOk = patient.heightCm !== null && patient.heightCm >= MIN_HEIGHT_CM && patient.heightCm <= MAX_HEIGHT_CM;
   const pbw = heightOk && patient.heightCm !== null ? calculateDevineIbw(patient.sex, patient.heightCm) : null;
   const pediatric = patient.ageYears !== null && patient.ageYears < 18;
+  const isPediatricContext = pediatric || scenario.id === 'pediatric';
+  const shortStature = !pediatric && patient.heightCm !== null && patient.heightCm < 152.4;
 
   const mlPerKg = vent.mlPerKgPbw;
-  const vt = pbw !== null && mlPerKg !== null ? calculateTidalVolumeMl(pbw, mlPerKg) : null;
+  const vt = !isPediatricContext && pbw !== null && mlPerKg !== null ? calculateTidalVolumeMl(pbw, mlPerKg) : null;
   const mv = vt !== null && vent.respiratoryRate !== null ? calculateMinuteVentilationLMin(vt, vent.respiratoryRate) : null;
   const driving =
     vent.plateauCmH2O !== null && vent.peepCmH2O !== null ? calculateDrivingPressure(vent.plateauCmH2O, vent.peepCmH2O) : null;
@@ -126,9 +128,14 @@ export const VentilationView: React.FC = () => {
         )}
       </section>
 
-      {(pediatric || scenario.id === 'pediatric') && (
+      {isPediatricContext && (
         <WarningBanner level="red" title="Pediatric: PBW formula not valid">
-          The Devine PBW formula applies to adults. {NO_SOURCE_VALUE} for pediatric tidal volume; do not rely on the PBW-based value below.
+          The Devine PBW formula applies to adults. Calculated PBW tidal volume is withheld to avoid delivering adult volumes. Set pediatric tidal volume per clinical protocol (typically 6-8 mL/kg actual weight).
+        </WarningBanner>
+      )}
+      {shortStature && (
+        <WarningBanner level="amber" title="Height below Devine 152.4 cm (5 ft) baseline">
+          PBW is fixed at the {patient.sex === 'male' ? '50' : '45.5'} kg baseline floor. Calculated tidal volume ({vt?.toFixed(0)} mL) may overestimate lung volume for short stature.
         </WarningBanner>
       )}
 
@@ -156,8 +163,8 @@ export const VentilationView: React.FC = () => {
           </p>
         )}
         <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-950 p-2">
-          <UnitValue label="Tidal volume" value={vt !== null ? vt.toFixed(0) : '--'} unit="mL" size="xl" tone={TONE[vtSeverity]} />
-          <UnitValue label="Per PBW" value={mlPerKg !== null ? mlPerKg.toFixed(1) : '--'} unit="mL/kg PBW" size="lg" align="end" tone={TONE[vtSeverity]} />
+          <UnitValue label="Tidal volume" value={vt !== null ? vt.toFixed(0) : '--'} unit="mL" size="xl" tone={isPediatricContext ? 'red' : TONE[vtSeverity]} />
+          <UnitValue label="Per PBW" value={!isPediatricContext && mlPerKg !== null ? mlPerKg.toFixed(1) : '--'} unit="mL/kg PBW" size="lg" align="end" tone={isPediatricContext ? 'red' : TONE[vtSeverity]} />
         </div>
         {scenario.id === 'ards' && mlPerKg !== null && mlPerKg > 8 && (
           <WarningBanner level="red" title="Above lung-protective range">

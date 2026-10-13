@@ -162,6 +162,13 @@ export const BiometricHeader: React.FC = () => {
             </WarningBanner>
           </div>
         )}
+        {!pediatric && patient.heightCm !== null && patient.heightCm < 152.4 && (
+          <div className="mt-1">
+            <WarningBanner level="amber" title="Height below Devine 152.4 cm (5 ft) baseline">
+              Devine formula hit its floor ({patient.sex === 'male' ? '50' : '45.5'} kg) and does not scale below 152.4 cm. Verify tidal volume and IBW against your protocol.
+            </WarningBanner>
+          </div>
+        )}
       </div>
 
       <KeypadModal
