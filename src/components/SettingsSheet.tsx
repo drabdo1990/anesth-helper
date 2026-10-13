@@ -34,10 +34,12 @@ export const SettingsSheet: React.FC = () => {
 
   const clearSaved = () => {
     try {
+      useAppStore.persist?.clearStorage?.();
       localStorage.removeItem('anesthassist-storage');
     } catch {
       /* storage unavailable: nothing to clear */
     }
+    useAppStore.getState().newCase();
     window.location.reload();
   };
 
