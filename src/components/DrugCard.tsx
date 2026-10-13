@@ -64,7 +64,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
   const [showDetails, setShowDetails] = useState(false);
 
   const tbw = biometrics?.tbw ?? null;
-  const applicable = medication.doses.filter((d) => (tbw === null ? !d.weightBandKg : doseAppliesToWeight(d, tbw)));
+  const applicable = tbw === null ? medication.doses : medication.doses.filter((d) => doseAppliesToWeight(d, tbw));
   const dose: MedicationDose | undefined =
     applicable.find((d) => d.id === selectedDoseIds[medication.id]) ?? applicable[0];
 
@@ -86,7 +86,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
   }
 
   const weightBased = isWeightBased(dose);
-  const needsWeight = weightBased && biometrics === null;
+  const needsWeight = (weightBased || dose.weightBandKg !== undefined) && biometrics === null;
   const lo = dose.min ?? dose.default ?? 0;
   const hi = dose.max ?? dose.default ?? lo;
   const value = doseValues[dose.id] ?? dose.default ?? lo;
@@ -223,7 +223,13 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
           </div>
         )}
 
-        {needsWeight && <WarningBanner level="info">Enter actual weight and height to calculate this weight-based dose.</WarningBanner>}
+        {needsWeight && (
+          <WarningBanner level="info">
+            {dose.weightBandKg
+              ? 'Enter actual weight to confirm this weight-banded dose.'
+              : 'Enter actual weight and height to calculate this weight-based dose.'}
+          </WarningBanner>
+        )}
 
         {computed?.kind === 'bolus' && computed.bolus && (
           <div className="grid grid-cols-2 gap-2 border-t border-slate-800 pt-2">

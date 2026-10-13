@@ -139,6 +139,11 @@ describe('weight bands (cefazolin)', () => {
     expect(doseAppliesToWeight(dose('cefazolin-ge120'), 119.9)).toBe(false);
     expect(doseAppliesToWeight(dose('cefazolin-redose'), 50)).toBe(true);
   });
+
+  it('correctly validates lower and upper band bounds', () => {
+    expect(doseAppliesToWeight(dose('cefazolin-lt120'), 70)).toBe(true);
+    expect(doseAppliesToWeight(dose('cefazolin-ge120'), 130)).toBe(true);
+  });
 });
 
 describe('scalar selection', () => {
