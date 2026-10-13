@@ -1,84 +1,55 @@
 import React from 'react';
-import { useAnesthesiaStore, AppTab } from '../store/useAnesthesiaStore';
-import { Calculator, ShieldAlert, Syringe, ClipboardCheck } from 'lucide-react';
+import { Calculator, ClipboardCheck, ShieldAlert, Stethoscope, Wind } from 'lucide-react';
+import { useAppStore, type AppTab } from '../store/useAppStore';
+import { DisclaimerBanner } from './DisclaimerBanner';
 
+const TABS: { id: AppTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'dosing', label: 'Dosing', icon: Calculator },
+  { id: 'airway', label: 'Airway', icon: Stethoscope },
+  { id: 'ventilation', label: 'Vent', icon: Wind },
+  { id: 'checklists', label: 'Lists', icon: ClipboardCheck },
+];
+
+/** Sticky bottom bar: four views plus the always-reachable red Emergency button. */
 export const Navigation: React.FC = () => {
-  const {
-    activeTab,
-    setActiveTab,
-    cprTimerRunning,
-    activeCrisisId,
-    getFractionalToxicity,
-  } = useAnesthesiaStore();
-
-  const toxicity = getFractionalToxicity();
-  const isLocalRisky = toxicity.status === 'caution' || toxicity.status === 'toxic';
-
-  const navItems: { id: AppTab; label: string; icon: React.ComponentType<{ className?: string }>; badge?: React.ReactNode }[] = [
-    {
-      id: 'calculator',
-      label: 'Calculator',
-      icon: Calculator,
-    },
-    {
-      id: 'crisis',
-      label: 'Crisis Cards',
-      icon: ShieldAlert,
-      badge: (cprTimerRunning || activeCrisisId) ? (
-        <span className="absolute top-1.5 right-4 flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
-        </span>
-      ) : null,
-    },
-    {
-      id: 'local_max',
-      label: 'Local Max',
-      icon: Syringe,
-      badge: isLocalRisky ? (
-        <span className={`absolute top-1.5 right-4 px-1 rounded-full text-[9px] font-bold ${
-          toxicity.status === 'toxic' ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-500 text-slate-950'
-        }`}>
-          {toxicity.percentageUsed}%
-        </span>
-      ) : null,
-    },
-    {
-      id: 'pacu',
-      label: 'Routine & PACU',
-      icon: ClipboardCheck,
-    },
-  ];
+  const activeTab = useAppStore((s) => s.activeTab);
+  const setActiveTab = useAppStore((s) => s.setActiveTab);
+  const openEmergency = useAppStore((s) => s.openEmergency);
+  const emergencyOpen = useAppStore((s) => s.emergencyOpen);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-t border-slate-800 pb-safe">
-      <div className="grid grid-cols-4 max-w-4xl mx-auto h-16">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-[#090d16]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
+      {/* Permanent disclaimer: pinned directly above the nav so it is visible on every screen. */}
+      <DisclaimerBanner />
+      <nav aria-label="Main" className="mx-auto flex max-w-4xl items-stretch gap-1 px-1.5 py-1.5">
+        {TABS.map(({ id, label, icon: Icon }) => {
+          const active = activeTab === id;
           return (
             <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`relative flex flex-col items-center justify-center gap-1 select-none transition-colors touch-target ${
-                isActive
-                  ? 'text-cyan-400 font-bold'
-                  : 'text-slate-400 hover:text-slate-200 font-medium'
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              aria-current={active ? 'page' : undefined}
+              className={`flex min-h-[56px] min-w-[56px] flex-1 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold touch-manipulation ${
+                active ? 'bg-cyan-500/15 text-cyan-300' : 'text-slate-400'
               }`}
             >
-              <div className={`p-1 rounded-lg transition-transform ${isActive ? 'scale-110 bg-cyan-500/10' : ''}`}>
-                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
-              </div>
-              <span className="text-[11px] tracking-tight">{item.label}</span>
-              {item.badge}
-              {isActive && (
-                <span className="absolute bottom-1 w-8 h-0.5 bg-cyan-400 rounded-full shadow-glow-cyan" />
-              )}
+              <Icon className="h-5 w-5" />
+              {label}
             </button>
           );
         })}
-      </div>
-    </nav>
+        <button
+          type="button"
+          onClick={() => openEmergency()}
+          aria-haspopup="dialog"
+          aria-expanded={emergencyOpen}
+          className="flex min-h-[56px] min-w-[72px] flex-col items-center justify-center gap-0.5 rounded-xl bg-red-500 text-[11px] font-black uppercase text-white shadow-glow-red touch-manipulation active:bg-red-600"
+        >
+          <ShieldAlert className="h-6 w-6" />
+          SOS
+        </button>
+      </nav>
+    </div>
   );
 };

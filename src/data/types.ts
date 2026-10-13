@@ -1,0 +1,160 @@
+// Data models for the versioned clinical reference layer (spec §12, extended).
+// Every clinical record carries sourceIds that must resolve in sources.ts (enforced by tests).
+
+export type WeightScalar = 'TBW' | 'IBW' | 'LBW' | 'ABW40';
+
+/** Where the weight scalar choice comes from. */
+export type ScalarBasis = 'label' | 'literature' | 'unspecified';
+
+export type SourceVerification = 'primary' | 'label' | 'secondary';
+
+export interface ClinicalSource {
+  id: string;
+  /** Short badge text, e.g. "ASRA LAST", "Product label". */
+  tag: string;
+  name: string;
+  publisher: string;
+  year: string;
+  version?: string;
+  url?: string;
+  tier: 1 | 2 | 3 | 4;
+  scope: string[];
+  /** How the content in this build was checked. */
+  verification: SourceVerification;
+  /** Plain-language note on what could and could not be accessed. */
+  accessNote?: string;
+}
+
+export type DoseUnit = 'mg/kg' | 'mcg/kg' | 'mg' | 'mcg' | 'mcg/kg/min' | 'mcg/min';
+
+export interface AbsoluteMax {
+  value: number;
+  unit: 'mg' | 'mcg' | 'mL' | 'mcg/min';
+  /** e.g. "cumulative" when the ceiling is not per dose. */
+  scope?: string;
+}
+
+export interface MedicationDose {
+  id: string;
+  indication: string;
+  min?: number;
+  max?: number;
+  default?: number;
+  unit: DoseUnit;
+  /** Ignored for fixed (mg, mcg, mcg/min) units. */
+  scalar?: WeightScalar;
+  scalarBasis?: ScalarBasis;
+  absoluteMax?: AbsoluteMax;
+  /** Applies only inside this actual-body-weight band (e.g. cefazolin 3 g at >=120 kg). */
+  weightBandKg?: { min?: number; max?: number };
+  notes?: string[];
+  sourceIds: string[];
+}
+
+export interface MedicationConcentration {
+  label: string;
+  mgPerMl: number;
+  sourceId: string;
+  /** Needs dilution before IV use (e.g. ketamine 100 mg/mL). */
+  requiresDilution?: boolean;
+}
+
+export type MedicationCategory =
+  | 'preinduction'
+  | 'induction'
+  | 'opioids'
+  | 'nmba'
+  | 'reversal'
+  | 'vasoactive'
+  | 'postoperative'
+  | 'local';
+
+export type MedicationPhase = 'preinduction' | 'induction' | 'maintenance' | 'emergence' | 'postoperative';
+
+export interface Medication {
+  id: string;
+  name: string;
+  class: string;
+  category: MedicationCategory;
+  phase: MedicationPhase;
+  doses: MedicationDose[];
+  concentrations: MedicationConcentration[];
+  preparation?: string[];
+  cautions?: string[];
+  /** Companion drug dosed as a ratio of this drug's calculated mass. */
+  companion?: { name: string; ratioMgPerMg: number; concentrationMgPerMl: number; sourceId: string };
+  sourceIds: string[];
+}
+
+export interface CategoryPlaceholder {
+  category: MedicationCategory;
+  /** Topic with no sourced content in this build, e.g. "Aspiration prophylaxis". */
+  topic: string;
+}
+
+export interface LocalAnestheticLimitRecord {
+  /** Primary limit used in calculations. */
+  mgPerKg?: number;
+  absoluteMaxMg?: number;
+  sourceIds: string[];
+  note?: string;
+}
+
+export interface LocalAnestheticAlternate {
+  label: string;
+  absoluteMaxMg?: number;
+  mgPerKg?: number;
+  sourceId: string;
+}
+
+export interface LocalAnesthetic {
+  id: string;
+  name: string;
+  plain?: LocalAnestheticLimitRecord;
+  withEpinephrine?: LocalAnestheticLimitRecord;
+  /** Conflicting or additional published figures, shown beside the default. */
+  alternates?: LocalAnestheticAlternate[];
+  concentrationsPercent: number[];
+  cautions?: string[];
+  sourceIds: string[];
+}
+
+export interface AirwayDeviceRule {
+  id: string;
+  device: string;
+  population: 'adult' | 'pediatric' | 'neonate';
+  basis: 'age' | 'weight' | 'height' | 'sex' | 'clinical';
+  recommendedSize?: string;
+  sizeRange?: string;
+  depth?: string;
+  cautions?: string[];
+  sourceIds: string[];
+}
+
+export interface VentilationScenario {
+  id: string;
+  name: string;
+  tidalVolumeMlPerKgPbw?: { target: number; min: number; max: number; targetIsAssumed?: boolean };
+  respiratoryRate?: { min: number; max: number; default: number };
+  peep?: { min: number; max: number; default: number };
+  plateauPressureLimit?: number;
+  cautions?: string[];
+  /** Topics with no sourced value for this scenario. */
+  unsourced?: string[];
+  sourceIds: string[];
+}
+
+export interface ChecklistItemRecord {
+  id: string;
+  text: string;
+  sourceIds: string[];
+}
+
+export interface ChecklistRecord {
+  id: string;
+  title: string;
+  note?: string;
+  items: ChecklistItemRecord[];
+}
+
+export const NO_SOURCE_VALUE = 'No high-quality source value specified';

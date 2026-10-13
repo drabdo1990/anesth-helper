@@ -1,0 +1,146 @@
+// Airway device sizing reference. Only rules traceable to a named source are included.
+// Anything else (adult ETT size, adult blades, face masks, double-lumen tubes, bougie sizing)
+// is listed in AIRWAY_UNSOURCED and shown as "No high-quality source value specified".
+
+import type { AirwayDeviceRule } from './types';
+
+/** Pediatric ETT validity window in years (the source calculator covers ages 1 to 8). */
+export const PEDS_ETT_AGE_RANGE_YEARS = { min: 1, max: 8 } as const;
+
+export interface PedsEttFormula {
+  id: string;
+  label: string;
+  /** ID (mm) = ageYears / 4 + constant */
+  constant: number;
+  cuffed: boolean;
+  sourceId: string;
+}
+
+export const PEDS_ETT_FORMULAS: PedsEttFormula[] = [
+  { id: 'cuffed-msd', label: 'Cuffed: age/4 + 3.5', constant: 3.5, cuffed: true, sourceId: 'msd-peds-ett' },
+  { id: 'cuffed-iowa', label: 'Cuffed (alternate): age/4 + 3', constant: 3, cuffed: true, sourceId: 'iowa-peds-ett' },
+  { id: 'uncuffed-msd', label: 'Uncuffed: age/4 + 4', constant: 4, cuffed: false, sourceId: 'msd-peds-ett' },
+];
+
+/** Oral ETT depth (cm) = 3 x internal diameter (mm), per the MSD calculator source. */
+export const PEDS_ETT_DEPTH_FACTOR = 3;
+
+export interface LmaSizeBand {
+  size: string;
+  /** Patient weight band in kg: from (exclusive) to (inclusive); null = open ended. */
+  fromKg: number | null;
+  toKg: number | null;
+  maxCuffVolumeMl: number;
+}
+
+/** LMA Classic sizes by weight (Teleflex); cuff volumes from the e-safe table (ceiling, not target). */
+export const LMA_BANDS: LmaSizeBand[] = [
+  { size: '1', fromKg: null, toKg: 5, maxCuffVolumeMl: 4 },
+  { size: '1.5', fromKg: 5, toKg: 10, maxCuffVolumeMl: 7 },
+  { size: '2', fromKg: 10, toKg: 20, maxCuffVolumeMl: 10 },
+  { size: '2.5', fromKg: 20, toKg: 30, maxCuffVolumeMl: 14 },
+  { size: '3', fromKg: 30, toKg: 50, maxCuffVolumeMl: 20 },
+  { size: '4', fromKg: 50, toKg: 70, maxCuffVolumeMl: 30 },
+  { size: '5', fromKg: 70, toKg: 100, maxCuffVolumeMl: 40 },
+  { size: '6', fromKg: 100, toKg: null, maxCuffVolumeMl: 50 },
+];
+
+export const LMA_MAX_CUFF_PRESSURE_CMH2O = 60;
+
+export interface BladeBand {
+  label: string;
+  /** Age band in months: from (inclusive) to (exclusive). */
+  fromMonths: number;
+  toMonths: number;
+  blade: string;
+}
+
+/** Pediatric laryngoscope blade by age (WikEM). Ages not listed here have no sourced value. */
+export const PEDS_BLADES: BladeBand[] = [
+  { label: 'Neonate', fromMonths: 0, toMonths: 1, blade: 'Miller 0' },
+  { label: 'About 6 months to 1 year', fromMonths: 6, toMonths: 12, blade: 'Miller 1' },
+  { label: '2 to 3 years', fromMonths: 24, toMonths: 48, blade: 'Miller 1.5' },
+  { label: '4 to 6 years', fromMonths: 48, toMonths: 84, blade: 'Miller 2 or Macintosh 2' },
+];
+
+export const AIRWAY_RULES: AirwayDeviceRule[] = [
+  {
+    id: 'peds-ett-cuffed',
+    device: 'Endotracheal tube, cuffed',
+    population: 'pediatric',
+    basis: 'age',
+    sizeRange: 'Age 1 to 8 years',
+    depth: 'Oral depth = 3 x internal diameter (cm)',
+    cautions: [
+      'Two published cuffed formulas differ by 0.5 mm; check the alternate value and have the next size up and down ready.',
+      'Confirm tube position with capnography and auscultation; check cuff pressure.',
+    ],
+    sourceIds: ['msd-peds-ett', 'iowa-peds-ett', 'asa-airway-2022'],
+  },
+  {
+    id: 'peds-ett-uncuffed',
+    device: 'Endotracheal tube, uncuffed',
+    population: 'pediatric',
+    basis: 'age',
+    sizeRange: 'Age 1 to 8 years',
+    depth: 'Oral depth = 3 x internal diameter (cm)',
+    sourceIds: ['msd-peds-ett'],
+  },
+  {
+    id: 'lma-classic',
+    device: 'Laryngeal mask airway (LMA Classic)',
+    population: 'adult',
+    basis: 'weight',
+    sizeRange: 'Size 1 to 6 by weight band',
+    cautions: [
+      'Weight-based sizing is approximate.',
+      'Maximum cuff volume is a ceiling, not a target. Maximum cuff pressure 60 cmH2O.',
+    ],
+    sourceIds: ['teleflex-lma', 'esafe-lma-cuff'],
+  },
+  {
+    id: 'peds-blade',
+    device: 'Laryngoscope blade',
+    population: 'pediatric',
+    basis: 'age',
+    cautions: ['Verify against a current pediatric resuscitation reference.'],
+    sourceIds: ['wikem-peds-airway'],
+  },
+  {
+    id: 'opa',
+    device: 'Oropharyngeal airway',
+    population: 'adult',
+    basis: 'clinical',
+    recommendedSize: 'Landmark: centre of the incisors to the angle of the mandible, measured with the airway on the face',
+    sourceIds: ['rch-airway'],
+  },
+  {
+    id: 'npa',
+    device: 'Nasopharyngeal airway',
+    population: 'adult',
+    basis: 'clinical',
+    recommendedSize: 'Landmark: tip of the nose to the tragus',
+    sourceIds: ['wikem-peds-airway'],
+  },
+];
+
+/** Airway topics with no sourced size/depth in this build. */
+export const AIRWAY_UNSOURCED: string[] = [
+  'Adult oral ETT size and depth',
+  'Adult nasal ETT size and depth',
+  'Pediatric ETT outside 1 to 8 years (neonates, infants, older children)',
+  'Adult direct laryngoscope blade',
+  'Video laryngoscope blade',
+  'Face-mask size',
+  'Double-lumen tube / bronchial blocker size',
+  'Bougie and stylet sizing',
+  'Pediatric laryngoscope blade for ages not listed (1 to 6 months, 12 to 24 months, above 6 years)',
+];
+
+/** Principles shown on the Airway tab, from the ASA difficult airway guideline. */
+export const AIRWAY_PRINCIPLES: { text: string; sourceIds: string[] }[] = [
+  { text: 'Preoxygenate and keep supplemental oxygen going throughout airway management.', sourceIds: ['asa-airway-2022'] },
+  { text: 'Confirm tracheal intubation with capnography.', sourceIds: ['asa-airway-2022'] },
+  { text: 'Limit repeated attempts at any one technique; track time and oxygen saturation.', sourceIds: ['asa-airway-2022'] },
+  { text: 'Escalate early when ventilation or oxygenation fails; do not delay invasive airway access when CICO is declared.', sourceIds: ['asa-airway-2022'] },
+];

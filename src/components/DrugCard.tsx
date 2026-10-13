@@ -1,222 +1,287 @@
 import React, { useState } from 'react';
-import { FormularyDrug } from '../types/anesthesia';
-import { useAnesthesiaStore } from '../store/useAnesthesiaStore';
-import { AlertTriangle, Info, Clock, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, FlaskConical, ShieldCheck } from 'lucide-react';
+import type { Medication, MedicationDose, WeightScalar } from '../data/types';
+import { resolveWithOverrides } from '../data/resolve';
+import { useAppStore } from '../store/useAppStore';
+import type { Biometrics } from '../lib/calc/biometrics';
+import { formatMcg, formatMg, formatMl } from '../lib/calc/format';
+import {
+  computeMedicationDose,
+  doseAppliesToWeight,
+  isWeightBased,
+  resolveConcentrationIndex,
+  scalarWeightKg,
+  type DoseComputation,
+} from '../lib/calc/medication';
+import { ConcentrationSelector } from './ui/ConcentrationSelector';
+import { NumericStepper } from './ui/NumericStepper';
+import { SegmentedControl } from './ui/SegmentedControl';
+import { SourceBadge } from './ui/SourceBadge';
+import { UnitValue } from './ui/UnitValue';
+import { WarningBanner } from './ui/WarningBanner';
+import { WeightScalarBadge } from './ui/WeightScalarBadge';
+
+const NICE_STEPS = [0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 25, 50, 100];
+
+const stepFor = (min: number, max: number): number => {
+  const ideal = (max - min) / 20;
+  return NICE_STEPS.find((s) => s >= ideal) ?? 100;
+};
+
+const decimalsFor = (step: number): number => (step.toString().split('.')[1] ?? '').length;
+
+/** mL: one decimal place, but two below 1 mL so small syringe volumes are not shown as 0.0. */
+const fmtVolume = (ml: number): string => (ml < 1 ? ml.toFixed(2) : formatMl(ml));
+
+const fmtMass = (mass: number, unit: 'mg' | 'mcg'): string => (unit === 'mg' ? formatMg(mass) : formatMcg(mass));
+
+const STUB_BIOMETRICS: Biometrics = { tbw: 0, bmi: 0, pbw: 0, ibw: 0, abw40: 0, lbw: 0 };
+
+const SCALARS: { value: WeightScalar; label: string }[] = [
+  { value: 'TBW', label: 'TBW' },
+  { value: 'IBW', label: 'IBW' },
+  { value: 'LBW', label: 'LBW' },
+  { value: 'ABW40', label: 'ABW40' },
+];
 
 interface DrugCardProps {
-  drug: FormularyDrug;
+  medication: Medication;
+  biometrics: Biometrics | null;
 }
 
-export const DrugCard: React.FC<DrugCardProps> = ({ drug }) => {
-  const { computeDose, selectedTiers, setSelectedTier } = useAnesthesiaStore();
+export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) => {
+  const selectedDoseIds = useAppStore((s) => s.selectedDose);
+  const setSelectedDose = useAppStore((s) => s.setSelectedDose);
+  const doseValues = useAppStore((s) => s.doseValues);
+  const setDoseValue = useAppStore((s) => s.setDoseValue);
+  const scalarOverrides = useAppStore((s) => s.scalarOverrides);
+  const setScalarOverride = useAppStore((s) => s.setScalarOverride);
+  const concentrationChoice = useAppStore((s) => s.concentrationChoice);
+  const setConcentrationChoice = useAppStore((s) => s.setConcentrationChoice);
+  const preferredScalar = useAppStore((s) => s.preferredScalar);
+  const guidelineSet = useAppStore((s) => s.guidelineSet);
+  const touchRecent = useAppStore((s) => s.touchRecent);
   const [showDetails, setShowDetails] = useState(false);
 
-  // Compute dose for active tier
-  const activeTierId = selectedTiers[drug.id] || drug.dosing[0].id;
-  const computed = computeDose(drug, activeTierId);
+  const tbw = biometrics?.tbw ?? null;
+  const applicable = medication.doses.filter((d) => (tbw === null ? !d.weightBandKg : doseAppliesToWeight(d, tbw)));
+  const dose: MedicationDose | undefined =
+    applicable.find((d) => d.id === selectedDoseIds[medication.id]) ?? applicable[0];
 
-  // Category badge colors
-  const getCategoryTheme = (cat: string) => {
-    switch (cat) {
-      case 'Induction':
-        return { border: 'border-cyan-500/30', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' };
-      case 'NMBA':
-        return { border: 'border-amber-500/30', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' };
-      case 'Reversal':
-        return { border: 'border-emerald-500/30', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' };
-      case 'Vasopressor':
-        return { border: 'border-purple-500/30', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20' };
-      case 'Emergency':
-        return { border: 'border-rose-500/40', badge: 'bg-rose-500/20 text-rose-400 border-rose-500/30' };
-      default:
-        return { border: 'border-slate-800', badge: 'bg-slate-800 text-slate-300 border-slate-700' };
-    }
-  };
+  // The saved choice is a strength (mg/mL), matched against the current data. If the data changed and
+  // that strength no longer exists, fall back to the first listed concentration.
+  const concIndex = resolveConcentrationIndex(medication.concentrations, concentrationChoice[medication.id]);
+  const conc = medication.concentrations[concIndex];
 
-  const theme = getCategoryTheme(drug.category);
+  if (!dose) {
+    return (
+      <article className="rounded-2xl border border-slate-800 bg-[#131b2e] p-4">
+        <h3 className="text-lg font-bold text-slate-100">{medication.name}</h3>
+        <WarningBanner level="info">Enter actual weight to select the applicable dose band.</WarningBanner>
+        <div className="mt-2">
+          <SourceBadge sourceIds={medication.sourceIds} />
+        </div>
+      </article>
+    );
+  }
 
-  // Scalar badge styling
-  const getScalarBadge = (scalar: string, weightKg: number) => {
-    switch (scalar) {
-      case 'LBW':
-        return { label: `LBW: ${weightKg} kg`, cls: 'bg-cyan-950 text-cyan-300 border-cyan-700/50' };
-      case 'IBW':
-        return { label: `IBW: ${weightKg} kg`, cls: 'bg-amber-950 text-amber-300 border-amber-700/50' };
-      case 'ABW40':
-        return { label: `ABW40: ${weightKg} kg`, cls: 'bg-emerald-950 text-emerald-300 border-emerald-700/50' };
-      case 'TBW':
-        return { label: `TBW: ${weightKg} kg`, cls: 'bg-slate-800 text-slate-300 border-slate-700' };
-      case 'FIXED':
-      default:
-        return { label: 'Fixed Dose', cls: 'bg-purple-950 text-purple-300 border-purple-700/50' };
-    }
-  };
+  const weightBased = isWeightBased(dose);
+  const needsWeight = weightBased && biometrics === null;
+  const lo = dose.min ?? dose.default ?? 0;
+  const hi = dose.max ?? dose.default ?? lo;
+  const value = doseValues[dose.id] ?? dose.default ?? lo;
+  const adjustable = hi > lo;
 
-  const scalarBadge = getScalarBadge(computed.appliedScalar, computed.scalarWeightUsedKg);
+  const prefApplies = weightBased && preferredScalar !== 'auto' && dose.scalarBasis !== 'label';
+  const scalar: WeightScalar | undefined = weightBased
+    ? (scalarOverrides[dose.id] ?? (prefApplies ? (preferredScalar as WeightScalar) : dose.scalar) ?? 'TBW')
+    : undefined;
+
+  const resolvedMax = dose.absoluteMax
+    ? resolveWithOverrides(`dose-max:${dose.id}`, dose.absoluteMax.value, guidelineSet)
+    : null;
+
+  const computed: DoseComputation | null = needsWeight
+    ? null
+    : computeMedicationDose(dose, value, conc.mgPerMl, biometrics ?? STUB_BIOMETRICS, {
+        scalarOverride: scalar,
+        absoluteMax: dose.absoluteMax && resolvedMax ? { ...dose.absoluteMax, value: resolvedMax.value } : undefined,
+        companion: medication.companion
+          ? {
+              name: medication.companion.name,
+              ratioMgPerMg: medication.companion.ratioMgPerMg,
+              concentrationMgPerMl: medication.companion.concentrationMgPerMl,
+            }
+          : undefined,
+      });
+
+  const step = adjustable ? stepFor(lo, hi) : 0;
+  const maxLabel = dose.absoluteMax
+    ? `${resolvedMax?.value ?? dose.absoluteMax.value} ${dose.absoluteMax.unit}${dose.absoluteMax.scope ? ` (${dose.absoluteMax.scope})` : ''}`
+    : '';
+
+  const maxTone =
+    computed?.max === 'exceeds' || computed?.max === 'at-limit'
+      ? 'red'
+      : computed?.percentOfMax !== undefined && computed.percentOfMax >= 90
+        ? 'amber'
+        : null;
+
+  const sourceIds = [...new Set([...dose.sourceIds, conc.sourceId, ...(resolvedMax?.tag === 'Local protocol' ? ['local-protocol'] : [])])];
 
   return (
-    <div className={`bg-[#131b2e] border ${theme.border} rounded-2xl p-4 shadow-lg hover:border-slate-700 transition-all flex flex-col justify-between gap-3`}>
-      {/* Top Header: Name, Category, Vial Conc */}
-      <div>
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg font-bold text-slate-100 tracking-tight leading-none">
-                {drug.name}
-              </h2>
-              {drug.genericName && drug.genericName !== drug.name && (
-                <span className="text-xs text-slate-400 italic">({drug.genericName})</span>
-              )}
-            </div>
-            {drug.subcategory && (
-              <span className="text-[11px] text-slate-400 font-medium block mt-0.5">
-                {drug.subcategory}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${theme.badge}`}>
-              {drug.category}
-            </span>
-          </div>
+    <article className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-[#131b2e] p-3 shadow-lg sm:p-4">
+      <header className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="text-lg font-bold leading-tight text-slate-100">{medication.name}</h3>
+          <p className="text-xs text-slate-400">{medication.class}</p>
         </div>
+        <SourceBadge sourceIds={sourceIds} />
+      </header>
 
-        {/* Standard Vial Concentration Tag */}
-        <div className="mt-1 flex items-center gap-2 text-xs">
-          <span className="text-slate-400 font-medium">Standard Conc:</span>
-          <span className="font-mono font-semibold text-slate-200 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
-            {drug.concentrationDisplay}
-          </span>
-        </div>
-      </div>
-
-      {/* Multiple Tiers Selector Buttons (Touch Targets >= 44px) */}
-      {drug.dosing.length > 1 && (
-        <div className="bg-slate-950/70 p-1 rounded-xl border border-slate-800 flex flex-col gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 px-1 uppercase tracking-wider">
-            Clinical Dosing Tier:
-          </span>
-          <div className="grid grid-cols-1 gap-1">
-            {drug.dosing.map((tier) => {
-              const isSelected = tier.id === activeTierId;
-              return (
-                <button
-                  key={tier.id}
-                  onClick={() => setSelectedTier(drug.id, tier.id)}
-                  className={`text-left text-xs font-semibold px-2.5 py-2 rounded-lg transition-colors flex items-center justify-between touch-target select-none ${
-                    isSelected
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-                      : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
-                  }`}
-                >
-                  <span className="truncate">{tier.label}</span>
-                  <span className="font-mono text-[11px] text-slate-400 shrink-0 ml-1">
-                    {tier.weightScalar}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+      {applicable.length > 1 && (
+        <div className="flex flex-col gap-1.5" role="radiogroup" aria-label="Dose / indication">
+          {applicable.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              role="radio"
+              aria-checked={d.id === dose.id}
+              onClick={() => {
+                setSelectedDose(medication.id, d.id);
+                touchRecent(medication.id);
+              }}
+              className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs font-semibold touch-manipulation ${
+                d.id === dose.id ? 'border-cyan-400 bg-cyan-500/15 text-cyan-100' : 'border-slate-700 bg-slate-900 text-slate-300'
+              }`}
+            >
+              {d.indication}
+            </button>
+          ))}
         </div>
       )}
+      {applicable.length === 1 && <p className="text-sm font-semibold text-slate-200">{dose.indication}</p>}
 
-      {/* Core Calculated Dose Box (Mass & Exact Volume in mL) */}
-      <div className="bg-slate-950 border border-slate-800/90 rounded-xl p-3 shadow-inner flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Calculated Dose</span>
-          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${scalarBadge.cls}`}>
-            [{scalarBadge.label}]
+      {/* Absolute-maximum warning goes ABOVE the result so it cannot be missed. */}
+      {computed && maxTone && (
+        <WarningBanner level={maxTone} title={computed.max === 'exceeds' ? 'Exceeds absolute maximum' : computed.max === 'at-limit' ? 'Reaches absolute maximum' : 'Approaching absolute maximum'}>
+          Calculated dose is {computed.percentOfMax !== undefined ? `${Math.round(computed.percentOfMax)}% of` : 'at'} the ceiling of {maxLabel}. Do not
+          exceed the ceiling. {resolvedMax?.tag === 'Local protocol' && 'Ceiling set by Local protocol.'}
+        </WarningBanner>
+      )}
+      {resolvedMax?.conflict && (
+        <WarningBanner level="amber" title="Guideline vs local protocol">
+          Guideline ceiling {resolvedMax.guidelineValue}, local protocol {resolvedMax.localValue}. {resolvedMax.origin === 'local-selected' ? 'Using local protocol.' : 'Using the guideline value; select "Use local protocol" in Settings to use the local value.'}
+        </WarningBanner>
+      )}
+      {conc.requiresDilution && (
+        <WarningBanner level="amber" title="Dilute before IV use">
+          The {conc.label} presentation must be diluted per the preparation notes before intravenous use.
+        </WarningBanner>
+      )}
+
+      <div className="grid grid-cols-1 gap-2 rounded-xl border border-slate-800 bg-slate-950 p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-xs text-slate-400">
+            Source range: {dose.min ?? dose.default}
+            {dose.max !== undefined && dose.max !== dose.min ? `-${dose.max}` : ''} {dose.unit}
           </span>
+          {scalar && scalarWeightKgOrNull(biometrics, scalar) !== null && (
+            <WeightScalarBadge scalar={scalar} kg={scalarWeightKgOrNull(biometrics, scalar) ?? 0} basis={dose.scalarBasis} />
+          )}
         </div>
 
-        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900">
-          {/* Mass Display */}
-          <div className="flex flex-col">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Mass</span>
-            <span className="text-xl sm:text-2xl font-mono font-black text-slate-100 tracking-tight">
-              {computed.massRangeDisplay}
-            </span>
-          </div>
+        {adjustable ? (
+          <NumericStepper
+            label="Selected dose"
+            value={value}
+            unit={dose.unit}
+            step={step}
+            min={lo}
+            max={hi}
+            decimals={decimalsFor(step)}
+            onChange={(v) => {
+              setDoseValue(dose.id, v);
+              touchRecent(medication.id);
+            }}
+            allowKeypad
+            keypadTitle={`Selected dose (${dose.unit})`}
+          />
+        ) : (
+          <UnitValue label="Selected dose" value={String(value)} unit={dose.unit} tone="neutral" size="md" />
+        )}
 
-          {/* Volume Display */}
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] text-cyan-400 uppercase font-semibold">Volume to Push</span>
-            <span className="text-xl sm:text-2xl font-mono font-black text-cyan-400 tracking-tight">
-              {computed.volumeRangeDisplayMl}
-            </span>
-          </div>
-        </div>
-
-        {/* Absolute Dose Ceiling Warning */}
-        {computed.isCapped && (
-          <div className="mt-1 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 flex items-center gap-2 text-amber-300 text-xs font-medium">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
-            <span>
-              <strong>Safe Ceiling Reached:</strong> Dose capped at maximum allowed adult ceiling ({computed.absoluteMaxDose} mg).
-            </span>
+        {weightBased && (
+          <div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Weight scalar</span>
+            <SegmentedControl
+              ariaLabel="Weight scalar"
+              value={scalar ?? 'TBW'}
+              options={SCALARS}
+              onChange={(s) => setScalarOverride(dose.id, s)}
+            />
           </div>
         )}
 
-        {/* Companion Drug (e.g. Neostigmine + Glycopyrrolate) */}
-        {computed.companionDrug && (
-          <div className="mt-1 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 flex flex-col gap-1 text-xs">
-            <div className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wide text-[10px]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Paired Antimuscarinic Dose
-            </div>
-            <div className="flex items-center justify-between text-slate-200">
-              <span className="font-semibold">{computed.companionDrug.name}:</span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-emerald-300">{computed.companionDrug.doseDisplay}</span>
-                <span className="font-mono font-bold text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
-                  {computed.companionDrug.volumeDisplay}
-                </span>
-              </div>
-            </div>
+        {needsWeight && <WarningBanner level="info">Enter actual weight and height to calculate this weight-based dose.</WarningBanner>}
+
+        {computed?.kind === 'bolus' && computed.bolus && (
+          <div className="grid grid-cols-2 gap-2 border-t border-slate-800 pt-2">
+            <UnitValue label="Total" value={fmtMass(computed.bolus.mass, computed.bolus.massUnit)} unit={computed.bolus.massUnit} size="lg" tone={computed.max === 'ok' ? 'neutral' : 'red'} />
+            <UnitValue label={`Volume at ${conc.label}`} value={fmtVolume(computed.bolus.volumeMl)} unit="mL" size="lg" tone="cyan" align="end" />
+          </div>
+        )}
+        {computed?.kind === 'infusion' && computed.infusion && (
+          <div className="grid grid-cols-2 gap-2 border-t border-slate-800 pt-2">
+            <UnitValue label="Rate" value={computed.infusion.mcgPerMin.toFixed(1)} unit="mcg/min" size="lg" tone={computed.max === 'ok' ? 'neutral' : 'red'} />
+            <UnitValue label={`Pump at ${conc.label}`} value={computed.infusion.mlPerHr.toFixed(1)} unit="mL/hr" size="lg" tone="cyan" align="end" />
+          </div>
+        )}
+
+        {computed?.companion && (
+          <div className="flex items-center justify-between gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs">
+            <span className="flex items-center gap-1 font-bold uppercase text-emerald-300">
+              <ShieldCheck className="h-4 w-4" /> {computed.companion.name}
+            </span>
+            <span className="font-mono font-bold tabular-nums text-emerald-200">
+              {formatMg(computed.companion.massMg)} mg = {fmtVolume(computed.companion.volumeMl)} mL
+            </span>
           </div>
         )}
       </div>
 
-      {/* Clinical Notes & Pearl Toggle */}
+      <ConcentrationSelector
+        options={medication.concentrations}
+        selectedIndex={concIndex}
+        onChange={(i) => setConcentrationChoice(medication.id, medication.concentrations[i].mgPerMl)}
+      />
+
       <div>
         <button
+          type="button"
           onClick={() => setShowDetails(!showDetails)}
-          className="w-full flex items-center justify-between text-xs text-slate-400 hover:text-cyan-300 py-1 transition-colors select-none"
+          className="flex min-h-[48px] w-full items-center justify-between text-xs font-semibold text-slate-400 hover:text-cyan-300"
+          aria-expanded={showDetails}
         >
           <span className="flex items-center gap-1">
-            <Info className="w-3.5 h-3.5" />
-            Clinical Notes & Pharmacokinetics
+            <FlaskConical className="h-4 w-4" /> Preparation, cautions and notes
           </span>
-          {showDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
-
         {showDetails && (
-          <div className="mt-2 pt-2 border-t border-slate-800/80 flex flex-col gap-2 text-xs text-slate-300 animate-fade-in">
-            {computed.notes && (
-              <p className="text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-                <strong className="text-slate-300">Dosing rule:</strong> {computed.notes}
-              </p>
+          <ul className="mt-1 flex list-disc flex-col gap-1 pl-5 text-xs text-slate-300">
+            {[...(dose.notes ?? []), ...(medication.preparation ?? []), ...(medication.cautions ?? [])].map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+            {[...(dose.notes ?? []), ...(medication.preparation ?? []), ...(medication.cautions ?? [])].length === 0 && (
+              <li className="list-none text-slate-500">No additional notes in the selected sources.</li>
             )}
-
-            <p className="leading-relaxed">
-              <strong className="text-cyan-400">Clinical Pearl:</strong> {drug.clinicalPearl}
-            </p>
-
-            {(drug.onset || drug.duration) && (
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-cyan-400" />
-                  <span>Onset: <strong className="text-slate-200">{drug.onset}</strong></span>
-                </div>
-                <div>
-                  <span>Duration: <strong className="text-slate-200">{drug.duration}</strong></span>
-                </div>
-              </div>
-            )}
-          </div>
+          </ul>
         )}
       </div>
-    </div>
+    </article>
   );
 };
+
+const scalarWeightKgOrNull = (b: Biometrics | null, s: WeightScalar): number | null =>
+  b === null ? null : scalarWeightKg(b, s);

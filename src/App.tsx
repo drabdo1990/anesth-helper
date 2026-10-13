@@ -1,84 +1,81 @@
-import React from 'react';
-import { useAnesthesiaStore } from './store/useAnesthesiaStore';
+import React, { useEffect, useState } from 'react';
+import { Activity, BookOpen, Settings, WifiOff } from 'lucide-react';
+import { useAppStore } from './store/useAppStore';
 import { BiometricHeader } from './components/BiometricHeader';
+import { EmergencyOverlay } from './components/EmergencyOverlay';
 import { Navigation } from './components/Navigation';
-import { DisclaimerBanner } from './components/DisclaimerBanner';
-import { CalculatorView } from './views/CalculatorView';
-import { CrisisView } from './views/CrisisView';
-import { LocalMaxView } from './views/LocalMaxView';
-import { RoutineChecklistsView } from './views/RoutineChecklistsView';
-import { Activity, Zap, WifiOff } from 'lucide-react';
+import { SettingsSheet } from './components/SettingsSheet';
+import { AirwayView } from './views/AirwayView';
+import { ChecklistsView } from './views/ChecklistsView';
+import { DosingView } from './views/DosingView';
+import { ReferencesView } from './views/ReferencesView';
+import { VentilationView } from './views/VentilationView';
 
 export const App: React.FC = () => {
-  const { activeTab, activeCrisisId } = useAnesthesiaStore();
-  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
+  const activeTab = useAppStore((s) => s.activeTab);
+  const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
+  const setReferencesOpen = useAppStore((s) => s.setReferencesOpen);
+  const [online, setOnline] = useState(navigator.onLine);
 
-  React.useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
     };
   }, []);
 
+  const iconBtn =
+    'flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 touch-manipulation';
+
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden w-full max-w-full">
-      {/* Top Application Bar */}
-      <div className="bg-[#090d16] border-b border-slate-800/80 px-3 sm:px-4 py-2">
-        <div className="max-w-4xl mx-auto flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center text-slate-950 font-black shadow-glow-cyan">
-            <Activity className="w-4 h-4 stroke-[2.8]" />
-          </div>
-          <div>
-            <h1 className="text-sm font-black tracking-wider uppercase text-slate-100 flex items-center gap-1.5 leading-none">
-              <span>AnesthAssist</span>
-              <span className="text-[9px] font-mono font-bold text-cyan-400 bg-cyan-950 px-1.5 py-0.2 rounded border border-cyan-800">
-                PWA
-              </span>
-            </h1>
-            <p className="text-[10px] text-slate-400 leading-tight">OR Decision Support</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Zero latency client-side badge */}
-          <div className="hidden sm:flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2 py-0.5 rounded-full font-mono">
-            <Zap className="w-3 h-3" />
-            <span>Zero-Latency Engine</span>
-          </div>
-
-          {!isOnline && (
-            <div className="flex items-center gap-1 text-[10px] text-amber-400 bg-amber-950/60 border border-amber-800 px-2 py-0.5 rounded-full font-mono">
-              <WifiOff className="w-3 h-3" />
-              <span>Offline Ready</span>
+    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-[#090d16] font-sans text-slate-100 selection:bg-cyan-500 selection:text-black">
+      <div className="border-b border-slate-800/80 px-3 py-1.5">
+        <div className="mx-auto flex max-w-4xl items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 text-slate-950">
+              <Activity className="h-4 w-4 stroke-[2.8]" />
             </div>
-          )}
-        </div>
+            <div>
+              <h1 className="text-sm font-black uppercase leading-none tracking-wider">AnesthAssist</h1>
+              <p className="text-[10px] leading-tight text-slate-400">OR cognitive aid · works offline</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {!online && (
+              <span className="flex items-center gap-1 rounded-full border border-amber-800 bg-amber-950/60 px-2 py-0.5 font-mono text-[10px] text-amber-400">
+                <WifiOff className="h-3 w-3" /> Offline
+              </span>
+            )}
+            <button type="button" className={iconBtn} aria-label="References" onClick={() => setReferencesOpen(true)}>
+              <BookOpen className="h-5 w-5" />
+            </button>
+            <button type="button" className={iconBtn} aria-label="Settings" onClick={() => setSettingsOpen(true)}>
+              <Settings className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Persistent Biometric Control Bar */}
-      <BiometricHeader />
+      {activeTab !== 'checklists' && <BiometricHeader />}
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4">
-        {activeTab === 'calculator' && <CalculatorView />}
-        {activeTab === 'crisis' && <CrisisView />}
-        {activeTab === 'local_max' && <LocalMaxView />}
-        {activeTab === 'pacu' && <RoutineChecklistsView />}
+      <main className="mx-auto w-full max-w-4xl flex-1 p-3 sm:p-4">
+        {activeTab === 'dosing' && <DosingView />}
+        {activeTab === 'airway' && <AirwayView />}
+        {activeTab === 'ventilation' && <VentilationView />}
+        {activeTab === 'checklists' && <ChecklistsView />}
       </main>
 
-      {/* Permanent Medical Disclaimer Banner */}
-      <div className="pb-16">
-        <DisclaimerBanner />
-      </div>
+      {/* Spacer so content clears the fixed disclaimer + navigation strip. */}
+      <div className="h-[128px]" aria-hidden="true" />
 
-      {/* Sticky Bottom Navigation Bar */}
       <Navigation />
+      <EmergencyOverlay />
+      <SettingsSheet />
+      <ReferencesView />
     </div>
   );
 };

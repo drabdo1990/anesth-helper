@@ -71,12 +71,19 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
     setValueStr('');
   };
 
+  const parsedValue = parseFloat(valueStr);
+  // Out-of-range or empty input is rejected, never silently clamped.
+  const rangeError =
+    valueStr === '' || isNaN(parsedValue)
+      ? null
+      : parsedValue < min || parsedValue > max
+        ? `Must be between ${min} and ${max} ${unit}.`
+        : null;
+  const canConfirm = valueStr !== '' && !isNaN(parsedValue) && rangeError === null;
+
   const handleConfirm = () => {
-    const parsed = parseFloat(valueStr);
-    if (!isNaN(parsed)) {
-      const clamped = Math.max(min, Math.min(max, parsed));
-      onConfirm(clamped);
-    }
+    if (!canConfirm) return;
+    onConfirm(parsedValue);
     onClose();
   };
 
@@ -98,7 +105,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, valueStr, isPristine]);
+  }, [isOpen, valueStr, isPristine, canConfirm]);
 
   if (!isOpen) return null;
 
@@ -135,6 +142,11 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
           </span>
           <span className="text-sm font-semibold text-slate-400">{unit}</span>
         </div>
+        {rangeError && (
+          <p role="alert" className="-mt-1 text-xs font-semibold text-red-400">
+            {rangeError}
+          </p>
+        )}
 
         {/* Keypad Grid (Touch targets >= 52px) */}
         <div className="grid grid-cols-3 gap-2">
@@ -184,7 +196,8 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
           </button>
           <button
             onClick={handleConfirm}
-            className="h-12 bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 text-slate-950 font-bold rounded-xl shadow-glow-cyan flex items-center justify-center gap-2"
+            disabled={!canConfirm}
+            className="h-12 bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl shadow-glow-cyan flex items-center justify-center gap-2"
           >
             <Check className="w-5 h-5 stroke-[2.5]" />
             Set
