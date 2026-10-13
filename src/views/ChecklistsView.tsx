@@ -59,7 +59,7 @@ const FreeText: React.FC<{ label: string; value: string; onChange: (v: string) =
       </span>
       <input
         value={value}
-        maxLength={MAX_FREE_TEXT_LENGTH + 20}
+        maxLength={MAX_FREE_TEXT_LENGTH}
         onChange={(e) => onChange(e.target.value)}
         autoComplete="off"
         className="min-h-[48px] rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"

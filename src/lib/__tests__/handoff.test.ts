@@ -36,6 +36,7 @@ describe('scrubFreeText', () => {
 
   it('accepts a short clinical note', () => {
     expect(scrubFreeText('  multimodal   analgesia ')).toEqual({ ok: true, text: 'multimodal analgesia' });
+    expect(scrubFreeText('a'.repeat(60))).toEqual({ ok: true, text: 'a'.repeat(60) });
   });
 });
 
