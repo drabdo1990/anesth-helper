@@ -2,8 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { REFERENCE_DRUGS } from '../referenceDrugs';
 import { MEDICATIONS } from '../medications';
 import { SOURCE_BY_ID } from '../sources';
+import type { ReferenceInfusionLine } from '../types';
 
 const medIds = new Set(MEDICATIONS.map((m) => m.id));
+
+/** Returns the contradicting mass unit quoted in the record's own text, or null when consistent. */
+const quotedMassContradiction = (i: Pick<ReferenceInfusionLine, 'rateMin' | 'unit' | 'notes' | 'suggested60kgRate'>): string | null => {
+  const unitMass = i.unit.startsWith('mcg') ? 'mcg' : i.unit.startsWith('mg') ? 'mg' : null;
+  if (!unitMass) return null;
+  const text = `${i.notes ?? ''} ${i.suggested60kgRate ?? ''}`;
+  const quoted = new RegExp(`(?:^|[^0-9.])${i.rateMin}(?:\\s*[–-]\\s*[0-9.]+)?\\s*(mcg|mg)\\s*/\\s*(?:kg\\s*/\\s*)?(?:min|h)`);
+  const m = text.match(quoted);
+  return m && m[1] !== unitMass ? m[1] : null;
+};
 
 describe('secondary-sourced reference drugs', () => {
   it('have unique ids that never collide with label-sourced medications', () => {
@@ -46,15 +57,14 @@ describe('secondary-sourced reference drugs', () => {
   it('never prints a mass unit that contradicts the figures quoted in the same infusion record', () => {
     // Catches the 1000x errors in the raw notebook data (e.g. "30-60 mg/min" for 30-60 mcg/min).
     for (const d of REFERENCE_DRUGS) {
-      for (const i of d.infusions) {
-        const unitMass = i.unit.startsWith('mcg') ? 'mcg' : i.unit.startsWith('mg') ? 'mg' : null;
-        if (!unitMass) continue;
-        const text = `${i.notes ?? ''} ${i.suggested60kgRate ?? ''}`;
-        const quoted = new RegExp(`(?:^|[^0-9.])${i.rateMin}(?:\\s*[–-]\\s*[0-9.]+)?\\s*(mcg|mg)\\s*/\\s*(?:kg\\s*/\\s*)?(?:min|h)`);
-        const m = text.match(quoted);
-        if (m) expect(m[1], `${d.id}: ${i.indication}`).toBe(unitMass);
-      }
+      for (const i of d.infusions) expect(quotedMassContradiction(i), `${d.id}: ${i.indication}`).toBeNull();
     }
+  });
+
+  it('the unit check catches the original raw notebook errors', () => {
+    expect(quotedMassContradiction({ rateMin: 30, unit: 'mg/min', suggested60kgRate: '0–30 mL/h (30–60 mcg/min)' })).toBe('mcg');
+    expect(quotedMassContradiction({ rateMin: 100, unit: 'mg/h', notes: '100 mcg/h fixed continuous infusion' })).toBe('mcg');
+    expect(quotedMassContradiction({ rateMin: 30, unit: 'mcg/min', suggested60kgRate: '0–30 mL/h (30–60 mcg/min)' })).toBeNull();
   });
 
   it('keeps the corrected phenylephrine and fentanyl infusion units', () => {
