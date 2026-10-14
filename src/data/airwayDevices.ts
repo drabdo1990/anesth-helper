@@ -201,6 +201,40 @@ export const DLT_BANDS: DltBand[] = [
   },
 ];
 
+export interface AirwayEquipmentItem {
+  title: string;
+  points: string[];
+  sourceIds: string[];
+}
+
+/** Adjunct equipment reference from the project notebook (section 3.4, Miller 6e p. 1019, 1209). */
+export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
+  {
+    title: 'Facemasks',
+    points: [
+      'Adult anatomic masks: Small (#3), Medium (#4), Large (#5).',
+      'Pediatric: Newborn, Infant and Child sizes, and the flat Rendell-Baker-Soucek mask (minimal dead space).',
+    ],
+    sourceIds: ['miller-6e'],
+  },
+  {
+    title: 'Guedel oropharyngeal airway sizes',
+    points: ['Sizes 000 to 0 (50 mm), 1 (60 mm), 2 (70 mm), 3 (80 mm), 4 (90 mm), 5 (100 mm).'],
+    sourceIds: ['miller-6e'],
+  },
+  {
+    title: 'Disaster / portable emergency airway kit (RADAR)',
+    points: [
+      'LMA size 2 and size 4.',
+      'Laryngoscope handle with MAC 3 and Miller 2 blades.',
+      'Cuffed ETT 4.0 mm and 7.0 mm.',
+      'OPA 60, 70, 80 and 90 mm.',
+      'Resuscitator bags: adult and pediatric facemask, and a pediatric AMBU bag (up to 600 mL tidal volume).',
+    ],
+    sourceIds: ['miller-6e'],
+  },
+];
+
 /** Airway topics with no sourced size/depth in this build. */
 export const AIRWAY_UNSOURCED: string[] = [
   'Adult nasal ETT depth (exact cm)',

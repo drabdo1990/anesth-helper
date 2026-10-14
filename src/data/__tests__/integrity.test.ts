@@ -27,9 +27,13 @@ describe('source registry', () => {
   it('every label and guideline source has a url, except where no public page exists', () => {
     const noUrl = SOURCES.filter((s) => !s.url).map((s) => s.id);
     expect(noUrl.sort()).toEqual([
+      'aagbi-2012',
       'aln-2025',
       'app-generic',
+      'asa-1986',
+      'asa-1994-nora',
       'asa-airway-2022',
+      'fda-1993',
       'local-protocol',
       'miller-6e',
       'oxford-handbook',

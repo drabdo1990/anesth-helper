@@ -6,7 +6,7 @@ import type { ChecklistRecord } from './types';
 
 const generic = ['app-generic'];
 
-export const CHECKLISTS: ChecklistRecord[] = [
+const BASE_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'pre-induction',
     title: 'Pre-induction',
@@ -70,6 +70,50 @@ export const CHECKLISTS: ChecklistRecord[] = [
     ],
   },
 ];
+
+// Notebook-sourced checklists (sections 5.2-5.4). Item text is quoted from the notebook; no step is added to it.
+const FDA_AAGBI = ['fda-1993', 'aagbi-2012'];
+const ASA_MONITORING = ['asa-1986', 'miller-6e'];
+const NORA = ['asa-1994-nora', 'miller-6e'];
+
+const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
+  {
+    id: 'two-bag-test',
+    title: 'Pre-case "two-bag" test (FDA 1993 / AAGBI 2012)',
+    note: 'Transcribed from the project notebook. Follow your institutional checklist for your machine.',
+    items: [
+      { id: 'twobag-testlung', text: 'Attach a test lung bag to the Y-piece', sourceIds: FDA_AAGBI },
+      { id: 'twobag-vent', text: 'Ventilator ON: ascending bellows rise during expiration and deliver the set tidal volume without leaks', sourceIds: FDA_AAGBI },
+      { id: 'twobag-valves', text: 'Verify unidirectional valves, vaporizer interlocks, and vaporizer fit, fill and leaks', sourceIds: FDA_AAGBI },
+      { id: 'twobag-analyzers', text: 'Calibrate the capnometer and O2 analyzers', sourceIds: FDA_AAGBI },
+    ],
+  },
+  {
+    id: 'asa-monitoring',
+    title: 'ASA basic monitoring standards',
+    note: 'Transcribed from the project notebook (Miller 6e p. 2027).',
+    items: [
+      { id: 'asa-presence', text: 'Qualified anesthesia personnel continuously present', sourceIds: ASA_MONITORING },
+      { id: 'asa-oxygenation', text: 'Oxygenation: inspired O2 low-limit alarm and SpO2', sourceIds: ASA_MONITORING },
+      { id: 'asa-ventilation', text: 'Ventilation: ETCO2 and disconnect alarm', sourceIds: ASA_MONITORING },
+      { id: 'asa-circulation', text: 'Circulation: ECG and NIBP at intervals of 5 minutes at most', sourceIds: ASA_MONITORING },
+      { id: 'asa-temperature', text: 'Temperature evaluated', sourceIds: ASA_MONITORING },
+    ],
+  },
+  {
+    id: 'nora-mri',
+    title: 'Non-operating-room anesthesia (NORA / MRI)',
+    note: 'Transcribed from the project notebook (Miller 6e p. 2025).',
+    items: [
+      { id: 'nora-o2', text: 'Dedicated reliable O2 source plus a full backup cylinder', sourceIds: NORA },
+      { id: 'nora-suction', text: 'Reliable suction and scavenging', sourceIds: NORA },
+      { id: 'nora-monitors', text: 'Full ASA monitors and a self-inflating hand resuscitator bag (AMBU)', sourceIds: NORA },
+      { id: 'nora-mr', text: 'MR Safe / MR Conditional / MR Unsafe status verified for all equipment', sourceIds: NORA },
+    ],
+  },
+];
+
+export const CHECKLISTS: ChecklistRecord[] = [...BASE_CHECKLISTS, ...NOTEBOOK_CHECKLISTS];
 
 /** Selectable options for the handoff generator. These are categories, not clinical values. */
 export const HANDOFF_OPTIONS = {

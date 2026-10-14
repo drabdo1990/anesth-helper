@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertOctagon, BookOpen } from 'lucide-react';
 import {
+  AIRWAY_EQUIPMENT_REFERENCE,
   AIRWAY_PRINCIPLES,
   AIRWAY_UNSOURCED,
   LMA_MAX_CUFF_PRESSURE_CMH2O,
@@ -247,6 +248,16 @@ export const AirwayView: React.FC = () => {
         </ul>
         <NoSourceValue topic="OPA / NPA size by age or sex" compact />
       </Card>
+
+      {AIRWAY_EQUIPMENT_REFERENCE.map((item) => (
+        <Card key={item.title} title={item.title} basis="reference" sourceIds={item.sourceIds}>
+          <ul className="list-disc pl-5 text-sm text-slate-200">
+            {item.points.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </Card>
+      ))}
 
       <button
         type="button"

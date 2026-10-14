@@ -1,7 +1,7 @@
 // Builds the "clinical values derived from each source" index shown in the References view.
 // Generated from the data files, so it can never drift from what the app actually uses.
 
-import { AIRWAY_RULES, LMA_BANDS, PEDS_BLADES, PEDS_ETT_FORMULAS } from './airwayDevices';
+import { AIRWAY_EQUIPMENT_REFERENCE, AIRWAY_RULES, LMA_BANDS, PEDS_BLADES, PEDS_ETT_FORMULAS } from './airwayDevices';
 import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE } from './ventilation';
@@ -53,6 +53,7 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
     }
   }
 
+  for (const item of AIRWAY_EQUIPMENT_REFERENCE) add(item.sourceIds, `Airway equipment reference: ${item.title}`);
   for (const item of VENT_ADVANCED_REFERENCE) add(item.sourceIds, `Ventilation reference: ${item.title}`);
 
   for (const r of NEURAXIAL_REGIMENS) {
