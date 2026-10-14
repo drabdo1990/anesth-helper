@@ -331,7 +331,7 @@ export const SOURCES: ClinicalSource[] = [
     publisher: 'Elsevier Churchill Livingstone (Miller RD, ed.)',
     year: '2005',
     tier: 3,
-    scope: ['neuraxial regimens (Tables 14-7, 14-8)'],
+    scope: ['neuraxial regimens (Tables 14-7, 14-8)', 'high-frequency ventilation, apneic threshold, laparoscopy CO2'],
     verification: 'secondary',
     accessNote:
       'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit.',
@@ -346,6 +346,29 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['neuraxial regimens', 'drug formulary tables 42.1 and 42.2'],
     verification: 'secondary',
     accessNote: 'Transcribed from the project notebook. Edition and page numbers were not verified in this build.',
+  },
+
+  {
+    id: 'aln-2025',
+    tag: 'Anesthesiology 2025',
+    name: 'Recruitability during general anesthesia (Anesthesiology 2025;143:1211-24)',
+    publisher: 'Anesthesiology (Mannes, Jiang et al., as cited in the project notebook)',
+    year: '2025',
+    tier: 3,
+    scope: ['respiratory mechanics and recruitment terminology'],
+    verification: 'secondary',
+    accessNote: 'Citation taken from the project notebook. The paper was not opened in this build, so no numeric value from it is encoded.',
+  },
+  {
+    id: 'project-notebook',
+    tag: 'Project notebook',
+    name: 'Project reference notebook (anesthesia_reference_data.md), sections without a named primary citation',
+    publisher: 'Project notebook (user supplied)',
+    year: '2026',
+    tier: 3,
+    scope: ['intraoperative ventilation baseline', 'one-lung ventilation'],
+    verification: 'secondary',
+    accessNote: 'Values are quoted from the notebook text, which names no primary source for them. Requires clinician review before use.',
   },
 
   // ---- Tier 4: local / app-generated ----

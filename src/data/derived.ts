@@ -4,7 +4,7 @@
 import { AIRWAY_RULES, LMA_BANDS, PEDS_BLADES, PEDS_ETT_FORMULAS } from './airwayDevices';
 import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
-import { VENTILATION_SCENARIOS } from './ventilation';
+import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE } from './ventilation';
 import { CHECKLISTS } from './checklists';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { SOURCES } from './sources';
@@ -52,6 +52,8 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
       add([a.sourceId], `${la.name}: ${a.label}: ${a.absoluteMaxMg !== undefined ? `${a.absoluteMaxMg} mg` : `${a.mgPerKg} mg/kg`}`);
     }
   }
+
+  for (const item of VENT_ADVANCED_REFERENCE) add(item.sourceIds, `Ventilation reference: ${item.title}`);
 
   for (const r of NEURAXIAL_REGIMENS) {
     add(r.sourceIds, `Neuraxial ${r.route}: ${r.agent} ${r.concLabel}, ${r.volumeMl[0]}-${r.volumeMl[1]} mL, ${r.totalDoseMg[0]}-${r.totalDoseMg[1]} mg`);

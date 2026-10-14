@@ -26,7 +26,16 @@ describe('source registry', () => {
 
   it('every label and guideline source has a url, except where no public page exists', () => {
     const noUrl = SOURCES.filter((s) => !s.url).map((s) => s.id);
-    expect(noUrl.sort()).toEqual(['app-generic', 'asa-airway-2022', 'local-protocol', 'miller-6e', 'oxford-handbook', 'samba-ponv-2020']);
+    expect(noUrl.sort()).toEqual([
+      'aln-2025',
+      'app-generic',
+      'asa-airway-2022',
+      'local-protocol',
+      'miller-6e',
+      'oxford-handbook',
+      'project-notebook',
+      'samba-ponv-2020',
+    ]);
   });
 
   it('declares a data version', () => {

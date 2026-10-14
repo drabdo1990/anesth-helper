@@ -77,6 +77,56 @@ export const VENT_MODES: ReferenceItem[] = [
   { title: 'SIMV', points: ['Set mandatory breaths synchronized to patient effort, with spontaneous breaths between.'], sourceIds: ['app-generic'] },
 ];
 
+/**
+ * Reference values from the project notebook (section 4). Shown as reference items only: none of these are
+ * applied as defaults, because the notebook is a secondary source. Tidal volume in this app still uses PBW.
+ */
+export const VENT_ADVANCED_REFERENCE: ReferenceItem[] = [
+  {
+    title: 'Baseline intraoperative IPPV (notebook)',
+    points: [
+      'Tidal volume 6-8 mL/kg. The notebook says ideal body weight; this app calculates tidal volume from predicted body weight (PBW), so compare against the PBW figure shown above.',
+      'Limit FiO2 to 0.6 or less where possible to reduce absorption atelectasis.',
+      'Respiratory rate 12-16 breaths/min (conventional IPPV: keep below 30/min).',
+      'PEEP baseline 5-10 cmH2O. Plateau pressure below 30 cmH2O. Driving pressure (plateau minus PEEP) below 14-15 cmH2O.',
+    ],
+    sourceIds: ['project-notebook'],
+  },
+  {
+    title: 'High-frequency and apneic modalities (Miller p. 1061, 1451)',
+    points: [
+      'HFPV: tidal volume 3-4 mL/kg at 60-100 breaths/min.',
+      'Thoracic HFV: tidal volume below 2 mL/kg at 60-2400 breaths/min.',
+      'Low-flow apneic oxygenation: 100% O2 with 5-10 cmH2O CPAP maintains adequate PaO2 for at least 20 minutes.',
+    ],
+    sourceIds: ['miller-6e'],
+  },
+  {
+    title: 'Apneic threshold and laparoscopy (Miller p. 168, 1702)',
+    points: [
+      'Apneic threshold: the highest PaCO2 at which a patient stays apneic is 4-5 mmHg below the resting PaCO2.',
+      'CO2 pneumoperitoneum lowers thoracopulmonary compliance. PaCO2 rises by 15-25% and plateaus after 20-30 minutes.',
+    ],
+    sourceIds: ['miller-6e'],
+  },
+  {
+    title: 'One-lung ventilation (notebook)',
+    points: ['FiO2 1.0; pressure control preferred; plateau pressure below 30 cmH2O; CPAP to the operative lung and PEEP to the dependent lung.'],
+    sourceIds: ['project-notebook'],
+  },
+  {
+    title: 'Respiratory mechanics terms (Anesthesiology 2025, p. 1211)',
+    points: [
+      'Driving pressure = plateau pressure - PEEP.',
+      'Respiratory system compliance = tidal volume / (plateau pressure - PEEP).',
+      'Recruited volume: volume gained above the baseline compliance curve. Recruitment-to-inflation (R/I) ratio: assesses recruitability.',
+      'End-expiratory lung volume (EELV) and impedance (EELI): functional volume monitoring.',
+      'Breath phase variables: trigger, limit and cycle (pressure, volume, flow or time).',
+    ],
+    sourceIds: ['aln-2025'],
+  },
+];
+
 export const VENT_ALARMS: ReferenceItem[] = [
   { title: 'High airway pressure', points: ['Treat as a real problem until excluded: check the patient, circuit and tube.'], sourceIds: ['app-generic'] },
   { title: 'Low airway pressure / disconnection', points: ['Check the circuit connections, the cuff and the machine.'], sourceIds: ['app-generic'] },

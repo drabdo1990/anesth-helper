@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { VENTILATION_SCENARIOS, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING, type ReferenceItem } from '../data/ventilation';
+import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING, type ReferenceItem } from '../data/ventilation';
 import { NO_SOURCE_VALUE } from '../data/types';
 import { useAppStore } from '../store/useAppStore';
 import { MAX_HEIGHT_CM, MIN_HEIGHT_CM, calculateDevineIbw } from '../lib/calc/biometrics';
@@ -243,6 +243,7 @@ export const VentilationView: React.FC = () => {
       )}
 
       <Accordion title="Mode quick reference (VC, PC, PSV, SIMV)" items={VENT_MODES} />
+      <Accordion title="Advanced ventilation and mechanics reference (secondary sources)" items={VENT_ADVANCED_REFERENCE} />
       <Accordion title="Alarm guidance" items={VENT_ALARMS} />
       <Accordion title="Troubleshooting prompts" items={VENT_TROUBLESHOOTING} />
     </div>
