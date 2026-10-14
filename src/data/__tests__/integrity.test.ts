@@ -33,6 +33,8 @@ describe('source registry', () => {
       'asa-1986',
       'asa-1994-nora',
       'asa-airway-2022',
+      'clinical-cases-anesth',
+      'dunn-2017',
       'fda-1993',
       'local-protocol',
       'miller-6e',

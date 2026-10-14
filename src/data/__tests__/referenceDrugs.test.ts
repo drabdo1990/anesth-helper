@@ -1,0 +1,71 @@
+import { describe, expect, it } from 'vitest';
+import { REFERENCE_DRUGS } from '../referenceDrugs';
+import { MEDICATIONS } from '../medications';
+import { SOURCE_BY_ID } from '../sources';
+
+const medIds = new Set(MEDICATIONS.map((m) => m.id));
+
+describe('secondary-sourced reference drugs', () => {
+  it('have unique ids that never collide with label-sourced medications', () => {
+    const ids = REFERENCE_DRUGS.map((d) => d.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) expect(medIds.has(id), id).toBe(false);
+  });
+
+  it('cite registered, secondary sources only', () => {
+    for (const d of REFERENCE_DRUGS) {
+      expect(d.sourceIds.length, d.id).toBeGreaterThan(0);
+      for (const s of d.sourceIds) {
+        expect(s in SOURCE_BY_ID, `${d.id} -> ${s}`).toBe(true);
+        expect(SOURCE_BY_ID[s].verification, `${d.id} -> ${s}`).toBe('secondary');
+      }
+    }
+  });
+
+  it('supplements point at an existing label-sourced medication and carry no doses', () => {
+    for (const d of REFERENCE_DRUGS.filter((x) => x.supplementTo)) {
+      expect(medIds.has(d.supplementTo as string), `${d.id} -> ${d.supplementTo}`).toBe(true);
+      expect(d.doses, d.id).toEqual([]);
+      expect(d.infusions.length > 0 || d.tivaTargets !== undefined, d.id).toBe(true);
+    }
+  });
+
+  it('have ordered, positive ranges', () => {
+    for (const d of REFERENCE_DRUGS) {
+      for (const x of d.doses) {
+        expect(x.min, d.id).toBeGreaterThan(0);
+        if (x.max !== undefined) expect(x.max, d.id).toBeGreaterThanOrEqual(x.min);
+      }
+      for (const i of d.infusions) {
+        expect(i.rateMin, `${d.id} ${i.indication}`).toBeGreaterThan(0);
+        if (i.rateMax !== undefined) expect(i.rateMax, `${d.id} ${i.indication}`).toBeGreaterThanOrEqual(i.rateMin);
+      }
+    }
+  });
+
+  it('never prints a mass unit that contradicts the figures quoted in the same infusion record', () => {
+    // Catches the 1000x errors in the raw notebook data (e.g. "30-60 mg/min" for 30-60 mcg/min).
+    for (const d of REFERENCE_DRUGS) {
+      for (const i of d.infusions) {
+        const unitMass = i.unit.startsWith('mcg') ? 'mcg' : i.unit.startsWith('mg') ? 'mg' : null;
+        if (!unitMass) continue;
+        const text = `${i.notes ?? ''} ${i.suggested60kgRate ?? ''}`;
+        const quoted = new RegExp(`(?:^|[^0-9.])${i.rateMin}(?:\\s*[–-]\\s*[0-9.]+)?\\s*(mcg|mg)\\s*/\\s*(?:kg\\s*/\\s*)?(?:min|h)`);
+        const m = text.match(quoted);
+        if (m) expect(m[1], `${d.id}: ${i.indication}`).toBe(unitMass);
+      }
+    }
+  });
+
+  it('keeps the corrected phenylephrine and fentanyl infusion units', () => {
+    const find = (id: string, indication: string) => REFERENCE_DRUGS.find((d) => d.id === id)?.infusions.find((i) => i.indication.startsWith(indication));
+    expect(find('phenylephrine-supplement', 'Adult Peripheral')?.unit).toBe('mcg/min');
+    expect(find('fentanyl-supplement', 'ICU Sedation')?.unit).toBe('mcg/h');
+  });
+
+  it('flags the records whose printed figures disagree', () => {
+    expect(REFERENCE_DRUGS.find((d) => d.id === 'calcium-gluconate')?.discrepancy).toBeTruthy();
+    const phenyl = REFERENCE_DRUGS.find((d) => d.id === 'phenylephrine-supplement');
+    expect(phenyl?.infusions.some((i) => i.discrepancy)).toBe(true);
+  });
+});

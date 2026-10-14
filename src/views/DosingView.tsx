@@ -7,6 +7,7 @@ import { useBiometricResult } from '../store/useBiometrics';
 import { DrugCard } from '../components/DrugCard';
 import { LocalAnestheticPanel } from '../components/LocalAnestheticPanel';
 import { NeuraxialReference } from '../components/NeuraxialReference';
+import { ReferenceDrugsPanel } from '../components/ReferenceDrugsPanel';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
 
 type Filter = MedicationCategory | 'all';
@@ -89,6 +90,8 @@ export const DosingView: React.FC = () => {
           </section>
         );
       })}
+
+      {filter === 'all' && <ReferenceDrugsPanel query={q} />}
     </div>
   );
 };

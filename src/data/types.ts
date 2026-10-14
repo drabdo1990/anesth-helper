@@ -177,4 +177,76 @@ export interface NeuraxialRegimen {
   sourceIds: string[];
 }
 
+export type ReferenceDrugGroup =
+  | 'induction'
+  | 'premedication'
+  | 'opioid'
+  | 'nmba'
+  | 'vasoactive'
+  | 'antiemetic'
+  | 'analgesic-adjunct'
+  | 'electrolyte-metabolic'
+  | 'emergency';
+
+/** Infusion units. Mass units must match the figures printed in the same record (checked by tests). */
+export type ReferenceInfusionUnit =
+  | 'mcg/kg/min'
+  | 'mcg/kg/h'
+  | 'mg/kg/h'
+  | 'mg/min'
+  | 'mcg/min'
+  | 'mcg/h'
+  | 'mg/h'
+  | 'mL/kg/h'
+  | 'mmol/h';
+
+export interface ReferenceDoseLine {
+  population: 'adult' | 'pediatric';
+  route?: string;
+  min: number;
+  max?: number;
+  /** Printed unit, e.g. "mg/kg", "mg", "mL/kg". */
+  unit: string;
+  /** Weight scalar named by the source, shown as text. Never applied by the app. */
+  scalar?: string;
+  maxAbsolute?: { value: number; unit: string };
+  note?: string;
+}
+
+export interface ReferenceInfusionLine {
+  indication: string;
+  rateMin: number;
+  rateMax?: number;
+  unit: ReferenceInfusionUnit;
+  loadingDose?: string;
+  standardDilution?: string;
+  suggested60kgRate?: string;
+  notes?: string;
+  /** Set when a printed figure in this record disagrees with another figure in the same record. */
+  discrepancy?: string;
+}
+
+/**
+ * Secondary-sourced drug reference. Shown as printed and never used to calculate a dose, volume or rate.
+ * `supplementTo` links an entry to a label-sourced medication that already exists; that medication is not changed.
+ */
+export interface ReferenceDrug {
+  id: string;
+  name: string;
+  group: ReferenceDrugGroup;
+  supplementTo?: string;
+  scalar?: string;
+  concentrationsMgPerMl?: number[];
+  doses: ReferenceDoseLine[];
+  infusions: ReferenceInfusionLine[];
+  tivaTargets?: Record<string, string>;
+  onsetSeconds?: [number, number];
+  durationMinutes?: [number, number];
+  cautions?: string[];
+  sideEffects?: string[];
+  /** Set when printed figures in this record disagree with each other. */
+  discrepancy?: string;
+  sourceIds: string[];
+}
+
 export const NO_SOURCE_VALUE = 'No high-quality source value specified';

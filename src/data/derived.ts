@@ -7,6 +7,7 @@ import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE } from './ventilation';
 import { CHECKLISTS } from './checklists';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
+import { REFERENCE_DRUGS } from './referenceDrugs';
 import { SOURCES } from './sources';
 
 const range = (min: number | undefined, max: number | undefined, def: number | undefined): string => {
@@ -52,6 +53,8 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
       add([a.sourceId], `${la.name}: ${a.label}: ${a.absoluteMaxMg !== undefined ? `${a.absoluteMaxMg} mg` : `${a.mgPerKg} mg/kg`}`);
     }
   }
+
+  for (const d of REFERENCE_DRUGS) add(d.sourceIds, `Reference drug (not calculated): ${d.name}`);
 
   for (const item of AIRWAY_EQUIPMENT_REFERENCE) add(item.sourceIds, `Airway equipment reference: ${item.title}`);
   for (const item of VENT_ADVANCED_REFERENCE) add(item.sourceIds, `Ventilation reference: ${item.title}`);
