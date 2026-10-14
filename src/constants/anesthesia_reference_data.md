@@ -255,3 +255,54 @@
 * **Bispectral Index (BIS) Target:** 40–60 during surgical general anesthesia[cite: 1].
 * **Preoxygenation:** 3–5 minutes of normal tidal breathing of 100% O2 at high fresh gas flow, or 4 vital capacity breaths[cite: 9].
 * **Minimum Fresh Gas Flow (Pediatrics):** Minimum 3 L/min to maintain inspired $CO_2 < 0.6\text{ kPa}$ (4.5 mmHg)[cite: 8].
+---
+
+## 7. Additional Notebook Sections (merged in the data sync)
+
+### 7.1 Inhalation Anesthetics & MAC
+* **Age-Adjusted MAC (Adult 40 yr):**
+  * Sevoflurane: 2.0%
+  * Isoflurane: 1.15%
+  * Desflurane: 6.0%
+  * Nitrous Oxide: 104%
+* **Compound A Caution:** Avoid closed-circuit or fresh gas flow < 1 L/min with Sevoflurane due to nephrotoxic Compound A accumulation.
+
+### 7.2 High-Frequency & Apneic Modalities (Miller 6e, p. 1061, 1451)
+* **HFPV (High-Frequency Positive-Pressure Ventilation):** $V_T$ `3–4 mL/kg`, RR `60–100 breaths/min`.
+* **HFV (High-Frequency Ventilation Thoracic):** $V_T$ `< 2 mL/kg`, RR `60–2400 breaths/min`.
+* **Apneic Insufflation (Low-Flow Apneic Oxygenation):** 100% O2 with `5–10 cm H2O CPAP` maintains adequate PaO2 for at least `20 minutes`.
+
+### 7.3 Physiological Thresholds & Laparoscopy (Miller 6e, p. 168, 1702)
+* **Apneic Threshold:** Highest PaCO2 at which a patient remains apneic = `4–5 mmHg below resting PaCO2`.
+* **CO2 Pneumoperitoneum (Laparoscopy):** Decreases thoracopulmonary compliance; PaCO2 increases by `15%–25%` and plateaus after `20–30 minutes`.
+
+### 7.4 Advanced Respiratory Mechanics & Recruitment Metrics (ALN 2025, p. 1211)
+* **Driving Pressure ($\Delta P$):** $P_{plat} - PEEP$.
+* **Respiratory System Compliance ($C_{RS}$):** $V_T / (P_{plat} - PEEP)$.
+* **PEEP-Induced Recruited Volume ($V_{rec}$):** Measured volume gain above baseline compliance curve.
+* **Recruitment-to-Inflation Ratio ($R/I$):** Assesses lung recruitability.
+* **End-Expiratory Lung Volume ($EELV$) & Impedance ($EELI$):** Functional volume monitoring.
+* **Phase Variables:** Trigger, Limit, and Cycle (Pressure, Volume, Flow, or Time).
+
+
+### 7.5 Anesthesia Machine Pressure Circuits (Miller 6e, p. 227)
+* **High-Pressure Circuit:** Cylinders to primary pressure regulator (O2 cylinder 2200 -> 45 psig; N2O cylinder 750 -> 45 psig).
+* **Intermediate-Pressure Circuit:** Regulated cylinder (45 psig) and hospital pipeline (50–55 psig) stepping down to second-stage regulators (14–26 psig).
+* **Low-Pressure Circuit:** Flow control valves, flow tubes, vaporizers, check valve, and common gas outlet.
+
+### 7.6 ASA Basic Monitoring Standards (Miller 6e, p. 2027)
+* Continuous presence of qualified personnel.
+* Continual evaluation of Oxygenation (inspired O2 low-limit alarm, SpO2), Ventilation (ETCO2, disconnect alarm), Circulation (ECG, NIBP q5min max interval), and Temperature.
+
+### 7.7 Non-Operating Room Anesthesia (NORA / MRI) Checklist (Miller 6e, p. 2025)
+* Dedicated reliable O2 source + full backup cylinder.
+* Reliable suction and scavenging.
+* Full ASA monitors + self-inflating hand resuscitator bag (AMBU).
+* MR Safe, MR Conditional, MR Unsafe verification.
+
+### 7.8 FDA 1993 & AAGBI 2012 Pre-Case "Two-Bag" Test
+* Attach test lung bag to Y-piece.
+* Ventilator ON; verify ascending bellows rise during expiration and deliver set TV without leaks.
+* Verify unidirectional valves, vaporizer interlocks, fit/fill/leaks, and calibrate capnometer/O2 analyzers.
+
+---
