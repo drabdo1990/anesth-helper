@@ -48,7 +48,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
       return;
     }
 
-    if (valueStr.length >= 5) return;
+    if (valueStr.length >= 8) return;
     if (digit === '.') {
       if (!allowDecimal || valueStr.includes('.')) return;
       setValueStr((prev) => (prev === '' ? '0.' : prev + '.'));

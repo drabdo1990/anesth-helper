@@ -112,10 +112,13 @@ export const dltSizeForHeight = (heightCm: number | null): DltResult | Unsourced
   if (heightCm === null || !Number.isFinite(heightCm) || heightCm <= 0) {
     return { ok: false, reason: 'Enter patient height to determine double-lumen tube size.' };
   }
+  if (heightCm < 150) {
+    return { ok: false, reason: 'Double-lumen tubes are not recommended for height < 150 cm or pediatric patients. Consider a bronchial blocker.' };
+  }
 
   const band = DLT_BANDS.find((b) => {
-    if (b.minHeightCm === null && b.maxHeightCm !== null) {
-      return heightCm < b.maxHeightCm;
+    if (b.maxHeightCm === 165) {
+      return heightCm < 165 && (b.minHeightCm === null || heightCm >= b.minHeightCm);
     }
     if (b.minHeightCm !== null && b.maxHeightCm !== null) {
       return heightCm >= b.minHeightCm && heightCm <= b.maxHeightCm;

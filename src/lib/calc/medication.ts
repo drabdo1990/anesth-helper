@@ -49,6 +49,7 @@ export const doseAppliesToWeight = (dose: MedicationDose, tbwKg: number): boolea
   if (!band) return true;
   if (band.min !== undefined && tbwKg < band.min) return false;
   if (band.max !== undefined && tbwKg > band.max) return false;
+  if (band.maxExclusive !== undefined && tbwKg >= band.maxExclusive) return false;
   return true;
 };
 

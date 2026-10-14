@@ -46,7 +46,7 @@ export interface MedicationDose {
   scalarBasis?: ScalarBasis;
   absoluteMax?: AbsoluteMax;
   /** Applies only inside this actual-body-weight band (e.g. cefazolin 3 g at >=120 kg). */
-  weightBandKg?: { min?: number; max?: number };
+  weightBandKg?: { min?: number; max?: number; maxExclusive?: number };
   notes?: string[];
   sourceIds: string[];
 }

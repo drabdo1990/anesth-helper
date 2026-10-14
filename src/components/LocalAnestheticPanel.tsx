@@ -45,7 +45,7 @@ const resolveMaxMg = (
       : undefined;
   const byWeight = perKg !== undefined ? perKg * weightKg : undefined;
   const candidates = [abs, byWeight].filter((n): n is number => n !== undefined);
-  const maxMg = Math.min(...candidates);
+  const maxMg = candidates.length > 0 ? Math.min(...candidates) : null;
   const note = [perKg !== undefined ? `${perKg} mg/kg` : null, abs !== undefined ? `${abs} mg absolute` : null]
     .filter(Boolean)
     .join(', ');

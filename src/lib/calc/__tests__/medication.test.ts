@@ -140,8 +140,10 @@ describe('weight bands (cefazolin)', () => {
     expect(doseAppliesToWeight(dose('cefazolin-redose'), 50)).toBe(true);
   });
 
-  it('correctly validates lower and upper band bounds', () => {
+  it('correctly validates lower and upper band bounds and avoids boundary gap', () => {
     expect(doseAppliesToWeight(dose('cefazolin-lt120'), 70)).toBe(true);
+    expect(doseAppliesToWeight(dose('cefazolin-lt120'), 119.9995)).toBe(true);
+    expect(doseAppliesToWeight(dose('cefazolin-ge120'), 119.9995)).toBe(false);
     expect(doseAppliesToWeight(dose('cefazolin-ge120'), 130)).toBe(true);
   });
 });
@@ -192,7 +194,7 @@ describe('epinephrine can never raise a local anesthetic limit above the plain-d
     expect(limitFor('bupivacaine', true, 40) ?? Infinity).toBeLessThanOrEqual(limitFor('bupivacaine', false, 40) ?? 0);
   });
 
-  it('bupivacaine at 100 kg is capped by the absolute figures: 175 mg plain, 225 mg with epinephrine', () => {
+  it('bupivacaine at 100 kg is capped by 2 mg/kg with epinephrine (200 mg) and 175 mg plain', () => {
     expect(limitFor('bupivacaine', false, 100)).toBe(175);
     expect(limitFor('bupivacaine', true, 100)).toBe(200);
   });

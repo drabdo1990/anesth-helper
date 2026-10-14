@@ -133,7 +133,7 @@ export const MEDICATIONS: Medication[] = [
         max: 2000,
         default: 1000,
         unit: 'mg',
-        weightBandKg: { max: 119.999 },
+        weightBandKg: { maxExclusive: 120 },
         notes: ['Give 30-60 minutes before the start of surgery.'],
         sourceIds: ['label-cefazolin'],
       },

@@ -151,6 +151,16 @@ describe('DLT sizing by height', () => {
     expect(r.sizeFr).toBe(expectedFr);
   });
 
+  it('rejects height < 150 cm or pediatric patients', () => {
+    const shortAdult = dltSizeForHeight(149.9);
+    expect(shortAdult.ok).toBe(false);
+    if (!shortAdult.ok) {
+      expect(shortAdult.reason).toContain('< 150 cm');
+    }
+    const peds = dltSizeForHeight(100);
+    expect(peds.ok).toBe(false);
+  });
+
   it('rejects null or invalid height', () => {
     expect(dltSizeForHeight(null).ok).toBe(false);
     expect(dltSizeForHeight(-10).ok).toBe(false);

@@ -1,6 +1,12 @@
 import React from 'react';
 import { REFERENCE_DRUGS } from '../data/referenceDrugs';
-import type { ReferenceDoseLine, ReferenceDrug, ReferenceDrugGroup, ReferenceInfusionLine } from '../data/types';
+import type {
+  MedicationCategory,
+  ReferenceDoseLine,
+  ReferenceDrug,
+  ReferenceDrugGroup,
+  ReferenceInfusionLine,
+} from '../data/types';
 import { SourceBadge } from './ui/SourceBadge';
 import { WarningBanner } from './ui/WarningBanner';
 
@@ -16,6 +22,15 @@ const GROUP_LABELS: Record<ReferenceDrugGroup, string> = {
   emergency: 'Emergency',
 };
 const GROUP_ORDER = Object.keys(GROUP_LABELS) as ReferenceDrugGroup[];
+
+const CATEGORY_TO_GROUPS: Partial<Record<MedicationCategory, ReferenceDrugGroup[]>> = {
+  induction: ['induction'],
+  preinduction: ['premedication'],
+  opioids: ['opioid', 'analgesic-adjunct'],
+  nmba: ['nmba'],
+  vasoactive: ['vasoactive'],
+  postoperative: ['antiemetic'],
+};
 
 const range = (min: number, max?: number): string => (max === undefined || max === min ? `${min}` : `${min}-${max}`);
 
@@ -98,19 +113,31 @@ const DrugEntry: React.FC<{ drug: ReferenceDrug }> = ({ drug }) => (
 interface Props {
   /** Lower-cased, trimmed search text from the dosing view. */
   query: string;
+  category?: MedicationCategory | 'all';
 }
 
 /** Reference only: nothing here uses the weight you entered or computes a dose. */
-export const ReferenceDrugsPanel: React.FC<Props> = ({ query }) => {
-  const matches = REFERENCE_DRUGS.filter((d) => query === '' || d.name.toLowerCase().includes(query) || d.id.includes(query));
+export const ReferenceDrugsPanel: React.FC<Props> = ({ query, category = 'all' }) => {
+  const allowedGroups =
+    category === 'all'
+      ? GROUP_ORDER
+      : CATEGORY_TO_GROUPS[category] ?? [];
+
+  if (category !== 'all' && allowedGroups.length === 0) return null;
+
+  const matches = REFERENCE_DRUGS.filter((d) => {
+    if (category !== 'all' && !allowedGroups.includes(d.group)) return false;
+    return query === '' || d.name.toLowerCase().includes(query) || d.id.includes(query);
+  });
   if (matches.length === 0) return null;
+
   return (
     <section className="flex flex-col gap-3" aria-label="Secondary-sourced drug reference">
       <h2 className="text-sm font-black uppercase tracking-wider text-cyan-300">Secondary-sourced drug reference</h2>
       <WarningBanner level="amber" title="Reference only, no calculation">
         Doses and infusion rates below are quoted from textbooks in the project notebook, not from product labels. They are not scaled to the patient, and no volume or rate is calculated. Verify against the product label and your protocol.
       </WarningBanner>
-      {GROUP_ORDER.map((g) => {
+      {allowedGroups.map((g) => {
         const drugs = matches.filter((d) => d.group === g);
         if (drugs.length === 0) return null;
         return (

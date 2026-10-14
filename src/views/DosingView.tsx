@@ -91,7 +91,7 @@ export const DosingView: React.FC = () => {
         );
       })}
 
-      {filter === 'all' && <ReferenceDrugsPanel query={q} />}
+      <ReferenceDrugsPanel query={q} category={filter} />
     </div>
   );
 };

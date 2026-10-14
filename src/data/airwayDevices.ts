@@ -179,10 +179,10 @@ export interface DltBand {
 
 export const DLT_BANDS: DltBand[] = [
   {
-    minHeightCm: null,
+    minHeightCm: 150,
     maxHeightCm: 165,
     sizeFr: '35–37 Fr',
-    category: 'Short (< 165 cm / < 5\'5")',
+    category: 'Short (150–165 cm / 4\'11"–5\'5")',
     sourceIds: ['oxford-miller-airway'],
   },
   {
