@@ -157,4 +157,24 @@ export interface ChecklistRecord {
   items: ChecklistItemRecord[];
 }
 
+/** Reference-only neuraxial regimen for a 70 kg adult. Never scaled by patient weight. */
+export interface NeuraxialRegimen {
+  id: string;
+  agent: string;
+  route: 'spinal' | 'epidural';
+  /** Display text, e.g. "1.5% or 5.0%". */
+  concLabel: string;
+  /** Numeric concentration bounds in %, used for arithmetic checks. */
+  concPercent: [number, number];
+  volumeMl: [number, number];
+  totalDoseMg: [number, number];
+  baricity?: 'Hyperbaric' | 'Isobaric' | 'Hypobaric';
+  glucosePercent?: number;
+  onsetMin?: [number, number];
+  durationMin?: [number, number];
+  /** Set when the transcribed total dose cannot be reached with the stated concentration and volume. */
+  discrepancy?: string;
+  sourceIds: string[];
+}
+
 export const NO_SOURCE_VALUE = 'No high-quality source value specified';

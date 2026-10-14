@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.10.13-draft2';
+export const DATA_VERSION = '2026.10.14-draft3';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -322,6 +322,30 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['adult ETT sizing', 'adult laryngoscope blade', 'double-lumen tube sizing by height', 'pediatric airway sizing table'],
     verification: 'primary',
     accessNote: 'Sourced from standardized airway sizing tables and clinical reference benchmarks (Miller & Oxford).',
+  },
+
+  {
+    id: 'miller-6e',
+    tag: 'Miller 6e',
+    name: "Miller's Anesthesia, 6th Edition",
+    publisher: 'Elsevier Churchill Livingstone (Miller RD, ed.)',
+    year: '2005',
+    tier: 3,
+    scope: ['neuraxial regimens (Tables 14-7, 14-8)'],
+    verification: 'secondary',
+    accessNote:
+      'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit.',
+  },
+  {
+    id: 'oxford-handbook',
+    tag: 'Oxford Handbook',
+    name: 'Oxford Handbook of Anaesthesia Formulary',
+    publisher: 'Oxford University Press',
+    year: '2015',
+    tier: 3,
+    scope: ['neuraxial regimens', 'drug formulary tables 42.1 and 42.2'],
+    verification: 'secondary',
+    accessNote: 'Transcribed from the project notebook. Edition and page numbers were not verified in this build.',
   },
 
   // ---- Tier 4: local / app-generated ----

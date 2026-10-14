@@ -6,6 +6,7 @@ import { useAppStore } from '../store/useAppStore';
 import { useBiometricResult } from '../store/useBiometrics';
 import { DrugCard } from '../components/DrugCard';
 import { LocalAnestheticPanel } from '../components/LocalAnestheticPanel';
+import { NeuraxialReference } from '../components/NeuraxialReference';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
 
 type Filter = MedicationCategory | 'all';
@@ -71,7 +72,10 @@ export const DosingView: React.FC = () => {
           <section key={cat} className="flex flex-col gap-3" aria-label={CATEGORY_LABELS[cat]}>
             <h2 className="text-sm font-black uppercase tracking-wider text-cyan-300">{CATEGORY_LABELS[cat]}</h2>
             {cat === 'local' ? (
-              <LocalAnestheticPanel biometrics={biometrics} />
+              <>
+                <LocalAnestheticPanel biometrics={biometrics} />
+                <NeuraxialReference />
+              </>
             ) : (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {meds.map((m) => (

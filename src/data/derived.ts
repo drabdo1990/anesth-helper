@@ -6,6 +6,7 @@ import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS } from './ventilation';
 import { CHECKLISTS } from './checklists';
+import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { SOURCES } from './sources';
 
 const range = (min: number | undefined, max: number | undefined, def: number | undefined): string => {
@@ -50,6 +51,10 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
     for (const a of la.alternates ?? []) {
       add([a.sourceId], `${la.name}: ${a.label}: ${a.absoluteMaxMg !== undefined ? `${a.absoluteMaxMg} mg` : `${a.mgPerKg} mg/kg`}`);
     }
+  }
+
+  for (const r of NEURAXIAL_REGIMENS) {
+    add(r.sourceIds, `Neuraxial ${r.route}: ${r.agent} ${r.concLabel}, ${r.volumeMl[0]}-${r.volumeMl[1]} mL, ${r.totalDoseMg[0]}-${r.totalDoseMg[1]} mg`);
   }
 
   for (const f of PEDS_ETT_FORMULAS) add([f.sourceId], `Pediatric ETT: ${f.label}`);
