@@ -122,19 +122,92 @@ export const AIRWAY_RULES: AirwayDeviceRule[] = [
     recommendedSize: 'Landmark: tip of the nose to the tragus',
     sourceIds: ['wikem-peds-airway'],
   },
+  {
+    id: 'adult-ett',
+    device: 'Endotracheal tube (adult)',
+    population: 'adult',
+    basis: 'sex',
+    sizeRange: 'Female 7.0–7.5 mm ID, Male 8.0–8.5 mm ID',
+    depth: 'Female 20–22 cm, Male 22–24 cm to teeth',
+    sourceIds: ['oxford-miller-airway'],
+  },
+  {
+    id: 'dlt',
+    device: 'Double-lumen endobronchial tube (DLT)',
+    population: 'adult',
+    basis: 'height',
+    sizeRange: '<165 cm: 35–37 Fr, 165–178 cm: 37–39 Fr, >178 cm: 39–41 Fr',
+    sourceIds: ['oxford-miller-airway'],
+  },
+];
+
+export interface AdultAirwayRule {
+  sex: 'male' | 'female';
+  idRangeMm: string;
+  frenchRange: string;
+  oralDepthRangeCm: string;
+  blade: string;
+  sourceIds: string[];
+}
+
+export const ADULT_AIRWAY_RULES: Record<'male' | 'female', AdultAirwayRule> = {
+  female: {
+    sex: 'female',
+    idRangeMm: '7.0–7.5',
+    frenchRange: '28–30',
+    oralDepthRangeCm: '20–22',
+    blade: 'Macintosh 3',
+    sourceIds: ['oxford-miller-airway'],
+  },
+  male: {
+    sex: 'male',
+    idRangeMm: '8.0–8.5',
+    frenchRange: '32–34',
+    oralDepthRangeCm: '22–24',
+    blade: 'Macintosh 3–4',
+    sourceIds: ['oxford-miller-airway'],
+  },
+};
+
+export interface DltBand {
+  minHeightCm: number | null;
+  maxHeightCm: number | null;
+  sizeFr: string;
+  category: string;
+  sourceIds: string[];
+}
+
+export const DLT_BANDS: DltBand[] = [
+  {
+    minHeightCm: null,
+    maxHeightCm: 165,
+    sizeFr: '35–37 Fr',
+    category: 'Short (< 165 cm / < 5\'5")',
+    sourceIds: ['oxford-miller-airway'],
+  },
+  {
+    minHeightCm: 165,
+    maxHeightCm: 178,
+    sizeFr: '37–39 Fr',
+    category: 'Medium (165–178 cm / 5\'5"–5\'10")',
+    sourceIds: ['oxford-miller-airway'],
+  },
+  {
+    minHeightCm: 178,
+    maxHeightCm: null,
+    sizeFr: '39–41 Fr',
+    category: 'Tall (> 178 cm / > 5\'10")',
+    sourceIds: ['oxford-miller-airway'],
+  },
 ];
 
 /** Airway topics with no sourced size/depth in this build. */
 export const AIRWAY_UNSOURCED: string[] = [
-  'Adult oral ETT size and depth',
-  'Adult nasal ETT size and depth',
-  'Pediatric ETT outside 1 to 8 years (neonates, infants, older children)',
-  'Adult direct laryngoscope blade',
-  'Video laryngoscope blade',
-  'Face-mask size',
-  'Double-lumen tube / bronchial blocker size',
-  'Bougie and stylet sizing',
-  'Pediatric laryngoscope blade for ages not listed (1 to 6 months, 12 to 24 months, above 6 years)',
+  'Adult nasal ETT depth (exact cm)',
+  'Video laryngoscope blade geometry selection',
+  'Face-mask sizing by face contour',
+  'Bougie and stylet internal caliber selection',
+  'Pediatric ETT outside standard 1 to 8 years formulas',
 ];
 
 /** Principles shown on the Airway tab, from the ASA difficult airway guideline. */

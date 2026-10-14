@@ -2,12 +2,16 @@
 // Out-of-range or unsourced requests return { ok: false } so the UI can show NO_SOURCE_VALUE.
 
 import {
+  ADULT_AIRWAY_RULES,
+  DLT_BANDS,
   LMA_BANDS,
   PEDS_BLADES,
   PEDS_ETT_AGE_RANGE_YEARS,
   PEDS_ETT_DEPTH_FACTOR,
   PEDS_ETT_FORMULAS,
+  type AdultAirwayRule,
   type BladeBand,
+  type DltBand,
   type LmaSizeBand,
 } from '../../data/airwayDevices';
 
@@ -68,4 +72,69 @@ export const lmaSizeForWeight = (weightKg: number): LmaResult | Unsourced => {
 export const pedsBladeForAge = (ageMonths: number): BladeBand | null => {
   if (!Number.isFinite(ageMonths) || ageMonths < 0) return null;
   return PEDS_BLADES.find((b) => ageMonths >= b.fromMonths && ageMonths < b.toMonths) ?? null;
+};
+
+export interface AdultAirwayResult {
+  ok: true;
+  sex: 'male' | 'female';
+  idRangeMm: string;
+  frenchRange: string;
+  oralDepthRangeCm: string;
+  blade: string;
+  sourceIds: string[];
+}
+
+export const adultEttAndBlade = (sex: 'male' | 'female' | null): AdultAirwayResult | Unsourced => {
+  if (sex !== 'male' && sex !== 'female') {
+    return { ok: false, reason: 'Select patient biological sex for adult ETT and blade sizing.' };
+  }
+  const rule = ADULT_AIRWAY_RULES[sex];
+  return {
+    ok: true,
+    sex,
+    idRangeMm: rule.idRangeMm,
+    frenchRange: rule.frenchRange,
+    oralDepthRangeCm: rule.oralDepthRangeCm,
+    blade: rule.blade,
+    sourceIds: rule.sourceIds,
+  };
+};
+
+export interface DltResult {
+  ok: true;
+  heightCm: number;
+  sizeFr: string;
+  category: string;
+  sourceIds: string[];
+}
+
+export const dltSizeForHeight = (heightCm: number | null): DltResult | Unsourced => {
+  if (heightCm === null || !Number.isFinite(heightCm) || heightCm <= 0) {
+    return { ok: false, reason: 'Enter patient height to determine double-lumen tube size.' };
+  }
+
+  const band = DLT_BANDS.find((b) => {
+    if (b.minHeightCm === null && b.maxHeightCm !== null) {
+      return heightCm < b.maxHeightCm;
+    }
+    if (b.minHeightCm !== null && b.maxHeightCm !== null) {
+      return heightCm >= b.minHeightCm && heightCm <= b.maxHeightCm;
+    }
+    if (b.minHeightCm !== null && b.maxHeightCm === null) {
+      return heightCm > b.minHeightCm;
+    }
+    return false;
+  });
+
+  if (!band) {
+    return { ok: false, reason: 'No DLT size found for this height.' };
+  }
+
+  return {
+    ok: true,
+    heightCm,
+    sizeFr: band.sizeFr,
+    category: band.category,
+    sourceIds: band.sourceIds,
+  };
 };

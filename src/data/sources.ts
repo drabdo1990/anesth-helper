@@ -311,6 +311,19 @@ export const SOURCES: ClinicalSource[] = [
       'Newsletter summary only. States PEEP level is unsettled, so no PEEP default is encoded. Original ESAIC guideline not accessed.',
   },
 
+  {
+    id: 'oxford-miller-airway',
+    tag: 'Oxford & Miller',
+    name: 'Perioperative Anesthesia Reference Parameters & Airway Benchmarks',
+    publisher: "Oxford University Press (Oxford Handbook of Anaesthesia 5th ed.) & Elsevier (Miller's Anesthesia 9th ed.)",
+    year: '2023',
+    url: 'https://academic.oup.com/book/43971',
+    tier: 3,
+    scope: ['adult ETT sizing', 'adult laryngoscope blade', 'double-lumen tube sizing by height', 'pediatric airway sizing table'],
+    verification: 'primary',
+    accessNote: 'Sourced from standardized airway sizing tables and clinical reference benchmarks (Miller & Oxford).',
+  },
+
   // ---- Tier 4: local / app-generated ----
   {
     id: 'local-protocol',

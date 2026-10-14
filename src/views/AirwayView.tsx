@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertOctagon } from 'lucide-react';
+import { AlertOctagon, BookOpen } from 'lucide-react';
 import {
   AIRWAY_PRINCIPLES,
   AIRWAY_UNSOURCED,
@@ -8,7 +8,13 @@ import {
   PEDS_ETT_FORMULAS,
 } from '../data/airwayDevices';
 import { useAppStore } from '../store/useAppStore';
-import { lmaSizeForWeight, pedsBladeForAge, pedsEtt } from '../lib/calc/airway';
+import {
+  adultEttAndBlade,
+  dltSizeForHeight,
+  lmaSizeForWeight,
+  pedsBladeForAge,
+  pedsEtt,
+} from '../lib/calc/airway';
 import { NumericStepper } from '../components/ui/NumericStepper';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
@@ -41,6 +47,8 @@ export const AirwayView: React.FC = () => {
   const ageYears = patient.ageYears;
   const ageMonths = ageYears === null ? null : ageYears * 12;
   const lma = patient.tbwKg !== null ? lmaSizeForWeight(patient.tbwKg) : null;
+  const adultAirway = patient.sex !== null ? adultEttAndBlade(patient.sex) : null;
+  const dlt = patient.heightCm !== null ? dltSizeForHeight(patient.heightCm) : null;
 
   const ageDisplay = ageYears === null ? null : ageUnit === 'years' ? Math.round(ageYears * 100) / 100 : Math.round(ageYears * 12);
 
@@ -149,6 +157,66 @@ export const AirwayView: React.FC = () => {
         </>
       )}
 
+      {population === 'adult' && (
+        <>
+          <Card title="Endotracheal tube & laryngoscope blade (adult)" basis="sex" sourceIds={['oxford-miller-airway']}>
+            {patient.sex === null ? (
+              <div className="flex flex-col gap-2">
+                <WarningBanner level="info">Select patient sex to display adult ETT sizing and blade recommendations.</WarningBanner>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPatient({ sex: 'female' })}
+                    className="flex-1 min-h-[44px] rounded-xl border border-slate-700 bg-slate-900 py-2 text-xs font-bold text-slate-200 hover:border-cyan-500 touch-manipulation"
+                  >
+                    Female (7.0–7.5 mm)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPatient({ sex: 'male' })}
+                    className="flex-1 min-h-[44px] rounded-xl border border-slate-700 bg-slate-900 py-2 text-xs font-bold text-slate-200 hover:border-cyan-500 touch-manipulation"
+                  >
+                    Male (8.0–8.5 mm)
+                  </button>
+                </div>
+              </div>
+            ) : adultAirway && adultAirway.ok ? (
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-950 p-2">
+                  <UnitValue label={`ETT internal diameter (${adultAirway.sex})`} value={adultAirway.idRangeMm} unit="mm ID" size="lg" tone="cyan" />
+                  <UnitValue label="Oral depth to teeth" value={adultAirway.oralDepthRangeCm} unit="cm" size="lg" align="end" />
+                  <UnitValue label="Outer size" value={adultAirway.frenchRange} unit="French" size="md" />
+                  <UnitValue label="Laryngoscope blade" value={adultAirway.blade} unit="" size="md" align="end" tone="cyan" />
+                </div>
+                <p className="text-xs text-slate-400">
+                  Standard adult tracheal intubation sizing (Oxford Handbook & Miller&apos;s Anesthesia). Verify bilateral breath sounds and maintain cuff pressure at 20–30 cmH2O.
+                </p>
+              </div>
+            ) : (
+              <NoSourceValue topic="Adult ETT and blade" />
+            )}
+          </Card>
+
+          <Card title="Double-lumen endobronchial tube (DLT)" basis="height" sourceIds={['oxford-miller-airway']}>
+            {patient.heightCm === null ? (
+              <WarningBanner level="info">Enter patient height in the biometric bar to size a left-sided double-lumen tube (DLT).</WarningBanner>
+            ) : dlt && dlt.ok ? (
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-950 p-2">
+                  <UnitValue label={`Height ${patient.heightCm.toFixed(0)} cm`} value={dlt.sizeFr} unit="Left DLT" size="lg" tone="cyan" />
+                  <UnitValue label="Height tier" value={dlt.category.split('(')[0].trim()} unit="" size="md" align="end" />
+                </div>
+                <p className="text-xs text-slate-300">
+                  {dlt.category}. Airway dimensions correlate with height. Chronic smokers and cystic fibrosis patients may tolerate larger sizes than predicted.
+                </p>
+              </div>
+            ) : (
+              <NoSourceValue topic="DLT size for this height" />
+            )}
+          </Card>
+        </>
+      )}
+
       <Card title="Laryngeal mask airway (LMA Classic)" basis="weight" sourceIds={['teleflex-lma', 'esafe-lma-cuff']}>
         {patient.tbwKg === null ? (
           <WarningBanner level="info">Enter actual weight to size an LMA.</WarningBanner>
@@ -179,6 +247,14 @@ export const AirwayView: React.FC = () => {
         </ul>
         <NoSourceValue topic="OPA / NPA size by age or sex" compact />
       </Card>
+
+      <button
+        type="button"
+        onClick={() => useAppStore.getState().setReferencesOpen(true)}
+        className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-cyan-800/60 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 hover:bg-cyan-950/60 touch-manipulation transition-colors"
+      >
+        <BookOpen className="h-4 w-4" /> Open Full Airway Sizing & Equipment Benchmarks Guide
+      </button>
 
       <section className="flex flex-col gap-2" aria-label="Items without a sourced value">
         <h3 className="text-sm font-black uppercase tracking-wider text-slate-300">No sourced value in this build</h3>

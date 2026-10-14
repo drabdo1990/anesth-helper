@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { lmaSizeForWeight, pedsBladeForAge, pedsEtt, roundToHalf } from '../airway';
+import {
+  adultEttAndBlade,
+  dltSizeForHeight,
+  lmaSizeForWeight,
+  pedsBladeForAge,
+  pedsEtt,
+  roundToHalf,
+} from '../airway';
 
 describe('pediatric ETT', () => {
   it('cuffed = age/4 + 3.5, depth = 3 x ID', () => {
@@ -104,3 +111,50 @@ describe('pediatric blade by age', () => {
     expect(pedsBladeForAge(-1)).toBeNull();
   });
 });
+
+describe('adult ETT and blade sizing', () => {
+  it('returns female sizing standards', () => {
+    const r = adultEttAndBlade('female');
+    if (!r.ok) throw new Error('expected ok');
+    expect(r.idRangeMm).toBe('7.0–7.5');
+    expect(r.frenchRange).toBe('28–30');
+    expect(r.oralDepthRangeCm).toBe('20–22');
+    expect(r.blade).toBe('Macintosh 3');
+  });
+
+  it('returns male sizing standards', () => {
+    const r = adultEttAndBlade('male');
+    if (!r.ok) throw new Error('expected ok');
+    expect(r.idRangeMm).toBe('8.0–8.5');
+    expect(r.frenchRange).toBe('32–34');
+    expect(r.oralDepthRangeCm).toBe('22–24');
+    expect(r.blade).toBe('Macintosh 3–4');
+  });
+
+  it('rejects null or missing sex', () => {
+    expect(adultEttAndBlade(null).ok).toBe(false);
+  });
+});
+
+describe('DLT sizing by height', () => {
+  it.each([
+    [155, '35–37 Fr'],
+    [164.9, '35–37 Fr'],
+    [165, '37–39 Fr'],
+    [175, '37–39 Fr'],
+    [178, '37–39 Fr'],
+    [178.1, '39–41 Fr'],
+    [190, '39–41 Fr'],
+  ])('height %s cm -> %s', (heightCm, expectedFr) => {
+    const r = dltSizeForHeight(heightCm);
+    if (!r.ok) throw new Error('expected ok');
+    expect(r.sizeFr).toBe(expectedFr);
+  });
+
+  it('rejects null or invalid height', () => {
+    expect(dltSizeForHeight(null).ok).toBe(false);
+    expect(dltSizeForHeight(-10).ok).toBe(false);
+    expect(dltSizeForHeight(Number.NaN).ok).toBe(false);
+  });
+});
+
