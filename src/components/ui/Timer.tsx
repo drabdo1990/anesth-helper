@@ -27,7 +27,8 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
   const audioEnabled = useAppStore((s) => s.audioEnabled);
   const setAudioEnabled = useAppStore((s) => s.setAudioEnabled);
   const [now, setNow] = useState(() => Date.now());
-  const lastAlertBucket = useRef(0);
+  // null until the first effect run, so re-mounting a timer that is already running does not replay an old alert.
+  const lastAlertBucket = useRef<number | null>(null);
 
   const running = timer?.running ?? false;
   useEffect(() => {
@@ -42,7 +43,7 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
   const flashing = running && alertEverySeconds > 0 && seconds > 0 && seconds % alertEverySeconds < 2;
 
   useEffect(() => {
-    if (!running || alertEverySeconds <= 0) {
+    if (!running || alertEverySeconds <= 0 || lastAlertBucket.current === null) {
       lastAlertBucket.current = bucket;
       return;
     }
