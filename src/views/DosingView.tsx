@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { CATEGORY_LABELS, CATEGORY_ORDER, CATEGORY_PLACEHOLDERS, MEDICATIONS } from '../data/medications';
-import type { MedicationCategory } from '../data/types';
 import { useAppStore } from '../store/useAppStore';
 import { useBiometricResult } from '../store/useBiometrics';
 import { DrugCard } from '../components/DrugCard';
 import { LocalAnestheticPanel } from '../components/LocalAnestheticPanel';
 import { NeuraxialReference } from '../components/NeuraxialReference';
 import { ReferenceDrugsPanel } from '../components/ReferenceDrugsPanel';
+import { OTHER_REFERENCE_FILTER, OTHER_REFERENCE_LABEL, type DosingFilter } from '../data/referenceGroups';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
 
-type Filter = MedicationCategory | 'all';
+type Filter = DosingFilter;
 
 export const DosingView: React.FC = () => {
   const [filter, setFilter] = useState<Filter>('all');
@@ -44,7 +44,11 @@ export const DosingView: React.FC = () => {
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Drug categories">
-        {([{ id: 'all', label: 'All' }, ...CATEGORY_ORDER.map((c) => ({ id: c, label: CATEGORY_LABELS[c] }))] as { id: Filter; label: string }[]).map((c) => (
+        {([
+          { id: 'all', label: 'All' },
+          ...CATEGORY_ORDER.map((c) => ({ id: c, label: CATEGORY_LABELS[c] })),
+          { id: OTHER_REFERENCE_FILTER, label: OTHER_REFERENCE_LABEL },
+        ] as { id: Filter; label: string }[]).map((c) => (
           <button
             key={c.id}
             type="button"
@@ -91,7 +95,7 @@ export const DosingView: React.FC = () => {
         );
       })}
 
-      <ReferenceDrugsPanel query={q} category={filter} />
+      <ReferenceDrugsPanel query={q} filter={filter} />
     </div>
   );
 };

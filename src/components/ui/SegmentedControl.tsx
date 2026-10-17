@@ -1,7 +1,8 @@
 import React from 'react';
 
 interface SegmentedControlProps<T extends string> {
-  value: T;
+  /** null = nothing selected yet. */
+  value: T | null;
   options: { value: T; label: string }[];
   onChange: (value: T) => void;
   ariaLabel: string;

@@ -78,7 +78,8 @@ export const VentilationView: React.FC = () => {
   const range = scenario.tidalVolumeMlPerKgPbw;
 
   const heightOk = patient.heightCm !== null && patient.heightCm >= MIN_HEIGHT_CM && patient.heightCm <= MAX_HEIGHT_CM;
-  const pbw = heightOk && patient.heightCm !== null ? calculateDevineIbw(patient.sex, patient.heightCm) : null;
+  const pbw =
+    heightOk && patient.heightCm !== null && patient.sex !== null ? calculateDevineIbw(patient.sex, patient.heightCm) : null;
   const pediatric = patient.ageYears !== null && patient.ageYears < 18;
   const isPediatricContext = pediatric || scenario.id === 'pediatric';
   const shortStature = !pediatric && patient.heightCm !== null && patient.heightCm < 152.4;
@@ -135,7 +136,7 @@ export const VentilationView: React.FC = () => {
       )}
       {shortStature && (
         <WarningBanner level="amber" title="Height below Devine 152.4 cm (5 ft) baseline">
-          PBW is fixed at the {patient.sex === 'male' ? '50' : '45.5'} kg baseline floor. Calculated tidal volume ({vt?.toFixed(0)} mL) may overestimate lung volume for short stature.
+          PBW is fixed at the {patient.sex === 'male' ? '50 kg' : patient.sex === 'female' ? '45.5 kg' : '45.5 kg (female) or 50 kg (male)'} baseline floor. Calculated tidal volume ({vt?.toFixed(0)} mL) may overestimate lung volume for short stature.
         </WarningBanner>
       )}
 

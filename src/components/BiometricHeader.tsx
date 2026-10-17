@@ -33,7 +33,7 @@ export const BiometricHeader: React.FC = () => {
   const [ageKeypad, setAgeKeypad] = useState(false);
 
   // Open while weight/height are missing; collapse once both are set so results stay on screen.
-  const complete = patient.tbwKg !== null && patient.heightCm !== null;
+  const complete = patient.tbwKg !== null && patient.heightCm !== null && patient.sex !== null;
   const wasComplete = useRef(false);
   useEffect(() => {
     if (complete && !wasComplete.current) setOpen(false);
@@ -56,7 +56,7 @@ export const BiometricHeader: React.FC = () => {
         >
           <span className="font-mono text-sm font-bold tabular-nums text-cyan-300">
             {patient.tbwKg !== null ? `${formatKg(patient.tbwKg)} kg` : '-- kg'} ·{' '}
-            {patient.heightCm !== null ? `${patient.heightCm} cm` : '-- cm'} · {patient.sex === 'male' ? 'M' : 'F'}
+            {patient.heightCm !== null ? `${patient.heightCm} cm` : '-- cm'} · {patient.sex === null ? '--' : patient.sex === 'male' ? 'M' : 'F'}
             {patient.ageYears !== null ? ` · ${patient.ageYears} y` : ''}
           </span>
           <span className="flex items-center gap-1 text-xs font-semibold text-slate-400">
@@ -119,7 +119,7 @@ export const BiometricHeader: React.FC = () => {
               <Pill label="ABW40" value={formatKg(b.abw40)} unit="kg" tone="text-emerald-300" title="IBW + 0.4 x (TBW - IBW)" />
             </>
           ) : (
-            <span className="text-xs text-slate-400">Body-weight scalars appear here once weight and height are valid.</span>
+            <span className="text-xs text-slate-400">Body-weight scalars appear here once weight, height and sex are entered.</span>
           )}
           <button
             type="button"
@@ -148,7 +148,14 @@ export const BiometricHeader: React.FC = () => {
           </button>
         </div>
 
-        {!result.ok && (patient.tbwKg !== null || patient.heightCm !== null) && (
+        {!result.ok && patient.tbwKg !== null && patient.heightCm !== null && patient.sex === null && (
+          <div className="mt-1">
+            <WarningBanner level="amber" title="Select biological sex">
+              Predicted, ideal and lean body weights depend on sex and are never assumed. Calculations stay blank until you choose.
+            </WarningBanner>
+          </div>
+        )}
+        {!result.ok && patient.sex !== null && (patient.tbwKg !== null || patient.heightCm !== null) && (
           <div className="mt-1">
             <WarningBanner level="red" title="Invalid input">
               {result.error} Calculations are blank until this is fixed.
@@ -165,7 +172,7 @@ export const BiometricHeader: React.FC = () => {
         {!pediatric && patient.heightCm !== null && patient.heightCm < 152.4 && (
           <div className="mt-1">
             <WarningBanner level="amber" title="Height below Devine 152.4 cm (5 ft) baseline">
-              Devine formula hit its floor ({patient.sex === 'male' ? '50' : '45.5'} kg) and does not scale below 152.4 cm. Verify tidal volume and IBW against your protocol.
+              Devine formula hit its floor ({patient.sex === 'male' ? '50 kg' : patient.sex === 'female' ? '45.5 kg' : '45.5 kg female, 50 kg male'}) and does not scale below 152.4 cm. Verify tidal volume and IBW against your protocol.
             </WarningBanner>
           </div>
         )}

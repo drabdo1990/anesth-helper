@@ -60,6 +60,30 @@ export const validateBiometricInput = (input: BiometricInput): string | null => 
   return null;
 };
 
+/** Patient inputs as the UI holds them: any of them can still be unset. Sex is never assumed. */
+export interface PatientBiometricInput {
+  tbwKg: number | null;
+  heightCm: number | null;
+  sex: Sex | null;
+}
+
+const joinList = (items: string[]): string =>
+  items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+
+/** Like computeBiometrics, but accepts unset fields and names what is still missing. */
+export const computePatientBiometrics = (p: PatientBiometricInput): BiometricResult => {
+  const { tbwKg, heightCm, sex } = p;
+  if (tbwKg === null || heightCm === null || sex === null) {
+    const missing = [
+      tbwKg === null ? 'actual weight' : null,
+      heightCm === null ? 'height' : null,
+      sex === null ? 'biological sex' : null,
+    ].filter((s): s is string => s !== null);
+    return { ok: false, error: `Enter ${joinList(missing)}.` };
+  }
+  return computeBiometrics({ tbwKg, heightCm, sex });
+};
+
 export const computeBiometrics = (input: BiometricInput): BiometricResult => {
   const error = validateBiometricInput(input);
   if (error) return { ok: false, error };

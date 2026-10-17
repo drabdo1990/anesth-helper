@@ -1,12 +1,7 @@
 import React from 'react';
 import { REFERENCE_DRUGS } from '../data/referenceDrugs';
-import type {
-  MedicationCategory,
-  ReferenceDoseLine,
-  ReferenceDrug,
-  ReferenceDrugGroup,
-  ReferenceInfusionLine,
-} from '../data/types';
+import { referenceGroupsForFilter, type DosingFilter } from '../data/referenceGroups';
+import type { ReferenceDoseLine, ReferenceDrug, ReferenceDrugGroup, ReferenceInfusionLine } from '../data/types';
 import { SourceBadge } from './ui/SourceBadge';
 import { WarningBanner } from './ui/WarningBanner';
 
@@ -20,16 +15,6 @@ const GROUP_LABELS: Record<ReferenceDrugGroup, string> = {
   'analgesic-adjunct': 'Analgesic adjuncts',
   'electrolyte-metabolic': 'Electrolytes and metabolic',
   emergency: 'Emergency',
-};
-const GROUP_ORDER = Object.keys(GROUP_LABELS) as ReferenceDrugGroup[];
-
-const CATEGORY_TO_GROUPS: Partial<Record<MedicationCategory, ReferenceDrugGroup[]>> = {
-  induction: ['induction'],
-  preinduction: ['premedication'],
-  opioids: ['opioid', 'analgesic-adjunct'],
-  nmba: ['nmba'],
-  vasoactive: ['vasoactive'],
-  postoperative: ['antiemetic'],
 };
 
 const range = (min: number, max?: number): string => (max === undefined || max === min ? `${min}` : `${min}-${max}`);
@@ -113,22 +98,18 @@ const DrugEntry: React.FC<{ drug: ReferenceDrug }> = ({ drug }) => (
 interface Props {
   /** Lower-cased, trimmed search text from the dosing view. */
   query: string;
-  category?: MedicationCategory | 'all';
+  /** The dosing view's active filter; the groups it shows come from referenceGroups.ts. */
+  filter?: DosingFilter;
 }
 
 /** Reference only: nothing here uses the weight you entered or computes a dose. */
-export const ReferenceDrugsPanel: React.FC<Props> = ({ query, category = 'all' }) => {
-  const allowedGroups =
-    category === 'all'
-      ? GROUP_ORDER
-      : CATEGORY_TO_GROUPS[category] ?? [];
+export const ReferenceDrugsPanel: React.FC<Props> = ({ query, filter = 'all' }) => {
+  const allowedGroups = referenceGroupsForFilter(filter);
+  if (allowedGroups.length === 0) return null;
 
-  if (category !== 'all' && allowedGroups.length === 0) return null;
-
-  const matches = REFERENCE_DRUGS.filter((d) => {
-    if (category !== 'all' && !allowedGroups.includes(d.group)) return false;
-    return query === '' || d.name.toLowerCase().includes(query) || d.id.includes(query);
-  });
+  const matches = REFERENCE_DRUGS.filter(
+    (d) => allowedGroups.includes(d.group) && (query === '' || d.name.toLowerCase().includes(query) || d.id.includes(query)),
+  );
   if (matches.length === 0) return null;
 
   return (

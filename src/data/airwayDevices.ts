@@ -179,10 +179,10 @@ export interface DltBand {
 
 export const DLT_BANDS: DltBand[] = [
   {
-    minHeightCm: 150,
+    minHeightCm: null,
     maxHeightCm: 165,
     sizeFr: '35–37 Fr',
-    category: 'Short (150–165 cm / 4\'11"–5\'5")',
+    category: 'Short (< 165 cm / < 5\'5")',
     sourceIds: ['oxford-miller-airway'],
   },
   {
@@ -200,6 +200,18 @@ export const DLT_BANDS: DltBand[] = [
     sourceIds: ['oxford-miller-airway'],
   },
 ];
+
+/**
+ * APP SAFETY RULE, NOT FROM A SOURCE. The sourced DLT bands above only say "Short: under 165 cm" and name no lower
+ * limit. This app refuses to show a double-lumen tube size below the height floor or under the age limit because a
+ * size chosen from an adult height table could be unsafe there. `sourceIds` is empty on purpose: the value needs
+ * clinician sign-off, and the UI says so wherever it is applied.
+ */
+export const DLT_SAFETY_FLOOR = {
+  minHeightCm: 150,
+  minAgeYears: 18,
+  sourceIds: [] as string[],
+} as const;
 
 export interface AirwayEquipmentItem {
   title: string;

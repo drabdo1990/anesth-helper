@@ -15,7 +15,8 @@ export type ScalarPreference = 'auto' | WeightScalar;
 export interface PatientInput {
   tbwKg: number | null;
   heightCm: number | null;
-  sex: Sex;
+  /** Unset until the user chooses: the app never assumes a sex. */
+  sex: Sex | null;
   ageYears: number | null;
 }
 
@@ -42,7 +43,7 @@ export interface TimerState {
   accumulatedMs: number;
 }
 
-const EMPTY_PATIENT: PatientInput = { tbwKg: null, heightCm: null, sex: 'male', ageYears: null };
+export const EMPTY_PATIENT: PatientInput = { tbwKg: null, heightCm: null, sex: null, ageYears: null };
 
 const DEFAULT_VENT: VentState = {
   scenarioId: 'ards',

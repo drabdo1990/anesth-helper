@@ -69,7 +69,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
   if (!biometrics) {
     return (
       <WarningBanner level="info" title="Actual weight needed">
-        Local anesthetic limits depend on actual body weight. Enter weight and height to use this calculator.
+        Local anesthetic limits depend on actual body weight. Enter weight, height and biological sex to use this calculator.
       </WarningBanner>
     );
   }

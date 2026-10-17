@@ -55,7 +55,7 @@ export const AirwayView: React.FC = () => {
   const ageMonths = ageYears === null ? null : ageYears * 12;
   const lma = patient.tbwKg !== null ? lmaSizeForWeight(patient.tbwKg) : null;
   const adultAirway = patient.sex !== null ? adultEttAndBlade(patient.sex) : null;
-  const dlt = patient.heightCm !== null ? dltSizeForHeight(patient.heightCm) : null;
+  const dlt = patient.heightCm !== null ? dltSizeForHeight(patient.heightCm, patient.ageYears) : null;
 
   const ageDisplay = ageYears === null ? null : ageUnit === 'years' ? Math.round(ageYears * 100) / 100 : Math.round(ageYears * 12);
 
@@ -203,6 +203,8 @@ export const AirwayView: React.FC = () => {
                     Standard adult tracheal intubation sizing (Oxford Handbook & Miller&apos;s Anesthesia). Verify bilateral breath sounds and maintain cuff pressure at 20–30 cmH2O.
                   </p>
                 </>
+              ) : patient.sex === null ? (
+                <WarningBanner level="info">Select biological sex to display adult ETT sizing and blade recommendations.</WarningBanner>
               ) : (
                 <NoSourceValue topic="Adult ETT and blade" />
               )}

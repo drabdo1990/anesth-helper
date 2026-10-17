@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DLT_BANDS, DLT_SAFETY_FLOOR } from '../../../data/airwayDevices';
 import {
   adultEttAndBlade,
   dltSizeForHeight,
@@ -151,14 +152,49 @@ describe('DLT sizing by height', () => {
     expect(r.sizeFr).toBe(expectedFr);
   });
 
-  it('rejects height < 150 cm or pediatric patients', () => {
+  it('rejects height < 150 cm and labels the rule as unsourced', () => {
     const shortAdult = dltSizeForHeight(149.9);
     expect(shortAdult.ok).toBe(false);
     if (!shortAdult.ok) {
       expect(shortAdult.reason).toContain('< 150 cm');
+      expect(shortAdult.reason).toContain('no source');
     }
-    const peds = dltSizeForHeight(100);
-    expect(peds.ok).toBe(false);
+    expect(dltSizeForHeight(100).ok).toBe(false);
+  });
+
+  it('keeps the sourced "Short (< 165 cm)" band down to the safety floor: 150 cm gets 35-37 Fr', () => {
+    const r = dltSizeForHeight(150);
+    if (!r.ok) throw new Error('expected ok');
+    expect(r.sizeFr).toBe('35–37 Fr');
+    expect(r.category).toBe('Short (< 165 cm / < 5\'5")');
+  });
+
+  it('rejects patients under 18 by age even when the height is in range', () => {
+    const teen = dltSizeForHeight(165, 15);
+    expect(teen.ok).toBe(false);
+    if (!teen.ok) expect(teen.reason).toContain('age < 18');
+    expect(dltSizeForHeight(165, 17.99).ok).toBe(false);
+  });
+
+  it('allows adults and an unknown age', () => {
+    expect(dltSizeForHeight(165, 18).ok).toBe(true);
+    expect(dltSizeForHeight(165, null).ok).toBe(true);
+    expect(dltSizeForHeight(165).ok).toBe(true);
+  });
+
+  it('declares the safety floor as having no source, so it cannot pass for sourced data', () => {
+    expect(DLT_SAFETY_FLOOR.sourceIds).toEqual([]);
+    expect(DLT_SAFETY_FLOOR.minHeightCm).toBe(150);
+    expect(DLT_SAFETY_FLOOR.minAgeYears).toBe(18);
+  });
+
+  it('keeps every sourced DLT band free of the app floor (bands stay exactly as sourced)', () => {
+    const [short, medium, tall] = DLT_BANDS;
+    expect(short.minHeightCm).toBeNull();
+    expect(short.maxHeightCm).toBe(165);
+    expect([medium.minHeightCm, medium.maxHeightCm]).toEqual([165, 178]);
+    expect([tall.minHeightCm, tall.maxHeightCm]).toEqual([178, null]);
+    for (const b of DLT_BANDS) expect(b.sourceIds.length).toBeGreaterThan(0);
   });
 
   it('rejects null or invalid height', () => {

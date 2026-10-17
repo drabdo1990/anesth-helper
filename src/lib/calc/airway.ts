@@ -4,6 +4,7 @@
 import {
   ADULT_AIRWAY_RULES,
   DLT_BANDS,
+  DLT_SAFETY_FLOOR,
   LMA_BANDS,
   PEDS_BLADES,
   PEDS_ETT_AGE_RANGE_YEARS,
@@ -108,17 +109,27 @@ export interface DltResult {
   sourceIds: string[];
 }
 
-export const dltSizeForHeight = (heightCm: number | null): DltResult | Unsourced => {
+export const dltSizeForHeight = (heightCm: number | null, ageYears: number | null = null): DltResult | Unsourced => {
   if (heightCm === null || !Number.isFinite(heightCm) || heightCm <= 0) {
     return { ok: false, reason: 'Enter patient height to determine double-lumen tube size.' };
   }
-  if (heightCm < 150) {
-    return { ok: false, reason: 'Double-lumen tubes are not recommended for height < 150 cm or pediatric patients. Consider a bronchial blocker.' };
+  // App safety rule (DLT_SAFETY_FLOOR), not from a named source: say so in the message.
+  if (ageYears !== null && Number.isFinite(ageYears) && ageYears < DLT_SAFETY_FLOOR.minAgeYears) {
+    return {
+      ok: false,
+      reason: `App safety rule (no source, needs clinician review): no adult double-lumen tube size is shown for age < ${DLT_SAFETY_FLOOR.minAgeYears} years. Consider a bronchial blocker.`,
+    };
+  }
+  if (heightCm < DLT_SAFETY_FLOOR.minHeightCm) {
+    return {
+      ok: false,
+      reason: `App safety rule (no source, needs clinician review): no double-lumen tube size is shown for height < ${DLT_SAFETY_FLOOR.minHeightCm} cm. Consider a bronchial blocker.`,
+    };
   }
 
   const band = DLT_BANDS.find((b) => {
-    if (b.maxHeightCm === 165) {
-      return heightCm < 165 && (b.minHeightCm === null || heightCm >= b.minHeightCm);
+    if (b.minHeightCm === null && b.maxHeightCm !== null) {
+      return heightCm < b.maxHeightCm;
     }
     if (b.minHeightCm !== null && b.maxHeightCm !== null) {
       return heightCm >= b.minHeightCm && heightCm <= b.maxHeightCm;

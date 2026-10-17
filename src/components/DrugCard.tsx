@@ -227,7 +227,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
           <WarningBanner level="info">
             {dose.weightBandKg
               ? 'Enter actual weight to confirm this weight-banded dose.'
-              : 'Enter actual weight and height to calculate this weight-based dose.'}
+              : 'Enter actual weight, height and biological sex to calculate this weight-based dose.'}
           </WarningBanner>
         )}
 
