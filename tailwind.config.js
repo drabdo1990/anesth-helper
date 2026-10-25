@@ -27,6 +27,7 @@ export default {
         'glow-cyan': '0 0 15px -3px rgba(6, 182, 212, 0.25)',
         'glow-red': '0 0 20px -3px rgba(239, 68, 68, 0.35)',
         'glow-emerald': '0 0 15px -3px rgba(16, 185, 129, 0.25)',
+        'glow-amber': '0 0 15px -3px rgba(245, 158, 11, 0.25)',
       },
       minHeight: {
         touch: '48px',
