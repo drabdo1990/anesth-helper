@@ -16,25 +16,16 @@ import {
   pedsBladeForAge,
   pedsEtt,
 } from '../lib/calc/airway';
+import { airwaySummary } from '../lib/calc/airwaySummary';
+import { BigValue } from '../components/hud/BigValue';
+import { Panel } from '../components/hud/Panel';
 import { NumericStepper } from '../components/ui/NumericStepper';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
-import { SourceBadge } from '../components/ui/SourceBadge';
 import { UnitValue } from '../components/ui/UnitValue';
 import { WarningBanner } from '../components/ui/WarningBanner';
 
 type Population = 'adult' | 'pediatric';
-
-const Card: React.FC<{ title: string; basis: string; sourceIds: string[]; children: React.ReactNode }> = ({ title, basis, sourceIds, children }) => (
-  <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
-    <div className="flex items-start justify-between gap-2">
-      <h3 className="text-base font-bold text-slate-100">{title}</h3>
-      <span className="rounded-md border border-slate-700 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-300">Basis: {basis}</span>
-    </div>
-    {children}
-    <SourceBadge sourceIds={sourceIds} />
-  </section>
-);
 
 export const AirwayView: React.FC = () => {
   const patient = useAppStore((s) => s.patient);
@@ -56,6 +47,13 @@ export const AirwayView: React.FC = () => {
   const lma = patient.tbwKg !== null ? lmaSizeForWeight(patient.tbwKg) : null;
   const adultAirway = patient.sex !== null ? adultEttAndBlade(patient.sex) : null;
   const dlt = patient.heightCm !== null ? dltSizeForHeight(patient.heightCm, patient.ageYears) : null;
+  const summary = airwaySummary({
+    population,
+    ageYears: patient.ageYears,
+    sex: patient.sex,
+    heightCm: patient.heightCm,
+    weightKg: patient.tbwKg,
+  });
 
   const ageDisplay = ageYears === null ? null : ageUnit === 'years' ? Math.round(ageYears * 100) / 100 : Math.round(ageYears * 12);
 
@@ -71,6 +69,56 @@ export const AirwayView: React.FC = () => {
         onChange={setPopulation}
       />
 
+      <Panel title="Airway summary">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {summary.ett.ok ? (
+            <BigValue
+              label="ETT"
+              value={'idRangeMm' in summary.ett ? summary.ett.idRangeMm : summary.ett.idRoundedMm.toFixed(1)}
+              unit="mm ID"
+            />
+          ) : (population === 'pediatric' ? ageYears : patient.sex) === null ? (
+            <p className="text-sm text-slate-400">{population === 'pediatric' ? 'Enter age for ETT sizing.' : 'Select sex for ETT sizing.'}</p>
+          ) : (
+            <NoSourceValue topic="ETT" compact />
+          )}
+
+          {population === 'adult' ? (
+            summary.blade && 'ok' in summary.blade && summary.blade.ok ? (
+              <BigValue label="Blade" value={summary.blade.blade} />
+            ) : patient.sex === null ? (
+              <p className="text-sm text-slate-400">Select sex for blade sizing.</p>
+            ) : (
+              <NoSourceValue topic="Blade" compact />
+            )
+          ) : summary.blade && 'blade' in summary.blade ? (
+            <BigValue label="Blade" value={summary.blade.blade} />
+          ) : ageYears === null ? (
+            <p className="text-sm text-slate-400">Enter age for blade sizing.</p>
+          ) : (
+            <NoSourceValue topic="Blade" compact />
+          )}
+
+          {summary.lma.ok ? (
+            <BigValue label="LMA" value={`LMA ${summary.lma.band.size}`} />
+          ) : patient.tbwKg === null ? (
+            <p className="text-sm text-slate-400">Enter weight for LMA sizing.</p>
+          ) : (
+            <NoSourceValue topic="LMA" compact />
+          )}
+
+          {population === 'adult' && (
+            summary.dlt.ok ? (
+              <BigValue label="DLT" value={summary.dlt.sizeFr} unit="Fr" />
+            ) : patient.heightCm === null ? (
+              <p className="text-sm text-slate-400">Enter height for DLT sizing.</p>
+            ) : (
+              <NoSourceValue topic="DLT" compact />
+            )
+          )}
+        </div>
+      </Panel>
+
       <button
         type="button"
         onClick={() => openEmergency('cico')}
@@ -79,6 +127,9 @@ export const AirwayView: React.FC = () => {
         <AlertOctagon className="h-5 w-5" /> CICO / failed airway pathway
       </button>
 
+      <details className="rounded-2xl border border-clinical-border bg-clinical-card p-3">
+        <summary className="flex min-h-[48px] cursor-pointer items-center text-base font-bold text-slate-100">Reference</summary>
+        <div className="flex flex-col gap-4 pt-3">
       <WarningBanner level="info" title="ASA difficult airway principles">
         <ul className="list-disc pl-4">
           {AIRWAY_PRINCIPLES.map((p) => (
@@ -116,7 +167,7 @@ export const AirwayView: React.FC = () => {
             <WarningBanner level="info">Enter the child&apos;s age to size tubes and blades.</WarningBanner>
           ) : (
             <>
-              <Card title="Endotracheal tube (pediatric)" basis="age" sourceIds={['msd-peds-ett', 'iowa-peds-ett', 'asa-airway-2022']}>
+              <Panel title="Endotracheal tube (pediatric)" basis="age" sourceIds={['msd-peds-ett', 'iowa-peds-ett', 'asa-airway-2022']}>
                 {(['cuffed-msd', 'uncuffed-msd'] as const).map((fid) => {
                   const r = pedsEtt(ageYears, fid);
                   const formula = PEDS_ETT_FORMULAS.find((f) => f.id === fid);
@@ -150,15 +201,15 @@ export const AirwayView: React.FC = () => {
                 <p className="text-xs text-slate-400">
                   Source formulas cover ages {PEDS_ETT_AGE_RANGE_YEARS.min} to {PEDS_ETT_AGE_RANGE_YEARS.max} years. Confirm tube position with capnography and auscultation and check cuff pressure.
                 </p>
-              </Card>
+              </Panel>
 
-              <Card title="Laryngoscope blade (pediatric)" basis="age" sourceIds={['wikem-peds-airway']}>
+              <Panel title="Laryngoscope blade (pediatric)" basis="age" sourceIds={['wikem-peds-airway']}>
                 {ageMonths !== null && pedsBladeForAge(ageMonths) ? (
                   <UnitValue label={pedsBladeForAge(ageMonths)?.label ?? ''} value={pedsBladeForAge(ageMonths)?.blade ?? ''} unit="" size="lg" tone="cyan" />
                 ) : (
                   <NoSourceValue topic="Blade for this age" />
                 )}
-              </Card>
+              </Panel>
             </>
           )}
         </>
@@ -166,7 +217,7 @@ export const AirwayView: React.FC = () => {
 
       {population === 'adult' && (
         <>
-          <Card title="Endotracheal tube & laryngoscope blade (adult)" basis="sex" sourceIds={['oxford-miller-airway']}>
+          <Panel title="Endotracheal tube & laryngoscope blade (adult)" basis="sex" sourceIds={['oxford-miller-airway']}>
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Biological sex</span>
@@ -174,7 +225,7 @@ export const AirwayView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPatient({ sex: 'female' })}
-                    className={`min-h-[36px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
+                    className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
                       patient.sex === 'female' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
                     }`}
                   >
@@ -183,7 +234,7 @@ export const AirwayView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPatient({ sex: 'male' })}
-                    className={`min-h-[36px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
+                    className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
                       patient.sex === 'male' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
                     }`}
                   >
@@ -209,9 +260,9 @@ export const AirwayView: React.FC = () => {
                 <NoSourceValue topic="Adult ETT and blade" />
               )}
             </div>
-          </Card>
+          </Panel>
 
-          <Card title="Double-lumen endobronchial tube (DLT)" basis="height" sourceIds={['oxford-miller-airway']}>
+          <Panel title="Double-lumen endobronchial tube (DLT)" basis="height" sourceIds={['oxford-miller-airway']}>
             {patient.heightCm === null ? (
               <WarningBanner level="info">Enter patient height in the biometric bar to size a left-sided double-lumen tube (DLT).</WarningBanner>
             ) : dlt && dlt.ok ? (
@@ -230,11 +281,11 @@ export const AirwayView: React.FC = () => {
                 {dlt && !dlt.ok && <WarningBanner level="amber">{dlt.reason}</WarningBanner>}
               </div>
             )}
-          </Card>
+          </Panel>
         </>
       )}
 
-      <Card title="Laryngeal mask airway (LMA Classic)" basis="weight" sourceIds={['teleflex-lma', 'esafe-lma-cuff']}>
+      <Panel title="Laryngeal mask airway (LMA Classic)" basis="weight" sourceIds={['teleflex-lma', 'esafe-lma-cuff']}>
         {patient.tbwKg === null ? (
           <WarningBanner level="info">Enter actual weight to size an LMA.</WarningBanner>
         ) : lma && lma.ok ? (
@@ -255,24 +306,24 @@ export const AirwayView: React.FC = () => {
         ) : (
           <NoSourceValue topic="LMA size" />
         )}
-      </Card>
+      </Panel>
 
-      <Card title="Oropharyngeal and nasopharyngeal airway" basis="clinical" sourceIds={['rch-airway', 'wikem-peds-airway']}>
+      <Panel title="Oropharyngeal and nasopharyngeal airway" basis="clinical" sourceIds={['rch-airway', 'wikem-peds-airway']}>
         <ul className="list-disc pl-5 text-sm text-slate-200">
           <li>Oropharyngeal: centre of the incisors to the angle of the mandible, measured with the airway on the face.</li>
           <li>Nasopharyngeal: tip of the nose to the tragus.</li>
         </ul>
         <NoSourceValue topic="OPA / NPA size by age or sex" compact />
-      </Card>
+      </Panel>
 
       {AIRWAY_EQUIPMENT_REFERENCE.map((item) => (
-        <Card key={item.title} title={item.title} basis="reference" sourceIds={item.sourceIds}>
+        <Panel key={item.title} title={item.title} basis="reference" sourceIds={item.sourceIds}>
           <ul className="list-disc pl-5 text-sm text-slate-200">
             {item.points.map((p) => (
               <li key={p}>{p}</li>
             ))}
           </ul>
-        </Card>
+        </Panel>
       ))}
 
       <button
@@ -289,6 +340,8 @@ export const AirwayView: React.FC = () => {
           <NoSourceValue key={t} topic={t} compact />
         ))}
       </section>
+        </div>
+      </details>
     </div>
   );
 };
