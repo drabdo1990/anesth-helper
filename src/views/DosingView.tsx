@@ -9,11 +9,13 @@ import { NeuraxialReference } from '../components/NeuraxialReference';
 import { ReferenceDrugsPanel } from '../components/ReferenceDrugsPanel';
 import { OTHER_REFERENCE_FILTER, OTHER_REFERENCE_LABEL, type DosingFilter } from '../data/referenceGroups';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
+import { SITUATIONS } from '../data/situations';
 
 type Filter = DosingFilter;
 
 export const DosingView: React.FC = () => {
   const [filter, setFilter] = useState<Filter>('all');
+  const [situation, setSituation] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const recents = useAppStore((s) => s.recents);
   const result = useBiometricResult();
@@ -27,6 +29,8 @@ export const DosingView: React.FC = () => {
 
   const matches = (name: string, cls: string): boolean => q === '' || name.toLowerCase().includes(q) || cls.toLowerCase().includes(q);
   const recentMeds = recents.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined);
+  const activeSituation = SITUATIONS.find((s) => s.id === situation);
+  const situationMeds = activeSituation?.drugIds.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined) ?? [];
 
   return (
     <div className="flex flex-col gap-4 pb-8">
@@ -41,6 +45,20 @@ export const DosingView: React.FC = () => {
           className="min-h-[48px] w-full rounded-xl border border-slate-800 bg-slate-900 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
           aria-label="Search drugs"
         />
+      </div>
+
+      <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Dosing situations">
+        {([{ id: null, label: 'All' }, ...SITUATIONS] as { id: string | null; label: string }[]).map((s) => (
+          <button
+            key={s.id ?? 'all'}
+            type="button"
+            aria-pressed={situation === s.id}
+            onClick={() => setSituation(s.id)}
+            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${situation === s.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Drug categories">
@@ -62,13 +80,21 @@ export const DosingView: React.FC = () => {
         ))}
       </div>
 
-      {filter === 'all' && q === '' && recentMeds.length > 0 && (
+      {activeSituation && (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {situationMeds.map((m) => (
+            <DrugCard key={m.id} medication={m} biometrics={biometrics} />
+          ))}
+        </div>
+      )}
+
+      {situation === null && filter === 'all' && q === '' && recentMeds.length > 0 && (
         <p className="text-xs text-slate-400">
           Recently used: {recentMeds.map((m) => m?.name).join(', ')}
         </p>
       )}
 
-      {visibleCategories.map((cat) => {
+      {situation === null && visibleCategories.map((cat) => {
         const meds = MEDICATIONS.filter((m) => m.category === cat && matches(m.name, m.class));
         const placeholders = CATEGORY_PLACEHOLDERS.filter((p) => p.category === cat && (q === '' || p.topic.toLowerCase().includes(q)));
         if (cat === 'local' && q !== '' && !'local anesthetic lidocaine bupivacaine ropivacaine mepivacaine chloroprocaine'.includes(q)) return null;
@@ -95,7 +121,7 @@ export const DosingView: React.FC = () => {
         );
       })}
 
-      <ReferenceDrugsPanel query={q} filter={filter} />
+      {situation === null && <ReferenceDrugsPanel query={q} filter={filter} />}
     </div>
   );
 };
