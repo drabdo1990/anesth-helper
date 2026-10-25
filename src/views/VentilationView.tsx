@@ -20,6 +20,9 @@ import { NoSourceValue } from '../components/ui/NoSourceValue';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { UnitValue, type ValueTone } from '../components/ui/UnitValue';
 import { WarningBanner } from '../components/ui/WarningBanner';
+import { Panel } from '../components/hud/Panel';
+import { StepFlow } from '../components/hud/StepFlow';
+import { ventSteps } from '../lib/ventFlow';
 
 const TONE: Record<Severity, ValueTone> = { ok: 'cyan', amber: 'amber', red: 'red' };
 const IE_OPTIONS: { label: string; i: number; e: number }[] = [
@@ -58,6 +61,26 @@ const Accordion: React.FC<{ title: string; items: ReferenceItem[] }> = ({ title,
   );
 };
 
+const ReferenceGroup: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="rounded-2xl border border-clinical-border bg-clinical-card">
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex min-h-[48px] w-full items-center justify-between px-3 text-sm font-bold text-slate-200">
+        Reference
+        {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      </button>
+      {open && (
+        <div className="flex flex-col gap-2 px-3 pb-3">
+          <Accordion title="Mode quick reference (VC, PC, PSV, SIMV)" items={VENT_MODES} />
+          <Accordion title="Advanced ventilation and mechanics reference (secondary sources)" items={VENT_ADVANCED_REFERENCE} />
+          <Accordion title="Alarm guidance" items={VENT_ALARMS} />
+          <Accordion title="Troubleshooting prompts" items={VENT_TROUBLESHOOTING} />
+        </div>
+      )}
+    </section>
+  );
+};
+
 export const VentilationView: React.FC = () => {
   const patient = useAppStore((s) => s.patient);
   const vent = useAppStore((s) => s.vent);
@@ -76,6 +99,16 @@ export const VentilationView: React.FC = () => {
 
   const scenario = VENTILATION_SCENARIOS.find((s) => s.id === vent.scenarioId) ?? VENTILATION_SCENARIOS[0];
   const range = scenario.tidalVolumeMlPerKgPbw;
+  const steps = ventSteps({
+    scenario,
+    ageYears: patient.ageYears,
+    heightCm: patient.heightCm,
+    sex: patient.sex,
+    mlPerKgPbw: vent.mlPerKgPbw,
+    respiratoryRate: vent.respiratoryRate,
+    peepCmH2O: vent.peepCmH2O,
+    plateauCmH2O: vent.plateauCmH2O,
+  });
 
   const heightOk = patient.heightCm !== null && patient.heightCm >= MIN_HEIGHT_CM && patient.heightCm <= MAX_HEIGHT_CM;
   const pbw =
@@ -98,6 +131,9 @@ export const VentilationView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4 pb-8">
+      <StepFlow steps={steps} />
+      <Panel title="Ventilation settings">
+        <div className="flex flex-col gap-4">
       <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Ventilation scenario">
         {VENTILATION_SCENARIOS.map((s) => (
           <button
@@ -243,10 +279,9 @@ export const VentilationView: React.FC = () => {
         </section>
       )}
 
-      <Accordion title="Mode quick reference (VC, PC, PSV, SIMV)" items={VENT_MODES} />
-      <Accordion title="Advanced ventilation and mechanics reference (secondary sources)" items={VENT_ADVANCED_REFERENCE} />
-      <Accordion title="Alarm guidance" items={VENT_ALARMS} />
-      <Accordion title="Troubleshooting prompts" items={VENT_TROUBLESHOOTING} />
+        </div>
+      </Panel>
+      <ReferenceGroup />
     </div>
   );
 };
