@@ -45,7 +45,7 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 | **Vent** | Scenario selector, tidal volume from **PBW** (adult age required; never actual weight), minute ventilation, I:E timing, plateau and driving-pressure warnings, mode/alarm/troubleshooting prompts. |
 | **Lists** | Pre-induction, a sourced Fasting / NPO checklist (routine, pediatric, obstetric, GLP-1 and urgent/unscheduled scenarios), machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary built only from fixed choices and numeric fields. |
 | **SOS** (red, bottom bar) | Full-screen LAST, MH and CICO support from any tab. |
-| **References** (book icon) | Source registry, verification status and the values derived from each source. The old prose guide is archived in `docs/reference-archive-2026-10-14.md` and is not a dosing source. |
+| **References** (book icon) | Source registry, verification status and the values derived from each source, plus a side-by-side comparison of the published conflicting GLP-1 perioperative protocols. The old prose guide is archived in `docs/reference-archive-2026-10-14.md` and is not a dosing source. |
 
 ### Biometric formulas (exact)
 

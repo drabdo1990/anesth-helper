@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp, ExternalLink, X } from 'lucide-react';
 import { derivedValuesBySource } from '../data/derived';
-import { DATA_STATUS, DATA_VERSION, SOURCES } from '../data/sources';
+import { GLP1_PROTOCOLS, type Glp1ProtocolReference } from '../data/glp1Protocols';
+import { DATA_STATUS, DATA_VERSION, SOURCES, SOURCE_BY_ID } from '../data/sources';
 import type { ClinicalSource } from '../data/types';
 import { useAppStore } from '../store/useAppStore';
 import { DisclaimerBanner } from '../components/DisclaimerBanner';
@@ -64,6 +65,46 @@ const SourceRow: React.FC<{ source: ClinicalSource; values: string[] }> = ({ sou
   );
 };
 
+const ProtocolRow: React.FC<{ protocol: Glp1ProtocolReference }> = ({ protocol }) => {
+  const source = SOURCE_BY_ID[protocol.sourceId];
+  return (
+    <li className="rounded-xl border border-clinical-border bg-slate-900 p-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h4 className="text-sm font-black text-slate-100">
+          {protocol.label} <span className="font-normal text-slate-400">· {protocol.year}</span>
+        </h4>
+        {source?.url ? (
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={source.name}
+            className="inline-flex min-h-[48px] items-center gap-1 text-xs font-bold text-cyan-300 underline"
+          >
+            <ExternalLink className="h-3.5 w-3.5" /> {source.tag}
+          </a>
+        ) : (
+          <span className="text-xs font-bold text-amber-300">{source?.tag ?? 'Local protocol'}</span>
+        )}
+      </div>
+      <dl className="mt-1 grid gap-2 text-xs text-slate-300">
+        <div>
+          <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Medication</dt>
+          <dd>{protocol.drugRule}</dd>
+        </div>
+        <div>
+          <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Fasting</dt>
+          <dd>{protocol.fastingRule}</dd>
+        </div>
+      </dl>
+      <p className="mt-2 text-xs text-slate-400">
+        <span className="font-bold text-slate-300">Distinction: </span>
+        {protocol.distinction}
+      </p>
+    </li>
+  );
+};
+
 export const ReferencesView: React.FC = () => {
   const open = useAppStore((s) => s.referencesOpen);
   const setOpen = useAppStore((s) => s.setReferencesOpen);
@@ -99,6 +140,21 @@ export const ReferencesView: React.FC = () => {
             {DATA_STATUS} Amber dots on source badges mark sources whose primary text was not fully verified. The structured
             data behind the calculators is the only dosing source in this build.
           </WarningBanner>
+
+          <section className="flex flex-col gap-2">
+            <h3 className="text-sm font-black uppercase tracking-wider text-cyan-300">GLP-1 perioperative protocols</h3>
+            <WarningBanner level="amber" title="Do not combine protocols">
+              These sources give different drug-continuation and fasting instructions for the same GLP-1 patient. Each row
+              is kept as stated by its own source and linked below. Use one adopted protocol rather than combining their
+              times.
+            </WarningBanner>
+            <ul className="flex flex-col gap-2">
+              {GLP1_PROTOCOLS.map((protocol) => (
+                <ProtocolRow key={protocol.id} protocol={protocol} />
+              ))}
+            </ul>
+          </section>
+
           {[1, 2, 3, 4].map((tier) => (
             <section key={tier} className="flex flex-col gap-2">
               <h3 className="text-sm font-black uppercase tracking-wider text-cyan-300">{TIER_TITLES[tier]}</h3>

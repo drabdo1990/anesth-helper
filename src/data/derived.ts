@@ -6,6 +6,7 @@ import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING } from './ventilation';
 import { CHECKLISTS } from './checklists';
+import { GLP1_PROTOCOLS } from './glp1Protocols';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { REFERENCE_DRUGS } from './referenceDrugs';
 import { SOURCES } from './sources';
@@ -84,6 +85,7 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
   for (const t of VENT_TROUBLESHOOTING) add(t.sourceIds, `Ventilator troubleshooting: ${t.title}`);
 
   for (const c of CHECKLISTS) for (const i of c.items) add(i.sourceIds, `Checklist ${c.title}: ${i.text}`);
+  for (const p of GLP1_PROTOCOLS) add([p.sourceId], `GLP-1 protocol ${p.label}: ${p.drugRule} Fasting: ${p.fastingRule}`);
   for (const s of [...LAST_STEPS, ...MH_STEPS, ...CICO_PLANS.flatMap((p) => p.steps)]) add(s.sourceIds, `Emergency step: ${s.text}`);
 
   for (const [id, lines] of Object.entries(PRINCIPLE_SOURCES)) for (const l of lines) out[id]?.push(l);

@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.10.27-draft7';
+export const DATA_VERSION = '2026.10.27-draft10';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -839,17 +839,30 @@ export const SOURCES: ClinicalSource[] = [
     accessNote: 'Open-access full text via PMC. Eight Delphi recommendations; not formally endorsed by a single society. Scope is adult elective anesthesia/sedation, excluding procedure-specific fasting and conditions that substantially increase aspiration risk.',
   },
   {
+    id: 'asa-glp1-2023',
+    tag: 'ASA GLP-1 2023',
+    name: 'American Society of Anesthesiologists Consensus-Based Guidance on Preoperative Management of Patients (Adults and Children) on Glucagon-Like Peptide-1 (GLP-1) Receptor Agonists',
+    publisher: 'American Society of Anesthesiologists',
+    year: '2023',
+    version: 'Published June 2023; updated November 2024',
+    url: 'https://www.asahq.org/about-asa/newsroom/news-releases/2023/06/american-society-of-anesthesiologists-consensus-based-guidance-on-preoperative',
+    tier: 1,
+    scope: ['GLP-1 withholding', 'preoperative fasting', 'GI symptoms', 'urgent and emergent procedures'],
+    verification: 'primary',
+    accessNote: 'Official ASA guidance read. Suggests considering holding daily GLP-1 on the procedure day and weekly GLP-1 for 1 week before; standard fasting applies; urgent or emergent cases are treated as full stomach. The page now points to newer multisociety guidance.',
+  },
+  {
     id: 'glp1-multisociety-2024',
     tag: 'GLP-1 2024',
-    name: 'Most Patients Can Continue Diabetes, Weight Loss GLP-1 Drugs Before Surgery, Those at Highest Risk for GI Problems Should Follow Liquid Diet Before Procedure',
+    name: 'Preprocedure Care of Patients on Glucagon-like Peptide-1 Receptor Agonists: A Multisociety Clinical Practice Guidance',
     publisher: 'American Society of Anesthesiologists, AGA, ASMBS, ISPCOP and SAGES',
     year: '2024',
-    version: 'Multi-society clinical practice guidance, released October 2024',
-    url: 'https://www.asahq.org/about-asa/newsroom/news-releases/2024/10/new-multi-society-glp-1-guidance',
+    version: 'Anesthesiology 2024;141:1208-1209',
+    url: 'https://doi.org/10.1097/ALN.0000000000005231',
     tier: 1,
     scope: ['GLP-1 perioperative continuation', 'escalation phase and GI symptoms', '24 h liquid-only risk mitigation', 'gastric ultrasound', 'procedure delay'],
     verification: 'secondary',
-    accessNote: 'Official ASA release and recommendation summary read; the full multisociety guidance was not accessed. Most patients continue GLP-1 therapy; selected higher-risk patients may need a 24 h liquid-only diet, aspiration-plan changes, gastric ultrasound or delay.',
+    accessNote: 'Official ASA release and article metadata read; full guidance not accessed. Most patients continue GLP-1 therapy; selected higher-risk patients may need a 24 h liquid-only diet, aspiration-plan changes, gastric ultrasound or delay.',
   },
   {
     id: 'glp1-spaqi-2025',
@@ -863,6 +876,32 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['GLP-1 perioperative continuation', 'GLP-1 solid and clear-liquid fasting protocol', 'significant GI symptoms'],
     verification: 'primary',
     accessNote: 'Open-access full text. Separate protocol: continue if no significant GI symptoms; solids 24 h; clear liquids <10% glucose 4 h and >=10% glucose 8 h. These times conflict with other society guidance; do not combine protocols.',
+  },
+  {
+    id: 'glp1-uk-2025',
+    tag: 'UK GLP-1 2025',
+    name: 'Elective peri-operative management of adults taking glucagon-like peptide-1 receptor agonists, glucose-dependent insulinotropic peptide agonists and sodium-glucose cotransporter-2 inhibitors',
+    publisher: 'Association of Anaesthetists, CPOC and UK multidisciplinary societies',
+    year: '2025',
+    version: 'Anaesthesia 2025;80:412-424',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11885194/',
+    tier: 1,
+    scope: ['GLP-1 and GIP/GLP-1 continuation', 'standard perioperative fasting', 'aspiration-risk mitigation'],
+    verification: 'primary',
+    accessNote: 'Open-access full text. Continue GLP-1 and dual GIP/GLP-1 therapy; follow standard fasting; do not extend fasting for the drug alone. Upper GI symptoms alone do not determine gastric content; consider individualized aspiration precautions and gastric ultrasound.',
+  },
+  {
+    id: 'glp1-anzca-2025',
+    tag: 'ANZCA GLP-1 2025',
+    name: 'Clinical Practice Recommendations regarding patients taking GLP-1 receptor agonists and dual GLP-1/GIP receptor co-agonists prior to anaesthesia or sedation for surgical and endoscopic procedures',
+    publisher: 'Australian Diabetes Society, ANZCA, GESA and NACOS',
+    year: '2025',
+    version: 'April 2025; Anaesth Intensive Care 2025;53:300-306',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12420935/',
+    tier: 1,
+    scope: ['GLP-1 and GIP/GLP-1 continuation', '24 h clear-fluid diet', 'standard 6 h fast', 'risk mitigation'],
+    verification: 'primary',
+    accessNote: 'Full PDF and published version reviewed. Do not routinely stop therapy; recommend a 24 h clear-fluid diet then a standard 6 h fast for all patients on these drugs. Risk mitigation is required if solids were not withheld for 24 h.',
   },
   {
     id: 'asa-obstetric-2016',
