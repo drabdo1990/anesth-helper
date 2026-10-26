@@ -69,13 +69,65 @@ export const AirwayView: React.FC = () => {
         onChange={setPopulation}
       />
 
+      {population === 'pediatric' ? (
+        <Panel title="Patient">
+          <SegmentedControl<'years' | 'months'>
+            ariaLabel="Age unit"
+            value={ageUnit}
+            options={[
+              { value: 'years', label: 'Years' },
+              { value: 'months', label: 'Months' },
+            ]}
+            onChange={setAgeUnit}
+          />
+          <NumericStepper
+            label={`Age (${ageUnit})`}
+            value={ageDisplay}
+            unit={ageUnit === 'years' ? 'y' : 'mo'}
+            step={1}
+            min={0}
+            max={ageUnit === 'years' ? 18 : 216}
+            decimals={ageUnit === 'years' && ageYears !== null && !Number.isInteger(ageYears) ? 2 : 0}
+            onChange={(v) => setPatient({ ageYears: ageUnit === 'years' ? v : v / 12 })}
+            keypadTitle="Enter age"
+          />
+        </Panel>
+      ) : (
+        <Panel title="Patient">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Biological sex</span>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => setPatient({ sex: 'female' })}
+                className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
+                  patient.sex === 'female' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
+                }`}
+              >
+                Female (7.0–7.5 mm)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPatient({ sex: 'male' })}
+                className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
+                  patient.sex === 'male' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
+                }`}
+              >
+                Male (8.0–8.5 mm)
+              </button>
+            </div>
+          </div>
+        </Panel>
+      )}
+
       <Panel title="Airway summary">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {summary.ett.ok ? (
             <BigValue
-              label="ETT"
+              label={population === 'pediatric' ? 'ETT cuffed' : 'ETT'}
               value={'idRangeMm' in summary.ett ? summary.ett.idRangeMm : summary.ett.idRoundedMm.toFixed(1)}
               unit="mm ID"
+              sourceIds={'sourceIds' in summary.ett ? summary.ett.sourceIds : ['msd-peds-ett']}
             />
           ) : (population === 'pediatric' ? ageYears : patient.sex) === null ? (
             <p className="text-sm text-slate-400">{population === 'pediatric' ? 'Enter age for ETT sizing.' : 'Select sex for ETT sizing.'}</p>
@@ -83,16 +135,20 @@ export const AirwayView: React.FC = () => {
             <NoSourceValue topic="ETT" compact />
           )}
 
+          {population === 'pediatric' && summary.ettUncuffed.ok && (
+            <BigValue label="ETT uncuffed" value={summary.ettUncuffed.idRoundedMm.toFixed(1)} unit="mm ID" sourceIds={['msd-peds-ett']} />
+          )}
+
           {population === 'adult' ? (
             summary.blade && 'ok' in summary.blade && summary.blade.ok ? (
-              <BigValue label="Blade" value={summary.blade.blade} />
+              <BigValue label="Blade" value={summary.blade.blade} sourceIds={summary.blade.sourceIds} />
             ) : patient.sex === null ? (
               <p className="text-sm text-slate-400">Select sex for blade sizing.</p>
             ) : (
               <NoSourceValue topic="Blade" compact />
             )
           ) : summary.blade && 'blade' in summary.blade ? (
-            <BigValue label="Blade" value={summary.blade.blade} />
+            <BigValue label="Blade" value={summary.blade.blade} sourceIds={['wikem-peds-airway']} />
           ) : ageYears === null ? (
             <p className="text-sm text-slate-400">Enter age for blade sizing.</p>
           ) : (
@@ -100,7 +156,7 @@ export const AirwayView: React.FC = () => {
           )}
 
           {summary.lma.ok ? (
-            <BigValue label="LMA" value={`LMA ${summary.lma.band.size}`} />
+            <BigValue label="LMA" value={`LMA ${summary.lma.band.size}`} sourceIds={['teleflex-lma']} />
           ) : patient.tbwKg === null ? (
             <p className="text-sm text-slate-400">Enter weight for LMA sizing.</p>
           ) : (
@@ -109,7 +165,7 @@ export const AirwayView: React.FC = () => {
 
           {population === 'adult' && (
             summary.dlt.ok ? (
-              <BigValue label="DLT" value={summary.dlt.sizeFr} unit="Fr" />
+              <BigValue label="DLT" value={summary.dlt.sizeFr} unit="Fr" sourceIds={summary.dlt.sourceIds} />
             ) : patient.heightCm === null ? (
               <p className="text-sm text-slate-400">Enter height for DLT sizing.</p>
             ) : (
@@ -117,6 +173,14 @@ export const AirwayView: React.FC = () => {
             )
           )}
         </div>
+        {population === 'pediatric' && ageYears !== null && (() => {
+          const alt = pedsEtt(ageYears, 'cuffed-iowa');
+          return alt.ok ? (
+            <WarningBanner level="amber" title="Sources differ (cuffed)">
+              The alternate cuffed formula (age/4 + 3) gives {alt.idRoundedMm.toFixed(1)} mm. Have the adjacent sizes ready.
+            </WarningBanner>
+          ) : null;
+        })()}
       </Panel>
 
       <button
@@ -140,29 +204,6 @@ export const AirwayView: React.FC = () => {
 
       {population === 'pediatric' && (
         <>
-          <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-slate-900 p-3">
-            <SegmentedControl<'years' | 'months'>
-              ariaLabel="Age unit"
-              value={ageUnit}
-              options={[
-                { value: 'years', label: 'Years' },
-                { value: 'months', label: 'Months' },
-              ]}
-              onChange={setAgeUnit}
-            />
-            <NumericStepper
-              label={`Age (${ageUnit})`}
-              value={ageDisplay}
-              unit={ageUnit === 'years' ? 'y' : 'mo'}
-              step={1}
-              min={0}
-              max={ageUnit === 'years' ? 18 : 216}
-              decimals={ageUnit === 'years' && ageYears !== null && !Number.isInteger(ageYears) ? 2 : 0}
-              onChange={(v) => setPatient({ ageYears: ageUnit === 'years' ? v : v / 12 })}
-              keypadTitle="Enter age"
-            />
-          </section>
-
           {ageYears === null ? (
             <WarningBanner level="info">Enter the child&apos;s age to size tubes and blades.</WarningBanner>
           ) : (
@@ -219,29 +260,6 @@ export const AirwayView: React.FC = () => {
         <>
           <Panel title="Endotracheal tube & laryngoscope blade (adult)" basis="sex" sourceIds={['oxford-miller-airway']}>
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Biological sex</span>
-                <div className="flex gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setPatient({ sex: 'female' })}
-                    className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
-                      patient.sex === 'female' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
-                    }`}
-                  >
-                    Female (7.0–7.5 mm)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPatient({ sex: 'male' })}
-                    className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
-                      patient.sex === 'male' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
-                    }`}
-                  >
-                    Male (8.0–8.5 mm)
-                  </button>
-                </div>
-              </div>
               {adultAirway && adultAirway.ok ? (
                 <>
                   <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-950 p-2">
