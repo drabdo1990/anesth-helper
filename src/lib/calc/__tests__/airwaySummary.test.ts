@@ -10,6 +10,10 @@ describe('airwaySummary', () => {
     const r = airwaySummary({ population: 'pediatric', ageYears: 5, sex: null, heightCm: null, weightKg: 18 });
     expect('idRoundedMm' in r.ett).toBe(true);
   });
+  it('pediatric returns both cuffed and uncuffed ETT', () => {
+    const r = airwaySummary({ population: 'pediatric', ageYears: 5, sex: null, heightCm: null, weightKg: 18 });
+    expect('idRoundedMm' in r.ettUncuffed).toBe(true);
+  });
   it('missing weight gives no LMA', () => {
     const r = airwaySummary({ population: 'adult', ageYears: 40, sex: 'male', heightCm: 170, weightKg: null });
     expect('band' in r.lma).toBe(false);

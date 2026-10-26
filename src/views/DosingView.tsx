@@ -40,7 +40,10 @@ export const DosingView: React.FC = () => {
           type="search"
           inputMode="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (e.target.value !== '') setSituation(null);
+          }}
           placeholder="Search drug or class"
           className="min-h-[48px] w-full rounded-xl border border-slate-800 bg-slate-900 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
           aria-label="Search drugs"
@@ -48,12 +51,18 @@ export const DosingView: React.FC = () => {
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Dosing situations">
-        {([{ id: null, label: 'All' }, ...SITUATIONS] as { id: string | null; label: string }[]).map((s) => (
+        {([{ id: null, label: 'All drugs' }, ...SITUATIONS] as { id: string | null; label: string }[]).map((s) => (
           <button
             key={s.id ?? 'all'}
             type="button"
             aria-pressed={situation === s.id}
-            onClick={() => setSituation(s.id)}
+            onClick={() => {
+              setSituation(s.id);
+              if (s.id !== null) {
+                setQuery('');
+                setFilter('all');
+              }
+            }}
             className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${situation === s.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
           >
             {s.label}
@@ -61,6 +70,7 @@ export const DosingView: React.FC = () => {
         ))}
       </div>
 
+      {situation === null && (
       <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Drug categories">
         {([
           { id: 'all', label: 'All' },
@@ -79,13 +89,19 @@ export const DosingView: React.FC = () => {
           </button>
         ))}
       </div>
+      )}
 
       {activeSituation && (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {situationMeds.map((m) => (
-            <DrugCard key={m.id} medication={m} biometrics={biometrics} />
-          ))}
-        </div>
+        <>
+          <p className="rounded-lg border border-amber-800 bg-amber-950/40 px-3 py-2 text-xs text-amber-200">
+            App grouping, not a guideline. Doses come from each card&apos;s sources.
+          </p>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {situationMeds.map((m) => (
+              <DrugCard key={m.id} medication={m} biometrics={biometrics} />
+            ))}
+          </div>
+        </>
       )}
 
       {situation === null && filter === 'all' && q === '' && recentMeds.length > 0 && (
