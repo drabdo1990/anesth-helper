@@ -4,7 +4,7 @@
 import { AIRWAY_EQUIPMENT_REFERENCE, AIRWAY_RULES, LMA_BANDS, PEDS_BLADES, PEDS_ETT_FORMULAS } from './airwayDevices';
 import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
-import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE } from './ventilation';
+import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING } from './ventilation';
 import { CHECKLISTS } from './checklists';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { REFERENCE_DRUGS } from './referenceDrugs';
@@ -72,8 +72,16 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
 
   for (const s of VENTILATION_SCENARIOS) {
     const v = s.tidalVolumeMlPerKgPbw;
-    if (v) add(s.sourceIds, `${s.name}: tidal volume ${v.min}-${v.max} mL/kg PBW (start ${v.target})${s.plateauPressureLimit ? `; plateau limit ${s.plateauPressureLimit} cmH2O` : ''}`);
+    if (v) {
+      add(s.sourceIds, `${s.name}: tidal volume ${v.min}-${v.max} mL/kg PBW (start ${v.target})${s.plateauPressureLimit ? `; plateau limit ${s.plateauPressureLimit} cmH2O` : ''}`);
+    } else {
+      add(s.sourceIds, `${s.name}: clinical ventilation parameters and cautions`);
+    }
   }
+
+  for (const m of VENT_MODES) add(m.sourceIds, `Ventilator mode: ${m.title}`);
+  for (const a of VENT_ALARMS) add(a.sourceIds, `Ventilator alarm: ${a.title}`);
+  for (const t of VENT_TROUBLESHOOTING) add(t.sourceIds, `Ventilator troubleshooting: ${t.title}`);
 
   for (const c of CHECKLISTS) for (const i of c.items) add(i.sourceIds, `Checklist ${c.title}: ${i.text}`);
   for (const s of [...LAST_STEPS, ...MH_STEPS, ...CICO_PLANS.flatMap((p) => p.steps)]) add(s.sourceIds, `Emergency step: ${s.text}`);
@@ -84,4 +92,4 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
 };
 
 /** Sources that intentionally have no derived value (kept for traceability or future local data). */
-export const SOURCES_WITHOUT_DERIVED_VALUES = ['local-protocol', 'samba-ponv-2020'];
+export const SOURCES_WITHOUT_DERIVED_VALUES = ['local-protocol', 'project-notebook', 'samba-ponv-2020'];

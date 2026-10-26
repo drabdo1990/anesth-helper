@@ -219,7 +219,7 @@ export interface AirwayEquipmentItem {
   sourceIds: string[];
 }
 
-/** Adjunct equipment reference from the project notebook (section 3.4, Miller 6e p. 1019, 1209). */
+/** Adjunct equipment reference from the project notebook (section 3.4, Miller 6e p. 1019, 1209) and manufacturer standards. */
 export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
   {
     title: 'Facemasks',
@@ -227,7 +227,19 @@ export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
       'Adult anatomic masks: Small (#3), Medium (#4), Large (#5).',
       'Pediatric: Newborn, Infant and Child sizes, and the flat Rendell-Baker-Soucek mask (minimal dead space).',
     ],
-    sourceIds: ['miller-6e'],
+    sourceIds: ['miller-6e', 'facemask-sizing-spec'],
+  },
+  {
+    title: 'Anatomical face-mask sizing by patient size and age (Ambu & Laerdal specifications)',
+    points: [
+      'Size 00 / 0: Premature / Neonate (< 2.5 kg).',
+      'Size 1: Infant (2.5–10 kg).',
+      'Size 2: Toddler / Child (10–20 kg).',
+      'Size 3: Small Child / Pediatric / Petite Adult (20–40 kg).',
+      'Size 4: Medium Adult (40–70 kg).',
+      'Size 5: Large Adult (> 70 kg).',
+    ],
+    sourceIds: ['facemask-sizing-spec'],
   },
   {
     title: 'Guedel oropharyngeal airway sizes',
@@ -253,6 +265,25 @@ export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
       'Portex single-use bougie, coude tip, 15 Fr (5.0 mm), 700 mm: recommended tube internal diameter 6.0-11.0 mm.',
     ],
     sourceIds: ['cook-frova-ifu', 'fda-k171917', 'icumed-portex-bougie'],
+  },
+  {
+    title: 'Stylet and bougie internal caliber compatibility (manufacturer specifications)',
+    points: [
+      'Pediatric stylet (6 Fr): compatible with ETT internal diameter 2.5–3.5 mm.',
+      'Small / child stylet (10 Fr): compatible with ETT internal diameter 4.0–5.5 mm.',
+      'Adult stylet (14 Fr): compatible with ETT internal diameter 6.0–10.0 mm.',
+      'Cook Frova 8 Fr (35 cm): recommended for ETT internal diameter 3.0 mm or larger (FDA K171917).',
+      'Cook Frova 14 Fr (70 cm) & Portex 15 Fr (70 cm): recommended for ETT internal diameter 6.0 mm or larger.',
+    ],
+    sourceIds: ['stylet-bougie-compat', 'cook-frova-ifu', 'fda-k171917', 'icumed-portex-bougie'],
+  },
+  {
+    title: 'Video laryngoscope blade selection (McGrath MAC & GlideScope)',
+    points: [
+      'McGrath MAC (Medtronic): Size 1 (infant 1.5–10 kg); Size 2 (child 10–25 kg); Size 3 (adult > 25 kg); Size 4 (large adult / deep pharynx); X-Blade (extreme anterior / difficult airway).',
+      'GlideScope Spectrum (Verathon): LoPro S1 (1.5–5 kg); LoPro S2 (10–28 kg); LoPro S3 (30–80 kg); LoPro S4 (> 80 kg); Miller 0/1 for neonates/infants.',
+    ],
+    sourceIds: ['mcgrath-mac-ifu', 'glidescope-ifu'],
   },
   {
     title: 'Adult nasal ETT depth (one study)',
@@ -283,15 +314,12 @@ export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
       'For patients shorter than 140 cm the authors use a bronchial blocker. Availability: 32 Fr is made only by Bronchocath; 28 Fr by Bronchocath and Sheridan; Portex and Rusch make none below 35 Fr.',
       'No source read gives a minimum age or height for adult-type tubes. The height bands above differ from the app bands, and the app height and age floor stays an app safety rule.',
     ],
-    sourceIds: ['dlt-sizing-review-aca-2023'],
+    sourceIds: ['dlt-sizing-review-aca-2023', 'slinger-campos-dlt-2011'],
   },
 ];
 
 /** Airway topics with no sourced size/depth in this build. */
 export const AIRWAY_UNSOURCED: string[] = [
-  'Video laryngoscope blade selection by patient size',
-  'Face-mask sizing by age or weight (only size names were found)',
-  'Stylet internal caliber selection',
   'Pediatric ETT calculator outside 1 to 8 years (reference tables above; published formulas disagree)',
 ];
 

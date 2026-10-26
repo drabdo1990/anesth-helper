@@ -941,13 +941,13 @@ export const MEDICATIONS: Medication[] = [
 
 /** Topics shown as "No high-quality source value specified" because no source value was verified. */
 export const CATEGORY_PLACEHOLDERS: CategoryPlaceholder[] = [
-  { category: 'preinduction', topic: 'Aspiration prophylaxis' },
-  { category: 'preinduction', topic: 'Other preoperative medications' },
+  { category: 'preinduction', topic: 'Aspiration prophylaxis (no calculated dose; guideline & label figures are in the reference list)' },
+  { category: 'preinduction', topic: 'Other preoperative medications (no calculated dose; multimodal analgesic figures are in the reference list)' },
   { category: 'vasoactive', topic: 'Epinephrine bolus (no calculated dose; guideline figures are in the reference list)' },
   { category: 'vasoactive', topic: 'Metaraminol (no calculated dose; label figures are in the reference list)' },
   { category: 'postoperative', topic: 'Ondansetron (PONV) (no calculated dose; label figures are in the reference list)' },
   { category: 'postoperative', topic: 'Dexamethasone (PONV) (no label dose; consensus figures are in the reference list)' },
-  { category: 'postoperative', topic: 'Other PONV / emergence medications' },
+  { category: 'postoperative', topic: 'Other PONV / emergence medications (droperidol, haloperidol, aprepitant figures are in the reference list)' },
 ];
 
 // ---------------------------------------------------------------------------

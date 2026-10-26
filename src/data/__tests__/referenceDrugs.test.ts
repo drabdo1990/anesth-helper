@@ -76,4 +76,15 @@ describe('secondary-sourced reference drugs', () => {
     const phenyl = REFERENCE_DRUGS.find((d) => d.id === 'phenylephrine-supplement');
     expect(phenyl?.infusions.some((i) => i.discrepancy)).toBe(true);
   });
+
+  it('includes verified aspiration prophylaxis and preoperative multimodal medications', () => {
+    const aspIds = ['sodium-citrate', 'famotidine', 'pantoprazole', 'acetaminophen-iv', 'gabapentin'];
+    for (const id of aspIds) {
+      const drug = REFERENCE_DRUGS.find((d) => d.id === id);
+      expect(drug, `drug ${id} exists`).toBeDefined();
+      expect(drug!.doses.length, `drug ${id} has doses`).toBeGreaterThan(0);
+      expect(drug!.sourceIds.length, `drug ${id} has sourceIds`).toBeGreaterThan(0);
+      for (const s of drug!.sourceIds) expect(s in SOURCE_BY_ID, `${id} -> ${s}`).toBe(true);
+    }
+  });
 });

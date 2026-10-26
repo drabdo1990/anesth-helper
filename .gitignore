@@ -29,6 +29,8 @@ dist-ssr
 
 # Vercel
 .vercel
+.env*
 
-# Claude Code personal overrides
-.claude/settings.local.json
+# Local agent metadata
+.claude/
+.omc/

@@ -108,6 +108,12 @@ describe('every clinical value resolves to a named source (acceptance criterion 
     }
   });
 
+  it('all ventilation scenarios cite verified sources (none are left completely unsourced)', () => {
+    for (const s of VENTILATION_SCENARIOS) {
+      expect(s.sourceIds.length, `${s.id} cites a verified source`).toBeGreaterThan(0);
+    }
+  });
+
   it('checklists and emergency steps', () => {
     for (const c of CHECKLISTS) {
       for (const i of c.items) {
