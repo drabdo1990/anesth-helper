@@ -14,8 +14,8 @@ export const VENTILATION_SCENARIOS: VentilationScenario[] = [
       'Use predicted body weight (PBW), never actual body weight.',
       'If plateau pressure stays above 30 cmH2O at 6 mL/kg PBW, consider reducing toward 4 mL/kg PBW.',
     ],
-    unsourced: ['Respiratory rate', 'PEEP', 'FiO2', 'I:E ratio'],
-    sourceIds: ['ats-ards-2017'],
+    unsourced: ['I:E ratio (numeric)'],
+    sourceIds: ['ats-ards-2017', 'ardsnet-protocol-2008'],
   },
   {
     id: 'periop-adult',
@@ -24,10 +24,10 @@ export const VENTILATION_SCENARIOS: VentilationScenario[] = [
     plateauPressureLimit: 30,
     cautions: [
       'The source gives a 6-8 mL/kg PBW range and a plateau below 28-30 cmH2O; it does not name a single target, so the lower bound is used as the starting point.',
-      'The source states the right PEEP level is unsettled: no PEEP default is supplied.',
+      'The 2019 expert consensus advises PEEP of 5 cmH2O or more, then individualized, and FiO2 0.4 after intubation, then the lowest FiO2 for SpO2 94% or higher. No preset default is supplied.',
     ],
-    unsourced: ['Respiratory rate', 'PEEP', 'FiO2', 'I:E ratio'],
-    sourceIds: ['esaic-periop-vent'],
+    unsourced: ['Respiratory rate', 'I:E ratio'],
+    sourceIds: ['esaic-periop-vent', 'young-bja-2019'],
   },
   {
     id: 'laparoscopic',
@@ -45,8 +45,9 @@ export const VENTILATION_SCENARIOS: VentilationScenario[] = [
   {
     id: 'one-lung',
     name: 'One-lung ventilation',
-    unsourced: ['Tidal volume', 'Respiratory rate', 'PEEP', 'FiO2', 'I:E ratio'],
-    sourceIds: [],
+    cautions: ['ERAS/ESTS 2019: PEEP usually 5-10 cmH2O; FiO2 1.0 immediately before starting one-lung ventilation. The guideline gives no tidal volume, rate or I:E ratio.'],
+    unsourced: ['Tidal volume', 'Respiratory rate', 'I:E ratio'],
+    sourceIds: ['eras-ests-lung-2019'],
   },
   {
     id: 'pediatric',
@@ -124,6 +125,55 @@ export const VENT_ADVANCED_REFERENCE: ReferenceItem[] = [
       'Breath phase variables: trigger, limit and cycle (pressure, volume, flow or time).',
     ],
     sourceIds: ['aln-2025'],
+  },
+  {
+    title: 'ARDS ventilation protocol (ARDSNet)',
+    points: [
+      'Start at 8 mL/kg predicted body weight, then reduce by 1 mL/kg at intervals of 2 hours or more to 6 mL/kg. Predicted body weight: men 50 + 2.3 x (height in inches - 60); women 45.5 + 2.3 x (height in inches - 60).',
+      'Plateau pressure goal 30 cmH2O or less. Set respiratory rate not above 35 breaths/min, starting near the baseline minute ventilation. Minimum PEEP 5 cmH2O. Inspiration is kept shorter than expiration; no numeric ratio is given.',
+      'Oxygenation goal: PaO2 55-80 mmHg or SpO2 88-95%.',
+      'Lower PEEP / higher FiO2 table (FiO2 : PEEP in cmH2O): 0.3:5, 0.4:5, 0.4:8, 0.5:8, 0.5:10, 0.6:10, 0.7:10, 0.7:12, 0.7:14, 0.8:14, 0.9:14, 0.9:16, 0.9:18, 1.0:18-24.',
+      'Higher PEEP / lower FiO2 table (FiO2 : PEEP in cmH2O): 0.3:5, 0.3:8, 0.3:10, 0.3:12, 0.3:14, 0.4:14, 0.4:16, 0.5:16, 0.5:18, 0.5-0.8:20, 0.8:22, 0.9:22, 1.0:22, 1.0:24.',
+    ],
+    sourceIds: ['ardsnet-protocol-2008'],
+  },
+  {
+    title: 'Intraoperative lung-protective ventilation (2019 expert consensus)',
+    points: [
+      'Tidal volume 6-8 mL/kg predicted body weight (strong recommendation).',
+      'Start PEEP at 5 cmH2O or more, then individualize it.',
+      'FiO2 0.4 after intubation, then the lowest FiO2 that keeps SpO2 at 94% or higher (weak recommendation).',
+      'No respiratory rate, I:E ratio or ventilation mode is recommended: the panel found the evidence lacking.',
+    ],
+    sourceIds: ['young-bja-2019'],
+  },
+  {
+    title: 'FiO2 during general anesthesia: guidance differs',
+    points: [
+      'WHO 2016: 80% FiO2 intraoperatively for adults under general anesthesia with intubation, and if feasible for 2-6 hours afterwards (a strong recommendation in 2016; reported as changed to conditional in the 2018 update).',
+      'The 2019 lung-protective consensus advises 0.4 after intubation, then the lowest FiO2 for SpO2 94% or higher. The two disagree, so no default is set here.',
+    ],
+    sourceIds: ['who-ssi-2018', 'young-bja-2019'],
+  },
+  {
+    title: 'One-lung ventilation (ERAS/ESTS 2019)',
+    points: [
+      'PEEP is usually in the range of 5-10 cmH2O.',
+      'FiO2 1.0 immediately before starting one-lung ventilation speeds collapse of the non-ventilated lung.',
+      'Lowering tidal volume from the traditional 10 mL/kg ideal body weight to 4-6 mL/kg is described as likely less injurious; large trials are lacking.',
+      'No respiratory rate, I:E ratio or plateau limit is given.',
+    ],
+    sourceIds: ['eras-ests-lung-2019'],
+  },
+  {
+    title: 'Obesity: PROBESE trial settings (a trial protocol, not a recommendation)',
+    points: [
+      'Tidal volume 7 mL/kg predicted body weight, volume control, I:E 1:2.',
+      'PEEP 12 cmH2O with recruitment maneuvers versus 4 cmH2O without.',
+      'Respiratory rate adjusted for end-tidal CO2 35-45 mmHg; FiO2 at least 0.4 with SpO2 above 92%.',
+      'Recruitment: tidal volume raised in 4 mL/kg steps until plateau pressure reaches 40-50 cmH2O, held for 3 breaths; peak pressure limit 55 cmH2O.',
+    ],
+    sourceIds: ['probese-protocol-2017'],
   },
 ];
 

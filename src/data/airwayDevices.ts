@@ -245,15 +245,54 @@ export const AIRWAY_EQUIPMENT_REFERENCE: AirwayEquipmentItem[] = [
     ],
     sourceIds: ['miller-6e'],
   },
+  {
+    title: 'Bougie / tracheal tube introducer sizes (manufacturer documents)',
+    points: [
+      'Cook Frova 14 Fr, 70 cm: for an endotracheal tube with an internal diameter of 6 mm or larger.',
+      'Cook Frova 8 Fr, 35 cm: for an endotracheal tube with an internal diameter of 3 mm or larger (FDA 510(k) K171917).',
+      'Portex single-use bougie, coude tip, 15 Fr (5.0 mm), 700 mm: recommended tube internal diameter 6.0-11.0 mm.',
+    ],
+    sourceIds: ['cook-frova-ifu', 'fda-k171917', 'icumed-portex-bougie'],
+  },
+  {
+    title: 'Adult nasal ETT depth (one study)',
+    points: [
+      'Depth from the nares to the tube tip, head neutral: men 28.9 +/- 1.3 cm, women 26.6 +/- 1.5 cm (110 Korean adults, ASA 1-2, oral and maxillofacial surgery).',
+      'Regression: depth (cm) = 19.856 + 0.267 x (sum of three external distances), R2 = 0.43. The text read does not define the three distances.',
+      'Single-center cohort with modest fit: a reference only.',
+    ],
+    sourceIds: ['nasal-ett-depth-korea-2017'],
+  },
+  {
+    title: 'Pediatric ETT size and depth outside the 1-8 year formulas (Polish consensus 2025)',
+    points: [
+      'Under 1 kg: uncuffed 2.0-2.5 mm, 7 cm from the mouth. 1-2 kg: uncuffed 2.5-3.0 mm, 8 cm. 2-3 kg: uncuffed 3.0 mm, cuffed 3.0 mm, 9 cm. Over 3 kg: uncuffed 3.5 mm, cuffed 3.0 mm, 10 cm.',
+      '1-6 months (4-6 kg): uncuffed 3.5-4.0 mm, cuffed 3.0 mm, 11 cm. 6-12 months (6-10 kg): uncuffed 3.5-4.0 mm, cuffed 3.5 mm, 12 cm.',
+      '1-2 years (10-12 kg): uncuffed 4.0 mm, cuffed 3.5-4.0 mm, 13 cm. 2-4 years (12-16 kg): uncuffed 4.5 mm, cuffed 4.5 mm, 14 cm.',
+      'Under-3-years formulas: uncuffed ID = age/4 + 4 mm; cuffed ID = age/4 + 3 mm; oral depth = age/2 + 12 cm; nasal depth = age/2 + 15 cm.',
+      'Over 3 years, internal diameter (French): 3-5 years 5.5 mm (24); 5-7 years 6.0 mm (26); 7-9 years 6.5 mm (28); 9-11 years 7.0 mm (30); boys over 11 years 7.0 mm with cuff (32); girls over 11 years 6.5 mm with cuff (30). No depth column is given.',
+      'Published cuffed-tube formulas disagree (age/4 + 3 here, age/4 + 3.5 in the calculator above). The calculator is unchanged.',
+    ],
+    sourceIds: ['polish-peds-under3-2025', 'polish-peds-over3-2025'],
+  },
+  {
+    title: 'Double-lumen tube size by height and sex (review)',
+    points: [
+      'Women under 160 cm: 35 Fr; women over 160 cm: 37 Fr. Men under 170 cm: 39 Fr; men over 170 cm: 41 Fr.',
+      'Additions credited to Slinger: women under 150 cm 32 Fr; men under 160 cm 37 Fr.',
+      'For patients shorter than 140 cm the authors use a bronchial blocker. Availability: 32 Fr is made only by Bronchocath; 28 Fr by Bronchocath and Sheridan; Portex and Rusch make none below 35 Fr.',
+      'No source read gives a minimum age or height for adult-type tubes. The height bands above differ from the app bands, and the app height and age floor stays an app safety rule.',
+    ],
+    sourceIds: ['dlt-sizing-review-aca-2023'],
+  },
 ];
 
 /** Airway topics with no sourced size/depth in this build. */
 export const AIRWAY_UNSOURCED: string[] = [
-  'Adult nasal ETT depth (exact cm)',
-  'Video laryngoscope blade geometry selection',
-  'Face-mask sizing by face contour',
-  'Bougie and stylet internal caliber selection',
-  'Pediatric ETT outside standard 1 to 8 years formulas',
+  'Video laryngoscope blade selection by patient size',
+  'Face-mask sizing by age or weight (only size names were found)',
+  'Stylet internal caliber selection',
+  'Pediatric ETT calculator outside 1 to 8 years (reference tables above; published formulas disagree)',
 ];
 
 /** Principles shown on the Airway tab, from the ASA difficult airway guideline. */

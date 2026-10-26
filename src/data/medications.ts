@@ -943,10 +943,10 @@ export const MEDICATIONS: Medication[] = [
 export const CATEGORY_PLACEHOLDERS: CategoryPlaceholder[] = [
   { category: 'preinduction', topic: 'Aspiration prophylaxis' },
   { category: 'preinduction', topic: 'Other preoperative medications' },
-  { category: 'vasoactive', topic: 'Epinephrine bolus' },
-  { category: 'vasoactive', topic: 'Metaraminol' },
-  { category: 'postoperative', topic: 'Ondansetron (PONV)' },
-  { category: 'postoperative', topic: 'Dexamethasone (PONV)' },
+  { category: 'vasoactive', topic: 'Epinephrine bolus (no calculated dose; guideline figures are in the reference list)' },
+  { category: 'vasoactive', topic: 'Metaraminol (no calculated dose; label figures are in the reference list)' },
+  { category: 'postoperative', topic: 'Ondansetron (PONV) (no calculated dose; label figures are in the reference list)' },
+  { category: 'postoperative', topic: 'Dexamethasone (PONV) (no label dose; consensus figures are in the reference list)' },
   { category: 'postoperative', topic: 'Other PONV / emergence medications' },
 ];
 

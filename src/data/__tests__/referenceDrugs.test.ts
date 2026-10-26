@@ -23,13 +23,11 @@ describe('secondary-sourced reference drugs', () => {
     for (const id of ids) expect(medIds.has(id), id).toBe(false);
   });
 
-  it('cite registered, secondary sources only', () => {
+  it('cite registered sources', () => {
+    // Reference-only figures may cite primary or label sources as well as secondary ones; they are never calculated.
     for (const d of REFERENCE_DRUGS) {
       expect(d.sourceIds.length, d.id).toBeGreaterThan(0);
-      for (const s of d.sourceIds) {
-        expect(s in SOURCE_BY_ID, `${d.id} -> ${s}`).toBe(true);
-        expect(SOURCE_BY_ID[s].verification, `${d.id} -> ${s}`).toBe('secondary');
-      }
+      for (const s of d.sourceIds) expect(s in SOURCE_BY_ID, `${d.id} -> ${s}`).toBe(true);
     }
   });
 
