@@ -26,7 +26,7 @@ const Chips: React.FC<{ label: string; options: readonly string[]; value: string
             type="button"
             aria-pressed={on}
             onClick={() => onChange(single ? (on ? [] : [o]) : on ? value.filter((v) => v !== o) : [...value, o])}
-            className={`min-h-[48px] rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500/20 text-cyan-100' : 'border-slate-700 bg-slate-900 text-slate-300'}`}
+            className={`min-h-[48px] rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500/20 text-cyan-100' : 'border-clinical-border-light bg-clinical-card text-slate-300'}`}
           >
             {o}
           </button>
@@ -45,7 +45,7 @@ const NumberField: React.FC<{ label: string; unit: string; value: string; onChan
       inputMode="decimal"
       value={value}
       onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, '').slice(0, 6))}
-      className="min-h-[48px] rounded-xl border border-slate-700 bg-slate-950 px-3 font-mono text-lg text-cyan-200 focus:border-cyan-500 focus:outline-none"
+      className="min-h-[48px] rounded-xl border border-clinical-border-light bg-clinical-bg px-3 font-mono text-lg text-cyan-200 focus:border-cyan-500 focus:outline-none"
     />
   </label>
 );
@@ -62,7 +62,7 @@ const FreeText: React.FC<{ label: string; value: string; onChange: (v: string) =
         maxLength={MAX_FREE_TEXT_LENGTH}
         onChange={(e) => onChange(e.target.value)}
         autoComplete="off"
-        className="min-h-[48px] rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
+        className="min-h-[48px] rounded-xl border border-clinical-border-light bg-clinical-bg px-3 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
       />
       {check && !check.ok && <span role="alert" className="text-xs font-semibold text-red-400">{check.reason} This field will be left out.</span>}
     </label>
@@ -132,7 +132,7 @@ const HandoffForm: React.FC = () => {
         </WarningBanner>
       )}
 
-      <pre className="whitespace-pre-wrap rounded-2xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs text-slate-200" aria-label="Summary preview">{text}</pre>
+      <pre className="whitespace-pre-wrap rounded-2xl border border-clinical-border-light bg-clinical-bg p-3 font-mono text-xs text-slate-200" aria-label="Summary preview">{text}</pre>
 
       <div className="grid grid-cols-2 gap-2">
         <button
@@ -149,7 +149,7 @@ const HandoffForm: React.FC = () => {
             setForm(EMPTY_HANDOFF);
             setCopied('idle');
           }}
-          className="min-h-[48px] rounded-xl border border-slate-700 bg-slate-900 font-bold uppercase text-slate-300"
+          className="min-h-[48px] rounded-xl border border-clinical-border-light bg-clinical-card font-bold uppercase text-slate-300"
         >
           Clear form
         </button>
@@ -178,7 +178,7 @@ export const ChecklistsView: React.FC = () => {
             role="tab"
             aria-selected={sub === t.id}
             onClick={() => setSub(t.id)}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${sub === t.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
+            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${sub === t.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`}
           >
             {t.label}
           </button>
@@ -197,12 +197,12 @@ export const ChecklistsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => resetChecks(list.items.map((i) => i.id))}
-                className="flex min-h-[48px] items-center gap-1 rounded-xl border border-slate-700 bg-slate-900 px-3 text-xs font-bold text-slate-300"
+                className="flex min-h-[48px] items-center gap-1 rounded-xl border border-clinical-border-light bg-clinical-card px-3 text-xs font-bold text-slate-300"
               >
                 <RotateCcw className="h-4 w-4" /> Reset list
               </button>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-800" aria-hidden>
+            <div className="h-2 overflow-hidden rounded-full bg-clinical-border" aria-hidden>
               <div className="h-full bg-emerald-500 transition-all" style={{ width: `${(done / list.items.length) * 100}%` }} />
             </div>
             {list.note && <WarningBanner level="info">{list.note}</WarningBanner>}

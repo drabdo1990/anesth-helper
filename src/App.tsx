@@ -29,11 +29,11 @@ export const App: React.FC = () => {
   }, []);
 
   const iconBtn =
-    'flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 touch-manipulation';
+    'flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl border border-clinical-border bg-clinical-card text-slate-300 touch-manipulation';
 
   return (
-    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-[#090d16] font-sans text-slate-100 selection:bg-cyan-500 selection:text-black">
-      <div className="border-b border-slate-800/80 px-3 py-1.5">
+    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-clinical-bg font-sans text-slate-100 selection:bg-cyan-500 selection:text-black">
+      <div className="border-b border-clinical-border/80 px-3 py-1.5">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 text-slate-950">

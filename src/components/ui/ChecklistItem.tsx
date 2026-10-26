@@ -19,10 +19,10 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({ checked, onToggle,
     onClick={onToggle}
     className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left select-none touch-manipulation min-h-[48px] transition-colors ${
       checked
-        ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-100'
+        ? 'border-clinical-emerald/50 bg-emerald-950/40 text-emerald-100'
         : critical
-          ? 'border-slate-700 bg-slate-950/80 text-slate-100'
-          : 'border-slate-800 bg-slate-950/50 text-slate-200'
+          ? 'border-clinical-border-light bg-clinical-bg/80 text-slate-100'
+          : 'border-clinical-border bg-clinical-card/50 text-slate-200'
     }`}
   >
     {checked ? (
