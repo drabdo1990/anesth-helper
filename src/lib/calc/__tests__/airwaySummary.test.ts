@@ -18,4 +18,15 @@ describe('airwaySummary', () => {
     const r = airwaySummary({ population: 'adult', ageYears: 40, sex: 'male', heightCm: 170, weightKg: null });
     expect('band' in r.lma).toBe(false);
   });
+  it('adult sizing requires age', () => {
+    const r = airwaySummary({ population: 'adult', ageYears: null, sex: 'male', heightCm: 170, weightKg: 70 });
+    expect('idRangeMm' in r.ett).toBe(false);
+    expect('sizeFr' in r.dlt).toBe(false);
+  });
+  it('adult sizing is withheld for a known child', () => {
+    const r = airwaySummary({ population: 'adult', ageYears: 5, sex: 'male', heightCm: 110, weightKg: 18 });
+    expect('idRangeMm' in r.ett).toBe(false);
+    expect('blade' in (r.blade ?? {})).toBe(false);
+    expect('sizeFr' in r.dlt).toBe(false);
+  });
 });

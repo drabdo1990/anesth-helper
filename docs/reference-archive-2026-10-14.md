@@ -1,4 +1,8 @@
-# Perioperative Anesthesia Reference Parameters & Clinical Benchmarks
+# Perioperative Anesthesia Reference Parameters & Clinical Benchmarks (ARCHIVED)
+
+> **Archive only. Not used by the app and not a dosing source.** This prose guide contained numbers that
+> disagreed with the tested structured data. The app now uses only `src/data/` and the calculators as its
+> numeric authority.
 
 > **Source Material:** Benchmarked from standard clinical anesthesia reference texts (*Miller's Anesthesia*, *Oxford Handbook of Anaesthesia*, *Clinical Cases in Anesthesia*).
 

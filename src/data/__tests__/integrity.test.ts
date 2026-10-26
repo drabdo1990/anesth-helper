@@ -63,6 +63,10 @@ describe('every clinical value resolves to a named source (acceptance criterion 
       for (const d of m.doses) {
         expect(d.sourceIds.length, d.id).toBeGreaterThan(0);
         for (const id of d.sourceIds) expect(known(id), `${d.id} -> ${id}`).toBe(true);
+        if (d.preferredConcentrationMgPerMl !== undefined) {
+          expect(m.concentrations.some((c) => c.mgPerMl === d.preferredConcentrationMgPerMl), d.id).toBe(true);
+        }
+        if (d.absoluteMax?.scope === 'cumulative') expect(d.absoluteMax.unit, d.id).toBe('mg');
       }
       for (const c of m.concentrations) expect(known(c.sourceId), `${m.id} conc ${c.label}`).toBe(true);
       if (m.companion) expect(known(m.companion.sourceId)).toBe(true);

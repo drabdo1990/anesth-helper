@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, BookOpen, Settings, WifiOff } from 'lucide-react';
+import { Activity, BookOpen, RefreshCw, Settings, WifiOff } from 'lucide-react';
 import { useAppStore } from './store/useAppStore';
+import { applyPwaUpdate } from './lib/pwaUpdate';
 import { BiometricHeader } from './components/BiometricHeader';
 import { EmergencyOverlay } from './components/EmergencyOverlay';
 import { Navigation } from './components/Navigation';
 import { SettingsSheet } from './components/SettingsSheet';
+import { CicoPanel } from './components/emergency/CicoPanel';
 import { AirwayView } from './views/AirwayView';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
@@ -15,6 +17,9 @@ export const App: React.FC = () => {
   const activeTab = useAppStore((s) => s.activeTab);
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const setReferencesOpen = useAppStore((s) => s.setReferencesOpen);
+  const emergencyOpen = useAppStore((s) => s.emergencyOpen);
+  const updateAvailable = useAppStore((s) => s.updateAvailable);
+  const cicoRunning = useAppStore((s) => s.timers.cico?.running ?? false);
   const [online, setOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -60,13 +65,33 @@ export const App: React.FC = () => {
         </div>
       </div>
 
+      {updateAvailable && (
+        <div className="border-b border-cyan-800/60 bg-cyan-950/60 px-3 py-2">
+          <button
+            type="button"
+            disabled={emergencyOpen || cicoRunning}
+            onClick={() => void applyPwaUpdate()}
+            className="mx-auto flex min-h-[48px] w-full max-w-4xl items-center justify-center gap-2 rounded-xl border border-cyan-500/60 bg-cyan-900 px-3 text-sm font-bold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw className="h-4 w-4" />
+            {emergencyOpen || cicoRunning ? 'Finish the emergency before updating' : 'Update ready: tap to reload'}
+          </button>
+        </div>
+      )}
+
       {activeTab !== 'checklists' && <BiometricHeader />}
 
       <main className="mx-auto w-full max-w-4xl flex-1 p-3 sm:p-4">
-        {activeTab === 'dosing' && <DosingView />}
-        {activeTab === 'airway' && <AirwayView />}
-        {activeTab === 'ventilation' && <VentilationView />}
-        {activeTab === 'checklists' && <ChecklistsView />}
+        {activeTab !== 'checklists' && (
+          <>
+            {activeTab === 'dosing' && <DosingView />}
+            {activeTab === 'airway' && <AirwayView />}
+            {activeTab === 'ventilation' && <VentilationView />}
+          </>
+        )}
+        <div className={activeTab === 'checklists' ? '' : 'hidden'} aria-hidden={activeTab !== 'checklists'}>
+          <ChecklistsView />
+        </div>
       </main>
 
       {/* Spacer so content clears the fixed disclaimer + navigation strip. */}
@@ -74,6 +99,11 @@ export const App: React.FC = () => {
 
       <Navigation />
       <EmergencyOverlay />
+      {!emergencyOpen && cicoRunning && (
+        <div className="hidden" aria-hidden="true">
+          <CicoPanel />
+        </div>
+      )}
       <SettingsSheet />
       <ReferencesView />
     </div>

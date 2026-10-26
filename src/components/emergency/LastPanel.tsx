@@ -13,7 +13,7 @@ export const LastPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
   const toggle = useAppStore((s) => s.toggleEmergencyCheck);
   const given = useAppStore((s) => s.lipidGivenMl);
   const addLipid = useAppStore((s) => s.addLipid);
-  const reset = useAppStore((s) => s.resetEmergencyTrackers);
+  const reset = useAppStore((s) => s.resetLipid);
 
   const plan = lipidPlan(weightKg);
   const cumulative = lipidCumulativeStatus(weightKg, given);
@@ -83,7 +83,7 @@ export const LastPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
             - 50 mL
           </button>
           <button type="button" onClick={reset} className="min-h-[48px] rounded-xl border border-slate-600 bg-slate-800 px-2 text-sm font-bold text-slate-300">
-            Reset all
+            Reset lipid total
           </button>
         </div>
         <p className="mt-1 text-xs text-slate-400">Log each bolus and infusion volume so the 12 mL/kg ceiling is tracked.</p>

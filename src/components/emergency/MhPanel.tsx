@@ -24,7 +24,7 @@ export const MhPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
   const toggle = useAppStore((s) => s.toggleEmergencyCheck);
   const given = useAppStore((s) => s.dantroleneGivenMg);
   const addDantrolene = useAppStore((s) => s.addDantrolene);
-  const reset = useAppStore((s) => s.resetEmergencyTrackers);
+  const reset = useAppStore((s) => s.resetDantrolene);
   const contact = useAppStore((s) => s.mhContact);
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
 
@@ -113,7 +113,7 @@ export const MhPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
             - 1 mg/kg
           </button>
           <button type="button" onClick={reset} className="min-h-[48px] rounded-xl border border-slate-600 bg-slate-800 px-2 text-sm font-bold text-slate-300">
-            Reset all
+            Reset dantrolene total
           </button>
         </div>
         <p className="mt-1 text-xs text-slate-400">Repeat or continue dosing according to your MHAUS / EMHG workflow. Log each dose to track the cumulative total.</p>

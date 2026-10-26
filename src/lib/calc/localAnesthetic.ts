@@ -2,7 +2,7 @@
 
 export interface LocalAnestheticLimit {
   /** mg/kg limit for the selected formulation (plain or epinephrine-containing). */
-  mgPerKg: number;
+  mgPerKg?: number;
   /** Absolute ceiling in mg, if the source defines one. */
   absoluteMaxMg?: number;
 }
@@ -13,9 +13,12 @@ export const percentToMgPerMl = (percent: number): number => percent * 10;
 export const localAnestheticDoseMg = (volumeMl: number, percent: number): number =>
   volumeMl * percentToMgPerMl(percent);
 
-export const maxAllowedMg = (limit: LocalAnestheticLimit, weightKg: number): number => {
-  const byWeight = limit.mgPerKg * weightKg;
-  return limit.absoluteMaxMg === undefined ? byWeight : Math.min(byWeight, limit.absoluteMaxMg);
+export const maxAllowedMg = (limit: LocalAnestheticLimit, weightKg: number): number | null => {
+  const candidates = [
+    limit.mgPerKg !== undefined ? limit.mgPerKg * weightKg : undefined,
+    limit.absoluteMaxMg,
+  ].filter((value): value is number => value !== undefined);
+  return candidates.length === 0 ? null : Math.min(...candidates);
 };
 
 export interface LocalAdministration {

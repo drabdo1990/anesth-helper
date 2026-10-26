@@ -25,11 +25,17 @@ describe('ventSteps', () => {
     expect(over.find((x) => x.id === 'plateau')?.tone).toBe('red');
     expect(over.find((x) => x.id === 'plateau')?.hint).toMatch(/High airway pressure/);
   });
-  it('pediatric never marks VT done and does not block currentStepIndex', () => {
+  it('pediatric never marks PBW or VT done and does not block currentStepIndex', () => {
     const s = ventSteps({ ...base, ageYears: 8, heightCm: 130, sex: 'male', scenario: ards, mlPerKgPbw: 6, respiratoryRate: 20, peepCmH2O: 5 });
+    expect(done(s, 'pbw')).toBe(false);
     expect(done(s, 'vt')).toBe(false);
-    // pbw (0) done, vt (1) manual, rate-peep (2) done -> next undone non-manual is plateau (3)
+    // pbw and vt are manual; rate-peep is done -> next undone non-manual is plateau.
     expect(currentStepIndex(s)).toBe(3);
+  });
+  it('unknown age blocks adult PBW until age is entered', () => {
+    const s = ventSteps({ ...base, ageYears: null, heightCm: 170, sex: 'male', scenario: ards, mlPerKgPbw: 6 });
+    expect(done(s, 'pbw')).toBe(false);
+    expect(s[0].hint).toMatch(/age/i);
   });
   it('scenario without VT range is not auto-done and does not block currentStepIndex', () => {
     const sc = { id: 'laparoscopic', name: 'l', sourceIds: [] };

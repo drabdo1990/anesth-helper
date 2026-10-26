@@ -54,12 +54,10 @@ const DEFAULT_VENT: VentState = {
   fio2Percent: null,
 };
 
-const round1 = (n: number): number => Math.round(n * 10) / 10;
-
 export interface PersistedPrefs {
   guidelineSet: GuidelineSet;
   preferredScalar: ScalarPreference;
-  /** medicationId -> chosen concentration in mg/mL (NOT an array index: data reordering must not change strength). */
+  /** doseId -> chosen concentration in mg/mL (per dose: bolus and infusion can need different strengths). */
   concentrationChoice: Record<string, number>;
   ventScenarioId: string;
   recents: string[];
@@ -76,24 +74,27 @@ interface AppState extends PersistedPrefs {
   emergencyKind: EmergencyKind;
   settingsOpen: boolean;
   referencesOpen: boolean;
+  updateAvailable: boolean;
 
   doseValues: Record<string, number>;
   selectedDose: Record<string, string>;
   scalarOverrides: Record<string, WeightScalar>;
+  /** medicationId -> individual bolus masses logged for cumulative ceilings. */
+  doseAdminLogs: Record<string, number[]>;
   laAdmins: LaAdmin[];
 
   lipidGivenMl: number;
   dantroleneGivenMg: number;
   emergencyChecks: Record<string, boolean>;
   cicoPlan: 'A' | 'B' | 'C' | 'D';
+  cicoHelpCalled: boolean;
+  cicoAlertEvery: number;
   timers: Record<string, TimerState>;
 
   vent: VentState;
 
   // ---- actions ----
   setPatient: (updates: Partial<PatientInput>) => void;
-  adjustWeight: (delta: number) => void;
-  adjustHeight: (delta: number) => void;
   newCase: () => void;
 
   setActiveTab: (tab: AppTab) => void;
@@ -102,10 +103,11 @@ interface AppState extends PersistedPrefs {
   setEmergencyKind: (kind: EmergencyKind) => void;
   setSettingsOpen: (open: boolean) => void;
   setReferencesOpen: (open: boolean) => void;
+  setUpdateAvailable: (available: boolean) => void;
 
   setGuidelineSet: (set: GuidelineSet) => void;
   setPreferredScalar: (pref: ScalarPreference) => void;
-  setConcentrationChoice: (medicationId: string, mgPerMl: number) => void;
+  setConcentrationChoice: (doseId: string, mgPerMl: number) => void;
   setMhContact: (value: string) => void;
   setAudioEnabled: (value: boolean) => void;
   touchRecent: (id: string) => void;
@@ -113,17 +115,23 @@ interface AppState extends PersistedPrefs {
   setSelectedDose: (medicationId: string, doseId: string) => void;
   setDoseValue: (doseId: string, value: number) => void;
   setScalarOverride: (doseId: string, scalar: WeightScalar | null) => void;
+  logDose: (medicationId: string, massMg: number) => void;
+  undoDose: (medicationId: string) => void;
+  resetDoseLog: (medicationId: string) => void;
 
-  addLaAdmin: (anestheticId: string) => void;
+  addLaAdmin: (anestheticId: string, percent: number) => void;
   updateLaAdmin: (id: string, updates: Partial<LaAdmin>) => void;
   removeLaAdmin: (id: string) => void;
   clearLaAdmins: () => void;
 
   addLipid: (ml: number) => void;
   addDantrolene: (mg: number) => void;
-  resetEmergencyTrackers: () => void;
+  resetLipid: () => void;
+  resetDantrolene: () => void;
   toggleEmergencyCheck: (id: string) => void;
   setCicoPlan: (plan: 'A' | 'B' | 'C' | 'D') => void;
+  setCicoHelpCalled: (called: boolean) => void;
+  setCicoAlertEvery: (seconds: number) => void;
   timerStart: (id: string) => void;
   timerPause: (id: string) => void;
   timerReset: (id: string) => void;
@@ -175,35 +183,25 @@ export const useAppStore = create<AppState>()(
       emergencyKind: 'last',
       settingsOpen: false,
       referencesOpen: false,
+      updateAvailable: false,
 
       doseValues: {},
       selectedDose: {},
       scalarOverrides: {},
+      doseAdminLogs: {},
       laAdmins: [],
 
       lipidGivenMl: 0,
       dantroleneGivenMg: 0,
       emergencyChecks: {},
       cicoPlan: 'A',
+      cicoHelpCalled: false,
+      cicoAlertEvery: 0,
       timers: {},
 
       vent: DEFAULT_VENT,
 
       setPatient: (updates) => set((s) => ({ patient: { ...s.patient, ...updates } })),
-
-      adjustWeight: (delta) => {
-        const cur = get().patient.tbwKg;
-        if (cur === null) return;
-        const next = round1(cur + delta);
-        if (next >= 1) set((s) => ({ patient: { ...s.patient, tbwKg: next } }));
-      },
-
-      adjustHeight: (delta) => {
-        const cur = get().patient.heightCm;
-        if (cur === null) return;
-        const next = Math.round(cur + delta);
-        if (next >= 1) set((s) => ({ patient: { ...s.patient, heightCm: next } }));
-      },
 
       newCase: () =>
         set({
@@ -211,11 +209,14 @@ export const useAppStore = create<AppState>()(
           doseValues: {},
           selectedDose: {},
           scalarOverrides: {},
+          doseAdminLogs: {},
           laAdmins: [],
           lipidGivenMl: 0,
           dantroleneGivenMg: 0,
           emergencyChecks: {},
           cicoPlan: 'A',
+          cicoHelpCalled: false,
+          cicoAlertEvery: 0,
           timers: {},
           vent: { ...DEFAULT_VENT, scenarioId: get().ventScenarioId },
           checks: {},
@@ -228,11 +229,12 @@ export const useAppStore = create<AppState>()(
       setEmergencyKind: (emergencyKind) => set({ emergencyKind }),
       setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
       setReferencesOpen: (referencesOpen) => set({ referencesOpen }),
+      setUpdateAvailable: (updateAvailable) => set({ updateAvailable }),
 
       setGuidelineSet: (guidelineSet) => set({ guidelineSet }),
       setPreferredScalar: (preferredScalar) => set({ preferredScalar }),
-      setConcentrationChoice: (medicationId, mgPerMl) =>
-        set((s) => ({ concentrationChoice: { ...s.concentrationChoice, [medicationId]: mgPerMl } })),
+      setConcentrationChoice: (doseId, mgPerMl) =>
+        set((s) => ({ concentrationChoice: { ...s.concentrationChoice, [doseId]: mgPerMl } })),
       setMhContact: (mhContact) => set({ mhContact }),
       setAudioEnabled: (audioEnabled) => set({ audioEnabled }),
       touchRecent: (id) =>
@@ -249,15 +251,35 @@ export const useAppStore = create<AppState>()(
           else next[doseId] = scalar;
           return { scalarOverrides: next };
         }),
+      logDose: (medicationId, massMg) =>
+        set((s) => ({
+          doseAdminLogs: {
+            ...s.doseAdminLogs,
+            [medicationId]: [...(s.doseAdminLogs[medicationId] ?? []), massMg],
+          },
+        })),
+      undoDose: (medicationId) =>
+        set((s) => ({
+          doseAdminLogs: {
+            ...s.doseAdminLogs,
+            [medicationId]: (s.doseAdminLogs[medicationId] ?? []).slice(0, -1),
+          },
+        })),
+      resetDoseLog: (medicationId) =>
+        set((s) => {
+          const next = { ...s.doseAdminLogs };
+          delete next[medicationId];
+          return { doseAdminLogs: next };
+        }),
 
-      addLaAdmin: (anestheticId) =>
+      addLaAdmin: (anestheticId, percent) =>
         set((s) => ({
           laAdmins: [
             ...s.laAdmins,
             {
               id: `la-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
               anestheticId,
-              percent: 0,
+              percent,
               volumeMl: 0,
               withEpi: false,
             },
@@ -270,11 +292,13 @@ export const useAppStore = create<AppState>()(
 
       addLipid: (ml) => set((s) => ({ lipidGivenMl: Math.max(0, s.lipidGivenMl + ml) })),
       addDantrolene: (mg) => set((s) => ({ dantroleneGivenMg: Math.max(0, s.dantroleneGivenMg + mg) })),
-      resetEmergencyTrackers: () =>
-        set({ lipidGivenMl: 0, dantroleneGivenMg: 0, emergencyChecks: {}, cicoPlan: 'A', timers: {} }),
+      resetLipid: () => set({ lipidGivenMl: 0 }),
+      resetDantrolene: () => set({ dantroleneGivenMg: 0 }),
       toggleEmergencyCheck: (id) =>
         set((s) => ({ emergencyChecks: { ...s.emergencyChecks, [id]: !s.emergencyChecks[id] } })),
       setCicoPlan: (cicoPlan) => set({ cicoPlan }),
+      setCicoHelpCalled: (cicoHelpCalled) => set({ cicoHelpCalled }),
+      setCicoAlertEvery: (cicoAlertEvery) => set({ cicoAlertEvery }),
 
       timerStart: (id) =>
         set((s) => {
@@ -318,7 +342,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'anesthassist-storage',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => localStorage),
       partialize: (s): PersistedPrefs => ({
         guidelineSet: s.guidelineSet,

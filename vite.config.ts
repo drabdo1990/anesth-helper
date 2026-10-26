@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // autoUpdate: a new service worker activates immediately and the page reloads onto it.
-      registerType: 'autoUpdate',
+      // prompt: a new service worker waits until the clinician explicitly reloads. Never reload a live case.
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         id: '/',
@@ -32,8 +32,6 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
         // No runtime caching: the app makes no network requests after the first load.
       },
     }),

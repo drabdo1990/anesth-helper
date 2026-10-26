@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { PhoneCall } from 'lucide-react';
 import { CICO_PLANS } from '../../data/emergencies';
 import { useAppStore } from '../../store/useAppStore';
-import { playEmergencyPulseTone } from '../../lib/audioAlerts';
+import { playEmergencyPulseTone, unlockAudio } from '../../lib/audioAlerts';
 import { ChecklistItem } from '../ui/ChecklistItem';
 import { SourceBadge } from '../ui/SourceBadge';
 import { Timer } from '../ui/Timer';
@@ -14,9 +14,16 @@ export const CicoPanel: React.FC = () => {
   const planId = useAppStore((s) => s.cicoPlan);
   const setPlan = useAppStore((s) => s.setCicoPlan);
   const timerStart = useAppStore((s) => s.timerStart);
+  const timerRunning = useAppStore((s) => s.timers.cico?.running ?? false);
   const audioEnabled = useAppStore((s) => s.audioEnabled);
-  const [alertEvery, setAlertEvery] = useState(0);
-  const [helpCalled, setHelpCalled] = useState(false);
+  const alertEvery = useAppStore((s) => s.cicoAlertEvery);
+  const setAlertEvery = useAppStore((s) => s.setCicoAlertEvery);
+  const helpCalled = useAppStore((s) => s.cicoHelpCalled);
+  const setHelpCalled = useAppStore((s) => s.setCicoHelpCalled);
+
+  useEffect(() => {
+    if (!timerRunning && helpCalled) setHelpCalled(false);
+  }, [timerRunning, helpCalled, setHelpCalled]);
 
   const idx = CICO_PLANS.findIndex((p) => p.id === planId);
   const plan = CICO_PLANS[idx < 0 ? 0 : idx];
@@ -27,6 +34,7 @@ export const CicoPanel: React.FC = () => {
       <button
         type="button"
         onClick={() => {
+          unlockAudio();
           setHelpCalled(true);
           timerStart('cico');
           if (audioEnabled) playEmergencyPulseTone();

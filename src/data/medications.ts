@@ -49,7 +49,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Midazolam (anxiolysis / premedication)',
     class: 'Benzodiazepine',
     category: 'preinduction',
-    phase: 'preinduction',
     doses: [
       {
         id: 'midazolam-im-premed',
@@ -93,7 +92,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Glycopyrrolate (antisialagogue)',
     class: 'Antimuscarinic',
     category: 'preinduction',
-    phase: 'preinduction',
     doses: [
       {
         id: 'glyco-im-premed',
@@ -124,7 +122,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Cefazolin (antibiotic prophylaxis)',
     class: 'Cephalosporin',
     category: 'preinduction',
-    phase: 'preinduction',
     doses: [
       {
         id: 'cefazolin-lt120',
@@ -170,7 +167,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Propofol',
     class: 'Intravenous hypnotic',
     category: 'induction',
-    phase: 'induction',
     doses: [
       {
         id: 'propofol-induction-adult',
@@ -239,7 +235,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Etomidate',
     class: 'Intravenous hypnotic',
     category: 'induction',
-    phase: 'induction',
     doses: [
       {
         id: 'etomidate-induction',
@@ -263,7 +258,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Ketamine',
     class: 'NMDA antagonist',
     category: 'induction',
-    phase: 'induction',
     doses: [
       {
         id: 'ketamine-iv',
@@ -305,7 +299,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Midazolam (induction)',
     class: 'Benzodiazepine',
     category: 'induction',
-    phase: 'induction',
     doses: [
       {
         id: 'midazolam-ind-unpremed',
@@ -346,7 +339,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Fentanyl',
     class: 'Opioid',
     category: 'opioids',
-    phase: 'induction',
     doses: [
       {
         id: 'fentanyl-low',
@@ -390,7 +382,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Morphine',
     class: 'Opioid',
     category: 'opioids',
-    phase: 'postoperative',
     doses: [
       {
         id: 'morphine-iv',
@@ -416,7 +407,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Hydromorphone',
     class: 'Opioid',
     category: 'opioids',
-    phase: 'postoperative',
     doses: [
       {
         id: 'hydromorphone-iv',
@@ -441,7 +431,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Remifentanil',
     class: 'Opioid (infusion)',
     category: 'opioids',
-    phase: 'maintenance',
     doses: [
       {
         id: 'remi-induction-infusion',
@@ -496,7 +485,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Rocuronium',
     class: 'Non-depolarizing NMBA',
     category: 'nmba',
-    phase: 'induction',
     doses: [
       {
         id: 'roc-standard',
@@ -531,7 +519,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Succinylcholine',
     class: 'Depolarizing NMBA',
     category: 'nmba',
-    phase: 'induction',
     doses: [
       {
         id: 'sux-intubation',
@@ -558,7 +545,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Cisatracurium',
     class: 'Non-depolarizing NMBA',
     category: 'nmba',
-    phase: 'induction',
     doses: [
       {
         id: 'cis-intubation',
@@ -607,7 +593,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Vecuronium',
     class: 'Non-depolarizing NMBA',
     category: 'nmba',
-    phase: 'induction',
     doses: [
       {
         id: 'vec-intubation',
@@ -654,7 +639,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Sugammadex',
     class: 'Selective relaxant binding agent',
     category: 'reversal',
-    phase: 'emergence',
     doses: [
       {
         id: 'sug-moderate',
@@ -701,7 +685,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Neostigmine + glycopyrrolate',
     class: 'Anticholinesterase + antimuscarinic',
     category: 'reversal',
-    phase: 'emergence',
     doses: [
       {
         id: 'neo-short',
@@ -750,7 +733,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Phenylephrine',
     class: 'Alpha-1 agonist',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'phenyl-bolus-initial',
@@ -779,6 +761,7 @@ export const MEDICATIONS: Medication[] = [
         max: 35,
         default: 10,
         unit: 'mcg/min',
+        preferredConcentrationMgPerMl: 0.02,
         absoluteMax: { value: 200, unit: 'mcg/min' },
         notes: ['Label: not to exceed 200 mcg/min.'],
         sourceIds: ['label-phenylephrine'],
@@ -800,7 +783,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Ephedrine',
     class: 'Mixed sympathomimetic',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'ephedrine-bolus',
@@ -826,7 +808,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Norepinephrine',
     class: 'Catecholamine vasopressor',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'norepi-initial',
@@ -858,7 +839,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Epinephrine (infusion)',
     class: 'Catecholamine',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'epi-infusion',
@@ -882,7 +862,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Labetalol',
     class: 'Alpha/beta blocker',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'labetalol-initial',
@@ -914,7 +893,6 @@ export const MEDICATIONS: Medication[] = [
     name: 'Esmolol',
     class: 'Beta-1 blocker',
     category: 'vasoactive',
-    phase: 'maintenance',
     doses: [
       {
         id: 'esmolol-immediate-bolus',
@@ -1049,5 +1027,3 @@ export const LOCAL_ANESTHETICS: LocalAnesthetic[] = [
     sourceIds: ['label-chloroprocaine', 'rosenberg-2004'],
   },
 ];
-
-export const LOCAL_ANESTHETIC_PRINCIPLE_SOURCES = ['cas-2025', 'asra-last-2020', 'rosenberg-2004'];

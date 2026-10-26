@@ -10,14 +10,15 @@ An offline, mobile-first cognitive aid for anesthesia providers in the operating
 
 The reference layer in `src/data/` was transcribed from product labels (DailyMed) and published references. Several primary texts could not be read in the build session (ASRA, MHAUS, EMHG, ASA 2022 full texts). Each source carries a `verification` field (`primary`, `label` or `secondary`) and an `accessNote`, and the in-app **References** view lists every source with the values derived from it.
 
-**A qualified clinician must review the data before any clinical use.** Where no high-quality source value was available, the app shows **"No high-quality source value specified."** instead of a number. That includes adult ETT sizing, adult/video laryngoscope blades, face masks, double-lumen tubes, aspiration prophylaxis, metaraminol, epinephrine bolus, PONV doses and most scenario-specific ventilation settings.
+**A qualified clinician must review the data before any clinical use.** Where no high-quality source value was available, the app shows **"No high-quality source value specified."** instead of a number. That includes face-mask sizing by contour, video-laryngoscope geometry, aspiration prophylaxis, metaraminol, epinephrine bolus, PONV doses and most scenario-specific ventilation settings.
 
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev        # http://localhost:5173
 npm test           # unit tests (clinical calculations and data integrity)
+npm run verify     # tests + type-check + production build
 ```
 
 Requires Node 20+.
@@ -29,7 +30,7 @@ npm run build      # type-check (strict), build, generate the service worker
 npm run preview    # serve dist/ locally to test offline behaviour
 ```
 
-`vite-plugin-pwa` is set to `autoUpdate` with a full precache of the app shell, bundle, icons and manifest. After the first load the app makes **no network requests**. To check: open `npm run preview`, load once, then switch the browser to Offline and reload.
+`vite-plugin-pwa` precaches the app shell, bundle, icons and manifest. The app data makes no network requests after the first load; the service worker checks every 15 minutes for an update and **waits** for the clinician to tap “Update ready”. It never reloads a live case automatically. To check offline use: open `npm run preview`, load once, then switch the browser to Offline and reload.
 
 Deploy the `dist/` folder to any static host. `vercel.json` already sets cache headers (service worker and manifest are never cached; hashed assets are immutable).
 
@@ -39,11 +40,12 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 
 | Tab / control | What it does |
 |---|---|
-| **Dosing** | Eight categories of drug cards: pre-induction, induction/sedation, opioids, neuromuscular blockers, reversal, pressors/inotropes/antihypertensives, PONV/postoperative, local anesthetics. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the chosen concentration, absolute-maximum warnings (shown above the result) and source badges. |
-| **Airway** | Pediatric ETT size/depth by age, LMA size by weight, pediatric blade by age, OPA/NPA landmarks, ASA difficult-airway principles. |
-| **Vent** | Scenario selector, tidal volume from **PBW** (never actual weight), minute ventilation, I:E timing, plateau and driving-pressure warnings, mode/alarm/troubleshooting prompts. |
-| **Lists** | Pre-induction, machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary generator with a copy-to-clipboard button. |
+| **Dosing** | Adult drug cards in eight categories. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the dose-specific concentration, single/cumulative maximum warnings and source badges. Cumulative ceilings for ephedrine and labetalol have a local dose log. Dosing is withheld for a known patient under 18 because this build has no pediatric dose set. |
+| **Airway** | Adult and pediatric ETT/blade summaries, age-gated DLT sizing, LMA size by weight, OPA/NPA landmarks, ASA difficult-airway principles. |
+| **Vent** | Scenario selector, tidal volume from **PBW** (adult age required; never actual weight), minute ventilation, I:E timing, plateau and driving-pressure warnings, mode/alarm/troubleshooting prompts. |
+| **Lists** | Pre-induction, machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary built only from fixed choices and numeric fields. |
 | **SOS** (red, bottom bar) | Full-screen LAST, MH and CICO support from any tab. |
+| **References** (book icon) | Source registry, verification status and the values derived from each source. The old prose guide is archived in `docs/reference-archive-2026-10-14.md` and is not a dosing source. |
 
 ### Biometric formulas (exact)
 
@@ -90,12 +92,12 @@ Settings (gear icon) has an **Active reference set** switch.
 
 ## What is and is not stored
 
-**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentrations, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, and anonymous checklist tick marks.
+**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentration for each dose, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, and anonymous checklist tick marks.
 
-**Never stored:** patient weight, height, sex, age, dose selections, local anesthetic entries, emergency logs, timers and handoff text. They live in memory and disappear when the app closes. **New case** clears them (and checklist ticks) on demand. Older saved data (including the previous version's patient values) is discarded on upgrade.
+**Never stored:** patient weight, height, sex, age, dose selections, cumulative dose logs, local anesthetic entries, emergency logs, timers and handoff text. They live in memory and disappear when the app closes. **New case** clears them (and checklist ticks) on demand. Older saved data (including the previous version's patient values) is discarded on upgrade.
 
-**Never done:** authentication, analytics or telemetry, network calls after the first load, logging of clinical entries. The handoff generator only uses selected categories and short numeric fields, scrubs free text for names/dates/ID numbers, and adds no weight, height or biometrics.
+**Never done:** authentication, analytics or telemetry, clinical network calls, logging of clinical entries. The only background request is the service-worker update check. The handoff generator only uses fixed choices and numeric fields, has no free-text fields, and adds no weight, height or biometrics.
 
 ## Tests
 
-`npm test` runs 120+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); maximum-dose flags on unrounded values; infusion rates; ETT and LMA sizing; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; handoff anonymization; and source traceability of every clinical record.
+`npm test` runs 200+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); single and cumulative maximum-dose flags; infusion rates; ETT/LMA/DLT sizing; pediatric age guards; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; anonymous handoff construction; and source traceability of every clinical record. CI and Vercel run `npm run verify`.

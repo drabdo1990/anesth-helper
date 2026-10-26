@@ -4,10 +4,10 @@ import { LOCAL_ANESTHETICS } from '../data/medications';
 import { resolveWithOverrides } from '../data/resolve';
 import type { LocalAnesthetic, LocalAnestheticLimitRecord } from '../data/types';
 import { useAppStore, type LaAdmin } from '../store/useAppStore';
-import type { Biometrics } from '../lib/calc/biometrics';
 import {
   combinedToxicityFraction,
   localAnestheticDoseMg,
+  maxAllowedMg,
   type LocalAdministration,
 } from '../lib/calc/localAnesthetic';
 import { formatMg } from '../lib/calc/format';
@@ -24,6 +24,9 @@ interface Row {
   record: LocalAnestheticLimitRecord | undefined;
   maxMg: number | null;
   maxNote: string;
+  absoluteMaxMg?: number;
+  localProtocol: boolean;
+  conflict?: { guidelineValue: number; localValue?: number };
 }
 
 const resolveMaxMg = (
@@ -31,34 +34,40 @@ const resolveMaxMg = (
   withEpi: boolean,
   weightKg: number,
   guidelineSet: 'international' | 'local',
-): { maxMg: number | null; note: string; record: LocalAnestheticLimitRecord | undefined } => {
+): Omit<Row, 'admin' | 'agent' | 'doseMg'> => {
   const record = withEpi ? agent.withEpinephrine : agent.plain;
-  if (!record) return { maxMg: null, note: '', record };
+  if (!record) return { maxMg: null, maxNote: '', record, localProtocol: false };
   const which = withEpi ? 'epi' : 'plain';
   const abs =
     record.absoluteMaxMg !== undefined
-      ? resolveWithOverrides(`la:${agent.id}:${which}:absoluteMaxMg`, record.absoluteMaxMg, guidelineSet).value
+      ? resolveWithOverrides(`la:${agent.id}:${which}:absoluteMaxMg`, record.absoluteMaxMg, guidelineSet)
       : undefined;
   const perKg =
     record.mgPerKg !== undefined
-      ? resolveWithOverrides(`la:${agent.id}:${which}:mgPerKg`, record.mgPerKg, guidelineSet).value
+      ? resolveWithOverrides(`la:${agent.id}:${which}:mgPerKg`, record.mgPerKg, guidelineSet)
       : undefined;
-  const byWeight = perKg !== undefined ? perKg * weightKg : undefined;
-  const candidates = [abs, byWeight].filter((n): n is number => n !== undefined);
-  const maxMg = candidates.length > 0 ? Math.min(...candidates) : null;
-  const note = [perKg !== undefined ? `${perKg} mg/kg` : null, abs !== undefined ? `${abs} mg absolute` : null]
+  const maxMg = maxAllowedMg({ mgPerKg: perKg?.value, absoluteMaxMg: abs?.value }, weightKg);
+  const note = [perKg ? `${perKg.value} mg/kg` : null, abs ? `${abs.value} mg absolute` : null]
     .filter(Boolean)
     .join(', ');
-  return { maxMg, note, record };
+  const conflict = [abs, perKg].find((resolved) => resolved?.conflict);
+  return {
+    maxMg,
+    maxNote: note,
+    record,
+    absoluteMaxMg: abs?.value,
+    localProtocol: [abs, perKg].some((resolved) => resolved?.tag === 'Local protocol'),
+    conflict: conflict ? { guidelineValue: conflict.guidelineValue, localValue: conflict.localValue } : undefined,
+  };
 };
 
 const STATUS_TONE: Record<'safe' | 'caution' | 'toxic', ValueTone> = { safe: 'emerald', caution: 'amber', toxic: 'red' };
 
 interface Props {
-  biometrics: Biometrics | null;
+  weightKg: number | null;
 }
 
-export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
+export const LocalAnestheticPanel: React.FC<Props> = ({ weightKg }) => {
   const admins = useAppStore((s) => s.laAdmins);
   const add = useAppStore((s) => s.addLaAdmin);
   const update = useAppStore((s) => s.updateLaAdmin);
@@ -66,18 +75,18 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
   const clear = useAppStore((s) => s.clearLaAdmins);
   const guidelineSet = useAppStore((s) => s.guidelineSet);
 
-  if (!biometrics) {
+  if (weightKg === null || weightKg <= 0) {
     return (
       <WarningBanner level="info" title="Actual weight needed">
-        Local anesthetic limits depend on actual body weight. Enter weight, height and biological sex to use this calculator.
+        Local anesthetic limits depend on actual body weight. Enter actual weight to use this calculator.
       </WarningBanner>
     );
   }
 
   const rows: Row[] = admins.map((admin) => {
     const agent = LOCAL_ANESTHETICS.find((a) => a.id === admin.anestheticId) ?? LOCAL_ANESTHETICS[0];
-    const { maxMg, note, record } = resolveMaxMg(agent, admin.withEpi, biometrics.tbw, guidelineSet);
-    return { admin, agent, doseMg: localAnestheticDoseMg(admin.volumeMl, admin.percent), record, maxMg, maxNote: note };
+    const resolved = resolveMaxMg(agent, admin.withEpi, weightKg, guidelineSet);
+    return { admin, agent, doseMg: localAnestheticDoseMg(admin.volumeMl, admin.percent), ...resolved };
   });
 
   const countable: LocalAdministration[] = rows
@@ -89,7 +98,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
   return (
     <section className="flex flex-col gap-3" aria-label="Local anesthetic maximum dose calculator">
       <WarningBanner level="info" title="Total local anesthetic exposure">
-        Add every local anesthetic given (surgeon, anesthesia, block service). The combined fraction is the sum of dose / maximum for each entry and must stay below 1.0. Weight used: actual body weight {biometrics.tbw.toFixed(1)} kg.
+        Add every local anesthetic given (surgeon, anesthesia, block service). The combined fraction is the sum of dose / maximum for each entry and must stay below 1.0. Weight used: actual body weight {weightKg.toFixed(1)} kg.
         Published maxima are not evidence-based and vary by source (Rosenberg 2004); reduce for age, pregnancy, and organ disease. CAS advises documenting the cumulative dose.
       </WarningBanner>
 
@@ -119,7 +128,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
         </WarningBanner>
       )}
 
-      {rows.map(({ admin, agent, doseMg, record, maxMg, maxNote }) => (
+      {rows.map(({ admin, agent, doseMg, record, maxMg, maxNote, absoluteMaxMg, localProtocol, conflict }) => (
         <div key={admin.id} className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Agent">
@@ -176,12 +185,17 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
           </div>
           {maxMg !== null && admin.percent > 0 && (
             <p className="font-mono text-xs text-slate-400">
-              Fraction {(doseMg / maxMg).toFixed(2)} · implied {(doseMg / (biometrics.tbw)).toFixed(1)} mg/kg
+              Fraction {(doseMg / maxMg).toFixed(2)} · implied {(doseMg / weightKg).toFixed(1)} mg/kg
             </p>
           )}
-          {record && record.mgPerKg === undefined && record.absoluteMaxMg !== undefined && (
+          {record && record.mgPerKg === undefined && absoluteMaxMg !== undefined && (
             <WarningBanner level="amber" title="Fixed adult total, not weight-scaled">
-              This published maximum is a fixed adult total ({record.absoluteMaxMg} mg) and does not shrink with weight. At {biometrics.tbw.toFixed(1)} kg it equals {(record.absoluteMaxMg / biometrics.tbw).toFixed(1)} mg/kg. Reduce for small, elderly or compromised patients.
+              This published maximum is a fixed adult total ({absoluteMaxMg} mg) and does not shrink with weight. At {weightKg.toFixed(1)} kg it equals {(absoluteMaxMg / weightKg).toFixed(1)} mg/kg. Reduce for small, elderly or compromised patients.
+            </WarningBanner>
+          )}
+          {conflict && (
+            <WarningBanner level="amber" title="Guideline vs local protocol">
+              Guideline {conflict.guidelineValue}, local protocol {conflict.localValue}. The value currently in force is shown above.
             </WarningBanner>
           )}
           {record?.note && <p className="text-xs text-slate-400">{record.note}</p>}
@@ -195,12 +209,16 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ biometrics }) => {
           {agent.cautions?.map((c) => (
             <WarningBanner key={c} level="amber">{c}</WarningBanner>
           ))}
-          <SourceBadge sourceIds={[...agent.sourceIds, ...(record?.sourceIds ?? [])]} />
+          <SourceBadge sourceIds={[...agent.sourceIds, ...(record?.sourceIds ?? []), ...(localProtocol ? ['local-protocol'] : [])]} />
         </div>
       ))}
 
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => add(LOCAL_ANESTHETICS[0].id)} className="min-h-[48px] rounded-xl bg-cyan-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => add(LOCAL_ANESTHETICS[0].id, LOCAL_ANESTHETICS[0].concentrationsPercent[0])}
+          className="min-h-[48px] rounded-xl bg-cyan-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5"
+        >
           <Plus className="h-5 w-5" /> Add entry
         </button>
         <button type="button" onClick={clear} disabled={admins.length === 0} className="min-h-[48px] rounded-xl border border-slate-700 bg-slate-900 font-bold uppercase text-slate-300 disabled:opacity-40">

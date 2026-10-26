@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.10.14-draft3';
+export const DATA_VERSION = '2026.10.26-draft4';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -429,7 +429,7 @@ export const SOURCES: ClinicalSource[] = [
   {
     id: 'project-notebook',
     tag: 'Project notebook',
-    name: 'Project reference notebook (anesthesia_reference_data.md), sections without a named primary citation',
+    name: 'Project reference notebook (archived at docs/reference-archive-2026-10-14.md), sections without a named primary citation',
     publisher: 'Project notebook (user supplied)',
     year: '2026',
     tier: 3,
@@ -467,5 +467,3 @@ export const SOURCES: ClinicalSource[] = [
 export const SOURCE_BY_ID: Record<string, ClinicalSource> = Object.fromEntries(
   SOURCES.map((s) => [s.id, s]),
 );
-
-export const getSource = (id: string): ClinicalSource | undefined => SOURCE_BY_ID[id];

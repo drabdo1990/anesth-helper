@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
-import { playCycleAlertGong } from '../../lib/audioAlerts';
+import { playCycleAlertGong, unlockAudio } from '../../lib/audioAlerts';
 
 interface TimerProps {
   id: string;
@@ -36,6 +36,16 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
     const t = window.setInterval(() => setNow(Date.now()), 250);
     return () => window.clearInterval(t);
   }, [running]);
+
+  useEffect(() => {
+    const resync = () => setNow(Date.now());
+    document.addEventListener('visibilitychange', resync);
+    window.addEventListener('focus', resync);
+    return () => {
+      document.removeEventListener('visibilitychange', resync);
+      window.removeEventListener('focus', resync);
+    };
+  }, []);
 
   const elapsedMs = (timer?.accumulatedMs ?? 0) + (running && timer ? now - timer.startedAtMs : 0);
   const seconds = Math.max(0, Math.floor(elapsedMs / 1000));
@@ -97,7 +107,14 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
             <Pause className="h-5 w-5" /> Pause
           </button>
         ) : (
-          <button type="button" onClick={() => start(id)} className="min-h-[48px] rounded-xl bg-emerald-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              unlockAudio();
+              start(id);
+            }}
+            className="min-h-[48px] rounded-xl bg-emerald-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5"
+          >
             <Play className="h-5 w-5" /> {seconds > 0 ? 'Resume' : 'Start'}
           </button>
         )}

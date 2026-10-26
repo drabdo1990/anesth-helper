@@ -41,6 +41,8 @@ export interface MedicationDose {
   max?: number;
   default?: number;
   unit: DoseUnit;
+  /** Strength this dose was written for, when one strength is the safe default. */
+  preferredConcentrationMgPerMl?: number;
   /** Ignored for fixed (mg, mcg, mcg/min) units. */
   scalar?: WeightScalar;
   scalarBasis?: ScalarBasis;
@@ -69,14 +71,11 @@ export type MedicationCategory =
   | 'postoperative'
   | 'local';
 
-export type MedicationPhase = 'preinduction' | 'induction' | 'maintenance' | 'emergence' | 'postoperative';
-
 export interface Medication {
   id: string;
   name: string;
   class: string;
   category: MedicationCategory;
-  phase: MedicationPhase;
   doses: MedicationDose[];
   concentrations: MedicationConcentration[];
   preparation?: string[];

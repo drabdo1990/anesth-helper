@@ -2,19 +2,29 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
+import { setPwaUpdate } from './lib/pwaUpdate';
+import { useAppStore } from './store/useAppStore';
 import './index.css';
 
-// Automatically activate update and reload client when a new version is published
-registerSW({
+// A new service worker waits until the clinician taps the in-app update button.
+const updateSW = registerSW({
   immediate: true,
+  onNeedRefresh() {
+    useAppStore.getState().setUpdateAvailable(true);
+  },
   onRegisteredSW(_swUrl, registration) {
     if (registration) {
-      // Proactively check for SW updates every 15 minutes
       setInterval(() => {
-        registration.update();
+        void registration.update().catch(() => undefined);
       }, 15 * 60 * 1000);
     }
   },
+});
+setPwaUpdate(() => updateSW(true));
+
+// Keep preference/checklist writes from two open tabs from overwriting each other.
+window.addEventListener('storage', (event) => {
+  if (event.key === 'anesthassist-storage') void useAppStore.persist.rehydrate();
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

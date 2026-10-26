@@ -33,10 +33,12 @@ export const scalarWeightKg = (b: Biometrics, scalar: WeightScalar): number => {
 export const resolveConcentrationIndex = (
   concentrations: ReadonlyArray<{ mgPerMl: number }>,
   savedMgPerMl: number | undefined,
+  fallbackMgPerMl: number | undefined = concentrations[0]?.mgPerMl,
 ): number => {
-  if (savedMgPerMl === undefined) return 0;
-  const i = concentrations.findIndex((c) => c.mgPerMl === savedMgPerMl);
-  return i >= 0 ? i : 0;
+  const savedIndex = savedMgPerMl === undefined ? -1 : concentrations.findIndex((c) => c.mgPerMl === savedMgPerMl);
+  if (savedIndex >= 0) return savedIndex;
+  const fallbackIndex = concentrations.findIndex((c) => c.mgPerMl === fallbackMgPerMl);
+  return fallbackIndex >= 0 ? fallbackIndex : 0;
 };
 
 const PER_KG_UNITS = new Set(['mg/kg', 'mcg/kg', 'mcg/kg/min']);
@@ -53,12 +55,11 @@ export const doseAppliesToWeight = (dose: MedicationDose, tbwKg: number): boolea
   return true;
 };
 
-export type RangeStatus = 'in-range' | 'below-source-range' | 'above-source-range';
-
-export const rangeStatus = (dose: MedicationDose, value: number): RangeStatus => {
-  if (dose.min !== undefined && value < dose.min) return 'below-source-range';
-  if (dose.max !== undefined && value > dose.max) return 'above-source-range';
-  return 'in-range';
+/** Compare a planned dose plus the already-logged total against a cumulative ceiling. */
+export const cumulativeDoseStatus = (givenMg: number, plannedMg: number, limitMg: number): MaxDoseStatus => {
+  const total = givenMg + plannedMg;
+  if (total > limitMg) return 'exceeds';
+  return total === limitMg ? 'at-limit' : 'ok';
 };
 
 export interface DoseComputation {
@@ -69,7 +70,6 @@ export interface DoseComputation {
   scalarKg?: number;
   bolus?: DoseResult;
   infusion?: InfusionResult;
-  range: RangeStatus;
   max: MaxDoseStatus;
   /** Percent of the absolute maximum reached (unrounded), if a maximum applies. */
   percentOfMax?: number;
@@ -96,7 +96,6 @@ export const computeMedicationDose = (
   const scalarKg = scalar ? scalarWeightKg(biometrics, scalar) : undefined;
   const weight = scalarKg ?? biometrics.tbw;
   const absoluteMax = options.absoluteMax ?? dose.absoluteMax;
-  const range = rangeStatus(dose, value);
 
   if (dose.unit === 'mcg/kg/min' || dose.unit === 'mcg/min') {
     const infusion = calculateInfusion(value, dose.unit, weight, concentrationMgPerMl);
@@ -109,7 +108,6 @@ export const computeMedicationDose = (
       scalar,
       scalarKg,
       infusion,
-      range,
       max,
       percentOfMax:
         absoluteMax?.unit === 'mcg/min' ? (infusion.mcgPerMin / absoluteMax.value) * 100 : undefined,
@@ -138,5 +136,5 @@ export const computeMedicationDose = (
       })()
     : undefined;
 
-  return { kind: 'bolus', value, unit: dose.unit, scalar, scalarKg, bolus, range, max, percentOfMax, absoluteMax, companion };
+  return { kind: 'bolus', value, unit: dose.unit, scalar, scalarKg, bolus, max, percentOfMax, absoluteMax, companion };
 };

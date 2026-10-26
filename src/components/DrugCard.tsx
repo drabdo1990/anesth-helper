@@ -4,9 +4,10 @@ import type { Medication, MedicationDose, WeightScalar } from '../data/types';
 import { resolveWithOverrides } from '../data/resolve';
 import { useAppStore } from '../store/useAppStore';
 import type { Biometrics } from '../lib/calc/biometrics';
-import { formatMcg, formatMg, formatMl } from '../lib/calc/format';
+import { formatMcg, formatMg, formatMl, maxDecimalPlaces } from '../lib/calc/format';
 import {
   computeMedicationDose,
+  cumulativeDoseStatus,
   doseAppliesToWeight,
   isWeightBased,
   resolveConcentrationIndex,
@@ -29,8 +30,6 @@ const stepFor = (min: number, max: number): number => {
   return NICE_STEPS.find((s) => s >= ideal) ?? 100;
 };
 
-const decimalsFor = (step: number): number => (step.toString().split('.')[1] ?? '').length;
-
 /** mL: one decimal place, but two below 1 mL so small syringe volumes are not shown as 0.0. */
 const fmtVolume = (ml: number): string => (ml < 1 ? ml.toFixed(2) : formatMl(ml));
 
@@ -51,12 +50,17 @@ interface DrugCardProps {
 }
 
 export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) => {
+  const actualWeightKg = useAppStore((s) => s.patient.tbwKg);
   const selectedDoseIds = useAppStore((s) => s.selectedDose);
   const setSelectedDose = useAppStore((s) => s.setSelectedDose);
   const doseValues = useAppStore((s) => s.doseValues);
   const setDoseValue = useAppStore((s) => s.setDoseValue);
   const scalarOverrides = useAppStore((s) => s.scalarOverrides);
   const setScalarOverride = useAppStore((s) => s.setScalarOverride);
+  const doseAdminLogs = useAppStore((s) => s.doseAdminLogs);
+  const logDose = useAppStore((s) => s.logDose);
+  const undoDose = useAppStore((s) => s.undoDose);
+  const resetDoseLog = useAppStore((s) => s.resetDoseLog);
   const concentrationChoice = useAppStore((s) => s.concentrationChoice);
   const setConcentrationChoice = useAppStore((s) => s.setConcentrationChoice);
   const preferredScalar = useAppStore((s) => s.preferredScalar);
@@ -64,15 +68,9 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
   const touchRecent = useAppStore((s) => s.touchRecent);
   const [showDetails, setShowDetails] = useState(false);
 
-  const tbw = biometrics?.tbw ?? null;
-  const applicable = tbw === null ? medication.doses : medication.doses.filter((d) => doseAppliesToWeight(d, tbw));
+  const applicable = actualWeightKg === null ? medication.doses : medication.doses.filter((d) => doseAppliesToWeight(d, actualWeightKg));
   const dose: MedicationDose | undefined =
     applicable.find((d) => d.id === selectedDoseIds[medication.id]) ?? applicable[0];
-
-  // The saved choice is a strength (mg/mL), matched against the current data. If the data changed and
-  // that strength no longer exists, fall back to the first listed concentration.
-  const concIndex = resolveConcentrationIndex(medication.concentrations, concentrationChoice[medication.id]);
-  const conc = medication.concentrations[concIndex];
 
   if (!dose) {
     return (
@@ -82,8 +80,17 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
     );
   }
 
+  // The saved strength is per dose. An infusion can therefore remember 20 mcg/mL while the bolus
+  // dose remembers the 100 mcg/mL syringe.
+  const defaultMgPerMl = dose.preferredConcentrationMgPerMl ?? medication.concentrations[0].mgPerMl;
+  const concIndex = resolveConcentrationIndex(
+    medication.concentrations,
+    concentrationChoice[dose.id],
+    defaultMgPerMl,
+  );
+  const conc = medication.concentrations[concIndex];
   const weightBased = isWeightBased(dose);
-  const needsWeight = (weightBased || dose.weightBandKg !== undefined) && biometrics === null;
+  const needsWeight = dose.weightBandKg !== undefined ? actualWeightKg === null : weightBased && biometrics === null;
   const lo = dose.min ?? dose.default ?? 0;
   const hi = dose.max ?? dose.default ?? lo;
   const value = doseValues[dose.id] ?? dose.default ?? lo;
@@ -113,18 +120,44 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
       });
 
   const step = adjustable ? stepFor(lo, hi) : 0;
+  const displayDecimals = maxDecimalPlaces(step, lo, hi, value);
   const maxLabel = dose.absoluteMax
     ? `${resolvedMax?.value ?? dose.absoluteMax.value} ${dose.absoluteMax.unit}${dose.absoluteMax.scope ? ` (${dose.absoluteMax.scope})` : ''}`
     : '';
 
+  const cumulativeDose = medication.doses.find((d) => d.absoluteMax?.scope === 'cumulative');
+  const cumulativeMax = cumulativeDose?.absoluteMax
+    ? resolveWithOverrides(`dose-max:${cumulativeDose.id}`, cumulativeDose.absoluteMax.value, guidelineSet).value
+    : undefined;
+  const loggedMg = (doseAdminLogs[medication.id] ?? []).reduce((sum, mg) => sum + mg, 0);
+  const plannedMg = computed?.bolus?.massMg;
+  const cumulativeStatus =
+    cumulativeMax !== undefined && plannedMg !== undefined
+      ? cumulativeDoseStatus(loggedMg, plannedMg, cumulativeMax)
+      : null;
+  const cumulativeTotal = plannedMg === undefined ? loggedMg : loggedMg + plannedMg;
+  const effectiveMax = cumulativeStatus ?? computed?.max;
+  const effectivePercent =
+    cumulativeMax !== undefined && plannedMg !== undefined
+      ? (cumulativeTotal / cumulativeMax) * 100
+      : computed?.percentOfMax;
+
   const maxTone =
-    computed?.max === 'exceeds' || computed?.max === 'at-limit'
+    effectiveMax === 'exceeds' || effectiveMax === 'at-limit'
       ? 'red'
-      : computed?.percentOfMax !== undefined && computed.percentOfMax >= 90
+      : effectivePercent !== undefined && effectivePercent >= 90
         ? 'amber'
         : null;
 
-  const sourceIds = [...new Set([...dose.sourceIds, conc.sourceId, ...(resolvedMax?.tag === 'Local protocol' ? ['local-protocol'] : [])])];
+  const sourceIds = [
+    ...new Set([
+      ...dose.sourceIds,
+      conc.sourceId,
+      ...(resolvedMax?.tag === 'Local protocol' || (cumulativeDose?.absoluteMax && cumulativeMax !== cumulativeDose.absoluteMax.value)
+        ? ['local-protocol']
+        : []),
+    ]),
+  ];
 
   return (
     <Panel title={medication.name} sourceIds={sourceIds}>
@@ -153,11 +186,29 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
       )}
       {applicable.length === 1 && <p className="text-sm font-semibold text-slate-200">{dose.indication}</p>}
 
-      {/* Absolute-maximum warning goes ABOVE the result so it cannot be missed. */}
+      {/* Maximum warning goes ABOVE the result so it cannot be missed. */}
       {computed && maxTone && (
-        <WarningBanner level={maxTone} title={computed.max === 'exceeds' ? 'Exceeds absolute maximum' : computed.max === 'at-limit' ? 'Reaches absolute maximum' : 'Approaching absolute maximum'}>
-          Calculated dose is {computed.percentOfMax !== undefined ? `${Math.round(computed.percentOfMax)}% of` : 'at'} the ceiling of {maxLabel}. Do not
-          exceed the ceiling. {resolvedMax?.tag === 'Local protocol' && 'Ceiling set by Local protocol.'}
+        <WarningBanner
+          level={maxTone}
+          title={
+            effectiveMax === 'exceeds'
+              ? 'Exceeds absolute maximum'
+              : effectiveMax === 'at-limit'
+                ? 'Reaches absolute maximum'
+                : 'Approaching absolute maximum'
+          }
+        >
+          {cumulativeMax !== undefined && plannedMg !== undefined ? (
+            <>
+              Logged {formatMg(loggedMg)} mg plus this selected dose ({formatMg(plannedMg)} mg) is{' '}
+              {formatMg(cumulativeTotal)} mg of the cumulative {cumulativeMax} mg ceiling. Do not exceed it.
+            </>
+          ) : (
+            <>
+              Calculated dose is {effectivePercent !== undefined ? `${Math.round(effectivePercent)}% of` : 'at'} the ceiling of {maxLabel}. Do not
+              exceed the ceiling. {resolvedMax?.tag === 'Local protocol' && 'Ceiling set by Local protocol.'}
+            </>
+          )}
         </WarningBanner>
       )}
       {resolvedMax?.conflict && (
@@ -178,7 +229,11 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
             {dose.max !== undefined && dose.max !== dose.min ? `-${dose.max}` : ''} {dose.unit}
           </span>
           {scalar && scalarWeightKgOrNull(biometrics, scalar) !== null && (
-            <WeightScalarBadge scalar={scalar} kg={scalarWeightKgOrNull(biometrics, scalar) ?? 0} basis={dose.scalarBasis} />
+            <WeightScalarBadge
+              scalar={scalar}
+              kg={scalarWeightKgOrNull(biometrics, scalar) ?? 0}
+              basis={scalar === dose.scalar ? dose.scalarBasis : undefined}
+            />
           )}
         </div>
 
@@ -190,7 +245,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
             step={step}
             min={lo}
             max={hi}
-            decimals={decimalsFor(step)}
+            decimals={displayDecimals}
             onChange={(v) => {
               setDoseValue(dose.id, v);
               touchRecent(medication.id);
@@ -224,14 +279,48 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
 
         {computed?.kind === 'bolus' && computed.bolus && (
           <div className="grid grid-cols-2 gap-2 border-t border-clinical-border pt-2">
-            <BigValue label="Total" value={fmtMass(computed.bolus.mass, computed.bolus.massUnit)} unit={computed.bolus.massUnit} tone={computed.max === 'ok' ? undefined : 'red'} />
+            <BigValue label="Total" value={fmtMass(computed.bolus.mass, computed.bolus.massUnit)} unit={computed.bolus.massUnit} tone={effectiveMax === 'ok' ? undefined : 'red'} />
             <BigValue label={`Volume at ${conc.label}`} value={fmtVolume(computed.bolus.volumeMl)} unit="mL" />
           </div>
         )}
         {computed?.kind === 'infusion' && computed.infusion && (
           <div className="grid grid-cols-2 gap-2 border-t border-clinical-border pt-2">
-            <BigValue label="Rate" value={computed.infusion.mcgPerMin.toFixed(1)} unit="mcg/min" tone={computed.max === 'ok' ? undefined : 'red'} />
+            <BigValue label="Rate" value={computed.infusion.mcgPerMin.toFixed(1)} unit="mcg/min" tone={effectiveMax === 'ok' ? undefined : 'red'} />
             <BigValue label={`Pump at ${conc.label}`} value={computed.infusion.mlPerHr.toFixed(1)} unit="mL/hr" />
+          </div>
+        )}
+
+        {cumulativeMax !== undefined && computed?.bolus && (
+          <div className="flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/20 p-2">
+            <p className="text-xs text-amber-100">
+              Cumulative logged: {formatMg(loggedMg)} mg. With this selected dose: {formatMg(cumulativeTotal)} mg of{' '}
+              {cumulativeMax} mg.
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => logDose(medication.id, computed.bolus!.massMg)}
+                className="min-h-[48px] rounded-lg bg-amber-500 px-2 text-xs font-black text-slate-950"
+              >
+                Log this dose
+              </button>
+              <button
+                type="button"
+                disabled={loggedMg === 0}
+                onClick={() => undoDose(medication.id)}
+                className="min-h-[48px] rounded-lg border border-amber-600/60 px-2 text-xs font-bold text-amber-100 disabled:opacity-40"
+              >
+                Undo last
+              </button>
+              <button
+                type="button"
+                disabled={loggedMg === 0}
+                onClick={() => resetDoseLog(medication.id)}
+                className="min-h-[48px] rounded-lg border border-amber-600/60 px-2 text-xs font-bold text-amber-100 disabled:opacity-40"
+              >
+                Reset total
+              </button>
+            </div>
           </div>
         )}
 
@@ -250,7 +339,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
       <ConcentrationSelector
         options={medication.concentrations}
         selectedIndex={concIndex}
-        onChange={(i) => setConcentrationChoice(medication.id, medication.concentrations[i].mgPerMl)}
+        onChange={(i) => setConcentrationChoice(dose.id, medication.concentrations[i].mgPerMl)}
       />
 
       <div>

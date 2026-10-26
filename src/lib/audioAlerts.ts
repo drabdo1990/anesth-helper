@@ -14,36 +14,14 @@ function getAudioContext(): AudioContext | null {
     }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    void audioCtx.resume().catch(() => undefined);
   }
   return audioCtx;
 }
 
-/**
- * Synthesizes a crisp woodblock/click for CPR chest compressions (110 bpm)
- */
-export function playCprMetronomeClick(): void {
-  try {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
-
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.045);
-  } catch (err) {
-    console.warn('Audio alert error:', err);
-  }
+/** Call from a real click so the browser allows later timer sounds. */
+export function unlockAudio(): void {
+  getAudioContext();
 }
 
 /**

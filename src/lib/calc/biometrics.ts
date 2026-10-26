@@ -35,7 +35,7 @@ export const calculateBmi = (weightKg: number, heightCm: number): number =>
 
 export const calculateDevineIbw = (sex: Sex, heightCm: number): number => {
   const base = sex === 'male' ? 50 : 45.5;
-  return base + 0.905 * Math.max(0, heightCm - 152.4);
+  return base + 0.905 * Math.max(0, heightCm - DEVINE_BASELINE_HEIGHT_CM);
 };
 
 export const calculateAbw40 = (tbwKg: number, ibwKg: number): number =>

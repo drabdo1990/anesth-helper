@@ -32,12 +32,12 @@ describe('pediatric ETT', () => {
     expect(r.depthCm).toBe(15);
   });
 
-  it('depth uses the unrounded ID', () => {
+  it('depth uses the displayed, rounded tube size', () => {
     const r = pedsEtt(5, 'cuffed-msd');
     if (!r.ok) throw new Error('expected ok');
     expect(r.idMm).toBe(4.75);
     expect(r.idRoundedMm).toBe(5);
-    expect(r.depthCm).toBe(14.25);
+    expect(r.depthCm).toBe(15);
   });
 
   it.each([0.5, 0.99, 8.01, 12, Number.NaN])('has no sourced value at age %s', (age) => {
@@ -147,23 +147,23 @@ describe('DLT sizing by height', () => {
     [178.1, '39–41 Fr'],
     [190, '39–41 Fr'],
   ])('height %s cm -> %s', (heightCm, expectedFr) => {
-    const r = dltSizeForHeight(heightCm);
+    const r = dltSizeForHeight(heightCm, 18);
     if (!r.ok) throw new Error('expected ok');
     expect(r.sizeFr).toBe(expectedFr);
   });
 
   it('rejects height < 150 cm and labels the rule as unsourced', () => {
-    const shortAdult = dltSizeForHeight(149.9);
+    const shortAdult = dltSizeForHeight(149.9, 18);
     expect(shortAdult.ok).toBe(false);
     if (!shortAdult.ok) {
       expect(shortAdult.reason).toContain('< 150 cm');
       expect(shortAdult.reason).toContain('no source');
     }
-    expect(dltSizeForHeight(100).ok).toBe(false);
+    expect(dltSizeForHeight(100, 18).ok).toBe(false);
   });
 
   it('keeps the sourced "Short (< 165 cm)" band down to the safety floor: 150 cm gets 35-37 Fr', () => {
-    const r = dltSizeForHeight(150);
+    const r = dltSizeForHeight(150, 18);
     if (!r.ok) throw new Error('expected ok');
     expect(r.sizeFr).toBe('35–37 Fr');
     expect(r.category).toBe('Short (< 165 cm / < 5\'5")');
@@ -176,10 +176,10 @@ describe('DLT sizing by height', () => {
     expect(dltSizeForHeight(165, 17.99).ok).toBe(false);
   });
 
-  it('allows adults and an unknown age', () => {
+  it('allows adults but requires age before showing an adult DLT size', () => {
     expect(dltSizeForHeight(165, 18).ok).toBe(true);
-    expect(dltSizeForHeight(165, null).ok).toBe(true);
-    expect(dltSizeForHeight(165).ok).toBe(true);
+    expect(dltSizeForHeight(165, null).ok).toBe(false);
+    expect(dltSizeForHeight(165).ok).toBe(false);
   });
 
   it('declares the safety floor as having no source, so it cannot pass for sourced data', () => {

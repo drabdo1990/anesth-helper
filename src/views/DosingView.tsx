@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import { CATEGORY_LABELS, CATEGORY_ORDER, CATEGORY_PLACEHOLDERS, MEDICATIONS } from '../data/medications';
+import { CATEGORY_LABELS, CATEGORY_ORDER, CATEGORY_PLACEHOLDERS, LOCAL_ANESTHETICS, MEDICATIONS } from '../data/medications';
 import { useAppStore } from '../store/useAppStore';
 import { useBiometricResult } from '../store/useBiometrics';
 import { DrugCard } from '../components/DrugCard';
@@ -9,6 +9,7 @@ import { NeuraxialReference } from '../components/NeuraxialReference';
 import { ReferenceDrugsPanel } from '../components/ReferenceDrugsPanel';
 import { OTHER_REFERENCE_FILTER, OTHER_REFERENCE_LABEL, type DosingFilter } from '../data/referenceGroups';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
+import { WarningBanner } from '../components/ui/WarningBanner';
 import { SITUATIONS } from '../data/situations';
 
 type Filter = DosingFilter;
@@ -18,8 +19,11 @@ export const DosingView: React.FC = () => {
   const [situation, setSituation] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const recents = useAppStore((s) => s.recents);
+  const actualWeightKg = useAppStore((s) => s.patient.tbwKg);
+  const ageYears = useAppStore((s) => s.patient.ageYears);
   const result = useBiometricResult();
   const biometrics = result.ok ? result.value : null;
+  const pediatric = ageYears !== null && ageYears < 18;
 
   const q = query.trim().toLowerCase();
   const visibleCategories = useMemo(
@@ -31,6 +35,24 @@ export const DosingView: React.FC = () => {
   const recentMeds = recents.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined);
   const activeSituation = SITUATIONS.find((s) => s.id === situation);
   const situationMeds = activeSituation?.drugIds.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined) ?? [];
+
+  if (ageYears === null) {
+    return (
+      <WarningBanner level="amber" title="Age required">
+        Enter age in the patient bar before using the adult dosing calculator. This prevents adult doses being shown for an
+        unknown child.
+      </WarningBanner>
+    );
+  }
+
+  if (pediatric) {
+    return (
+      <WarningBanner level="red" title="Pediatric dosing not available">
+        This dosing calculator contains adult label doses only. It is withheld for a patient under 18. Use a current pediatric
+        dosing reference and your local protocol.
+      </WarningBanner>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 pb-8">
@@ -113,14 +135,21 @@ export const DosingView: React.FC = () => {
       {situation === null && visibleCategories.map((cat) => {
         const meds = MEDICATIONS.filter((m) => m.category === cat && matches(m.name, m.class));
         const placeholders = CATEGORY_PLACEHOLDERS.filter((p) => p.category === cat && (q === '' || p.topic.toLowerCase().includes(q)));
-        if (cat === 'local' && q !== '' && !'local anesthetic lidocaine bupivacaine ropivacaine mepivacaine chloroprocaine'.includes(q)) return null;
+        if (
+          cat === 'local' &&
+          q !== '' &&
+          !'local anesthetic'.includes(q) &&
+          !LOCAL_ANESTHETICS.some((a) => a.name.toLowerCase().includes(q) || a.id.includes(q))
+        ) {
+          return null;
+        }
         if (meds.length === 0 && placeholders.length === 0 && cat !== 'local') return null;
         return (
           <section key={cat} className="flex flex-col gap-3" aria-label={CATEGORY_LABELS[cat]}>
             <h2 className="text-sm font-black uppercase tracking-wider text-cyan-300">{CATEGORY_LABELS[cat]}</h2>
             {cat === 'local' ? (
               <>
-                <LocalAnestheticPanel biometrics={biometrics} />
+                <LocalAnestheticPanel weightKg={actualWeightKg} />
                 <NeuraxialReference />
               </>
             ) : (

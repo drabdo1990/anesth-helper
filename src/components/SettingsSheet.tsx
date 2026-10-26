@@ -6,6 +6,7 @@ import { LOCAL_OVERRIDES } from '../data/localOverrides';
 import { useAppStore, type ScalarPreference } from '../store/useAppStore';
 import type { GuidelineSet } from '../data/resolve';
 import { DisclaimerBanner } from './DisclaimerBanner';
+import { useDialogFocus } from '../lib/useDialogFocus';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { WarningBanner } from './ui/WarningBanner';
 
@@ -28,6 +29,7 @@ export const SettingsSheet: React.FC = () => {
   const setMhContact = useAppStore((s) => s.setMhContact);
   const audioEnabled = useAppStore((s) => s.audioEnabled);
   const setAudioEnabled = useAppStore((s) => s.setAudioEnabled);
+  const dialogRef = useDialogFocus<HTMLDivElement>(open, () => setOpen(false));
 
   if (!open) return null;
   const localCount = Object.keys(LOCAL_OVERRIDES).length;
@@ -39,16 +41,17 @@ export const SettingsSheet: React.FC = () => {
     } catch {
       /* storage unavailable: nothing to clear */
     }
-    useAppStore.getState().newCase();
     window.location.reload();
   };
 
   return createPortal(
-    <div onClick={() => setOpen(false)} className="fixed inset-0 z-[55] flex items-end justify-center bg-black/80 sm:items-center">
+    <div onClick={() => setOpen(false)} className="fixed inset-0 z-[75] flex items-end justify-center bg-black/80 sm:items-center">
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[92vh] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-t-3xl border border-slate-700 bg-slate-900 p-4 sm:rounded-3xl"
       >
@@ -61,21 +64,29 @@ export const SettingsSheet: React.FC = () => {
 
         <section className="flex flex-col gap-2">
           <h3 className="text-sm font-bold text-slate-200">Active reference set</h3>
-          <SegmentedControl<GuidelineSet>
-            ariaLabel="Active reference set"
-            value={guidelineSet}
-            options={[
-              { value: 'international', label: 'International guidelines' },
-              { value: 'local', label: 'Use local protocol' },
-            ]}
-            onChange={setGuidelineSet}
-          />
-          <p className="text-xs text-slate-400">
-            Local protocol values loaded: <strong className="font-mono text-slate-200">{localCount}</strong>.{' '}
-            {localCount === 0
-              ? 'No local notebook was supplied, so this build contains no local values and both choices give the same numbers.'
-              : 'A local value that is MORE restrictive is always used. A LESS restrictive local value is shown beside the guideline value and only applied when you choose "Use local protocol".'}
-          </p>
+          {localCount === 0 ? (
+            <p className="text-xs text-slate-400">
+              No local protocol values are loaded in this build, so the guideline values are always used. The local-protocol
+              switch will appear after values are added to <code>localOverrides.ts</code>.
+            </p>
+          ) : (
+            <>
+              <SegmentedControl<GuidelineSet>
+                ariaLabel="Active reference set"
+                value={guidelineSet}
+                options={[
+                  { value: 'international', label: 'International guidelines' },
+                  { value: 'local', label: 'Use local protocol' },
+                ]}
+                onChange={setGuidelineSet}
+              />
+              <p className="text-xs text-slate-400">
+                Local protocol values loaded: <strong className="font-mono text-slate-200">{localCount}</strong>. A local value
+                that is MORE restrictive is always used. A LESS restrictive local value is shown beside the guideline value and
+                only applied when you choose &quot;Use local protocol&quot;.
+              </p>
+            </>
+          )}
         </section>
 
         <section className="flex flex-col gap-2">

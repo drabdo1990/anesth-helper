@@ -4,7 +4,7 @@ import { CHECKLISTS, HANDOFF_OPTIONS } from '../data/checklists';
 import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
 import { useAppStore } from '../store/useAppStore';
-import { EMPTY_HANDOFF, MAX_FREE_TEXT_LENGTH, buildHandoffSummary, scrubFreeText, type HandoffInput } from '../lib/handoff';
+import { EMPTY_HANDOFF, buildHandoffSummary, type HandoffInput } from '../lib/handoff';
 import { ChecklistItem } from '../components/ui/ChecklistItem';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { WarningBanner } from '../components/ui/WarningBanner';
@@ -50,25 +50,6 @@ const NumberField: React.FC<{ label: string; unit: string; value: string; onChan
   </label>
 );
 
-const FreeText: React.FC<{ label: string; value: string; onChange: (v: string) => void }> = ({ label, value, onChange }) => {
-  const check = value.trim() === '' ? null : scrubFreeText(value);
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-        {label} (max {MAX_FREE_TEXT_LENGTH} characters; no names, dates or ID numbers)
-      </span>
-      <input
-        value={value}
-        maxLength={MAX_FREE_TEXT_LENGTH}
-        onChange={(e) => onChange(e.target.value)}
-        autoComplete="off"
-        className="min-h-[48px] rounded-xl border border-clinical-border-light bg-clinical-bg px-3 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
-      />
-      {check && !check.ok && <span role="alert" className="text-xs font-semibold text-red-400">{check.reason} This field will be left out.</span>}
-    </label>
-  );
-};
-
 const copyText = async (text: string): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(text);
@@ -103,10 +84,9 @@ const HandoffForm: React.FC = () => {
   return (
     <div className="flex flex-col gap-3">
       <WarningBanner level="info" title="Anonymous handoff">
-        Built only from the fields below. No patient name, MRN, date of birth, surgeon name or weight/height is added. Nothing is saved: the form clears when you close the app.
+        Built only from fixed choices and short numeric fields. There are no free-text fields, so names, dates and IDs cannot be added. Nothing is saved: the form clears when you close or refresh the app.
       </WarningBanner>
       <Chips label="Procedure type" options={HANDOFF_OPTIONS.procedureCategories} value={form.procedureCategory ? [form.procedureCategory] : []} onChange={(v) => set('procedureCategory', v[0] ?? '')} single />
-      <FreeText label="Procedure detail (optional)" value={form.procedureOther} onChange={(v) => set('procedureOther', v)} />
       <Chips label="ASA physical status" options={HANDOFF_OPTIONS.asaStatus} value={form.asaStatus ? [form.asaStatus] : []} onChange={(v) => set('asaStatus', v[0] ?? '')} single />
       <Chips label="Airway" options={HANDOFF_OPTIONS.airway} value={form.airway ? [form.airway] : []} onChange={(v) => set('airway', v[0] ?? '')} single />
       <Chips label="Induction agents" options={namesFor('induction')} value={form.inductionAgents} onChange={(v) => set('inductionAgents', v)} />
@@ -124,7 +104,6 @@ const HandoffForm: React.FC = () => {
         <NumberField label="PEEP" unit="cmH2O" value={form.ventPeepCmH2O} onChange={(v) => set('ventPeepCmH2O', v)} />
         <NumberField label="FiO2" unit="%" value={form.ventFio2Percent} onChange={(v) => set('ventFio2Percent', v)} />
       </div>
-      <FreeText label="Emergence / analgesia plan" value={form.emergenceAnalgesiaPlan} onChange={(v) => set('emergenceAnalgesiaPlan', v)} />
 
       {omitted.length > 0 && (
         <WarningBanner level="amber" title="Left out of the summary">

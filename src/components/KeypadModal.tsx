@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Delete, Check } from 'lucide-react';
+import { useDialogFocus } from '../lib/useDialogFocus';
 
 interface KeypadModalProps {
   title: string;
@@ -27,6 +28,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
 }) => {
   const [valueStr, setValueStr] = useState<string>(initialValue.toString());
   const [isPristine, setIsPristine] = useState<boolean>(true);
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   // Re-sync with the current value each time the keypad opens
   useEffect(() => {
@@ -97,8 +99,6 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
         handleDigit('.');
       } else if (e.key === 'Backspace') {
         handleBackspace();
-      } else if (e.key === 'Escape') {
-        onClose();
       } else if (e.key === 'Enter') {
         handleConfirm();
       }
@@ -114,9 +114,14 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
   return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm"
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-xs max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-4 flex flex-col gap-3 sm:gap-4"
       >

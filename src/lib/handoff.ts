@@ -1,11 +1,8 @@
-// Anonymous handoff summary. Only user-selected categories and short numeric parameters are
-// included. Free text is limited and scrubbed so identifiers cannot be copied into the summary.
-
-export const MAX_FREE_TEXT_LENGTH = 60;
+// Anonymous handoff summary. Only fixed pick-lists and short numeric parameters are included.
+// There are deliberately no free-text fields: names cannot be detected reliably.
 
 export interface HandoffInput {
   procedureCategory: string;
-  procedureOther: string;
   asaStatus: string;
   airway: string;
   inductionAgents: string[];
@@ -19,12 +16,10 @@ export interface HandoffInput {
   ventRespiratoryRate: string;
   ventPeepCmH2O: string;
   ventFio2Percent: string;
-  emergenceAnalgesiaPlan: string;
 }
 
 export const EMPTY_HANDOFF: HandoffInput = {
   procedureCategory: '',
-  procedureOther: '',
   asaStatus: '',
   airway: '',
   inductionAgents: [],
@@ -38,27 +33,6 @@ export const EMPTY_HANDOFF: HandoffInput = {
   ventRespiratoryRate: '',
   ventPeepCmH2O: '',
   ventFio2Percent: '',
-  emergenceAnalgesiaPlan: '',
-};
-
-export type ScrubResult = { ok: true; text: string } | { ok: false; reason: string };
-
-const LONG_DIGITS = /\d{6,}/;
-const DATE_LIKE = /\b\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}\b/;
-const EMAIL_LIKE = /@/;
-const ID_WORDS = /\b(mrn|dob|ssn|nid|passport|phone|tel|id\s*[:#]|name\s*[:#]|dr\.?|doctor|surgeon|mr\.?|mrs\.?|ms\.?)\b/i;
-
-/** Reject free text that looks like it carries an identifier. Deliberately conservative. */
-export const scrubFreeText = (raw: string): ScrubResult => {
-  const text = raw.trim().replace(/\s+/g, ' ');
-  if (text.length > MAX_FREE_TEXT_LENGTH) {
-    return { ok: false, reason: `Keep notes to ${MAX_FREE_TEXT_LENGTH} characters.` };
-  }
-  if (LONG_DIGITS.test(text)) return { ok: false, reason: 'Long numbers look like an ID (MRN, phone). Remove them.' };
-  if (DATE_LIKE.test(text)) return { ok: false, reason: 'Dates are not allowed (possible date of birth).' };
-  if (EMAIL_LIKE.test(text)) return { ok: false, reason: 'Email-like text is not allowed.' };
-  if (ID_WORDS.test(text)) return { ok: false, reason: 'Names, titles and ID labels are not allowed.' };
-  return { ok: true, text };
 };
 
 const isNumeric = (s: string): boolean => s.trim() !== '' && Number.isFinite(Number(s));
@@ -84,19 +58,7 @@ export const buildHandoffSummary = (input: HandoffInput): { text: string; omitte
     return `${label}: ${Number(value)} ${unit}`;
   };
 
-  const free = (label: string, value: string): string | null => {
-    if (value.trim() === '') return null;
-    const r = scrubFreeText(value);
-    if (!r.ok) {
-      omitted.push(label);
-      return null;
-    }
-    return `${label}: ${r.text}`;
-  };
-
-  const procedure = [input.procedureCategory, free('Procedure detail', input.procedureOther)?.replace('Procedure detail: ', '')]
-    .filter((s): s is string => Boolean(s))
-    .join(' - ');
+  const procedure = input.procedureCategory.trim();
 
   const vent = [
     input.ventMode.trim() ? input.ventMode.trim() : null,
@@ -120,7 +82,6 @@ export const buildHandoffSummary = (input: HandoffInput): { text: string; omitte
     num('Fluids', input.fluidsMl, 'mL'),
     num('Blood loss', input.bloodLossMl, 'mL'),
     vent ? `Ventilation: ${vent}` : null,
-    free('Emergence / analgesia plan', input.emergenceAnalgesiaPlan),
     'No patient identifiers included.',
   ].filter((s): s is string => Boolean(s));
 

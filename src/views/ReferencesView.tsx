@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { BookOpen, ChevronDown, ChevronUp, ExternalLink, Layers, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, X } from 'lucide-react';
 import { derivedValuesBySource } from '../data/derived';
 import { DATA_STATUS, DATA_VERSION, SOURCES } from '../data/sources';
 import type { ClinicalSource } from '../data/types';
 import { useAppStore } from '../store/useAppStore';
 import { DisclaimerBanner } from '../components/DisclaimerBanner';
 import { WarningBanner } from '../components/ui/WarningBanner';
-import { ClinicalReferenceGuide } from '../components/ClinicalReferenceGuide';
+import { useDialogFocus } from '../lib/useDialogFocus';
 
 const TIER_TITLES: Record<number, string> = {
   1: 'Tier 1: Society and guideline sources',
@@ -67,13 +67,20 @@ const SourceRow: React.FC<{ source: ClinicalSource; values: string[] }> = ({ sou
 export const ReferencesView: React.FC = () => {
   const open = useAppStore((s) => s.referencesOpen);
   const setOpen = useAppStore((s) => s.setReferencesOpen);
-  const [activeTab, setActiveTab] = useState<'guide' | 'sources'>('guide');
-  const derived = useMemo(() => derivedValuesBySource(), []);
+  const derived = useMemo(() => (open ? derivedValuesBySource() : {}), [open]);
+  const dialogRef = useDialogFocus<HTMLDivElement>(open, () => setOpen(false));
 
   if (!open) return null;
 
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label="References" className="fixed inset-0 z-[58] flex flex-col bg-[#090d16]">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="References"
+      tabIndex={-1}
+      className="fixed inset-0 z-[70] flex flex-col bg-[#090d16]"
+    >
       <div className="flex items-center gap-2 border-b border-slate-800 px-3 py-2">
         <h2 className="flex-1 text-lg font-black uppercase text-slate-100">References & Guidelines</h2>
         <button
@@ -86,55 +93,22 @@ export const ReferencesView: React.FC = () => {
         </button>
       </div>
 
-      {/* Segmented Tab Controls */}
-      <div className="flex border-b border-slate-800 bg-slate-950/70 px-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('guide')}
-          className={`flex min-h-[44px] items-center gap-2 border-b-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors touch-manipulation ${
-            activeTab === 'guide'
-              ? 'border-cyan-500 text-cyan-300'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <BookOpen className="h-4 w-4" />
-          Clinical Reference Guide
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('sources')}
-          className={`flex min-h-[44px] items-center gap-2 border-b-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors touch-manipulation ${
-            activeTab === 'sources'
-              ? 'border-cyan-500 text-cyan-300'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Layers className="h-4 w-4" />
-          Evidence Sources
-        </button>
-      </div>
-
       <div className="flex-1 overflow-y-auto px-3 py-3 pb-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-4">
-          {activeTab === 'guide' ? (
-            <ClinicalReferenceGuide />
-          ) : (
-            <>
-              <WarningBanner level="amber" title={`Clinical data version ${DATA_VERSION}`}>
-                {DATA_STATUS} Amber dots on source badges mark sources whose primary text was not fully verified.
-              </WarningBanner>
-              {[1, 2, 3, 4].map((tier) => (
-                <section key={tier} className="flex flex-col gap-2">
-                  <h3 className="text-sm font-black uppercase tracking-wider text-cyan-300">{TIER_TITLES[tier]}</h3>
-                  <ul className="flex flex-col gap-2">
-                    {SOURCES.filter((s) => s.tier === tier).map((s) => (
-                      <SourceRow key={s.id} source={s} values={derived[s.id] ?? []} />
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </>
-          )}
+          <WarningBanner level="amber" title={`Clinical data version ${DATA_VERSION}`}>
+            {DATA_STATUS} Amber dots on source badges mark sources whose primary text was not fully verified. The structured
+            data behind the calculators is the only dosing source in this build.
+          </WarningBanner>
+          {[1, 2, 3, 4].map((tier) => (
+            <section key={tier} className="flex flex-col gap-2">
+              <h3 className="text-sm font-black uppercase tracking-wider text-cyan-300">{TIER_TITLES[tier]}</h3>
+              <ul className="flex flex-col gap-2">
+                {SOURCES.filter((s) => s.tier === tier).map((s) => (
+                  <SourceRow key={s.id} source={s} values={derived[s.id] ?? []} />
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
       </div>
       <DisclaimerBanner />

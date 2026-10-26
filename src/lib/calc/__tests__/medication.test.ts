@@ -3,7 +3,7 @@ import { LOCAL_ANESTHETICS, MEDICATIONS } from '../../../data/medications';
 import type { MedicationDose } from '../../../data/types';
 import { computeBiometrics, type Biometrics } from '../biometrics';
 import { calculateInfusion, checkRateMax } from '../dosing';
-import { computeMedicationDose, doseAppliesToWeight, rangeStatus, resolveConcentrationIndex, scalarWeightKg } from '../medication';
+import { computeMedicationDose, cumulativeDoseStatus, doseAppliesToWeight, resolveConcentrationIndex, scalarWeightKg } from '../medication';
 import { localAnestheticDoseMg, maxAllowedMg } from '../localAnesthetic';
 
 const bio = (tbwKg: number, heightCm: number, sex: 'male' | 'female'): Biometrics => {
@@ -118,11 +118,10 @@ describe('computeMedicationDose', () => {
     expect(computeMedicationDose(d, 3, 1, male70).max).toBe('exceeds');
   });
 
-  it('flags values outside the sourced range', () => {
-    const d = dose('propofol-induction-adult');
-    expect(rangeStatus(d, 2)).toBe('in-range');
-    expect(rangeStatus(d, 1.9)).toBe('below-source-range');
-    expect(rangeStatus(d, 2.6)).toBe('above-source-range');
+  it('checks a logged cumulative total plus the selected dose', () => {
+    expect(cumulativeDoseStatus(20, 20, 50)).toBe('ok');
+    expect(cumulativeDoseStatus(40, 10, 50)).toBe('at-limit');
+    expect(cumulativeDoseStatus(45, 10, 50)).toBe('exceeds');
   });
 
   it('sugammadex 16 mg/kg for 100 kg is 16 mL at 100 mg/mL', () => {
@@ -172,9 +171,10 @@ describe('concentration persistence', () => {
     expect(extended[resolveConcentrationIndex(extended, 100)].mgPerMl).toBe(100);
   });
 
-  it('falls back to the first listed concentration when the strength no longer exists', () => {
+  it('falls back to the requested strength, then the first listed concentration', () => {
     expect(resolveConcentrationIndex(ketamine, 75)).toBe(0);
     expect(resolveConcentrationIndex(ketamine, undefined)).toBe(0);
+    expect(resolveConcentrationIndex(ketamine, 75, 50)).toBe(1);
     expect(resolveConcentrationIndex([], 10)).toBe(0);
   });
 });

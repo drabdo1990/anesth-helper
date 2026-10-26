@@ -14,7 +14,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+}
+
+button {
   user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Force tabular figures on numbers to eliminate visual jitter */
@@ -42,20 +46,4 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
-}
-
-/* Pulse animation for active emergency alarms */
-@keyframes emergency-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.02);
-  }
-}
-
-.animate-emergency {
-  animation: emergency-pulse 1.2s infinite ease-in-out;
 }

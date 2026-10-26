@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING, type ReferenceItem } from '../data/ventilation';
-import { NO_SOURCE_VALUE } from '../data/types';
 import { useAppStore } from '../store/useAppStore';
-import { MAX_HEIGHT_CM, MIN_HEIGHT_CM, calculateDevineIbw } from '../lib/calc/biometrics';
+import { calculateDevineIbw, isDevineBaselineMet, MAX_HEIGHT_CM, MIN_HEIGHT_CM } from '../lib/calc/biometrics';
 import {
   ardsPlateauAdvice,
   calculateDrivingPressure,
@@ -12,6 +11,7 @@ import {
   expiratoryTimeSeconds,
   inspiratoryTimeSeconds,
   plateauSeverity,
+  PLATEAU_LIMIT_CMH2O,
   tidalVolumeSeverity,
   type Severity,
 } from '../lib/calc/ventilation';
@@ -111,21 +111,25 @@ export const VentilationView: React.FC = () => {
   });
 
   const heightOk = patient.heightCm !== null && patient.heightCm >= MIN_HEIGHT_CM && patient.heightCm <= MAX_HEIGHT_CM;
-  const pbw =
-    heightOk && patient.heightCm !== null && patient.sex !== null ? calculateDevineIbw(patient.sex, patient.heightCm) : null;
+  const ageUnknown = patient.ageYears === null;
   const pediatric = patient.ageYears !== null && patient.ageYears < 18;
   const isPediatricContext = pediatric || scenario.id === 'pediatric';
-  const shortStature = !pediatric && patient.heightCm !== null && patient.heightCm < 152.4;
+  const pbwAllowed = !ageUnknown && !isPediatricContext;
+  const pbw =
+    pbwAllowed && heightOk && patient.heightCm !== null && patient.sex !== null
+      ? calculateDevineIbw(patient.sex, patient.heightCm)
+      : null;
+  const shortStature = !ageUnknown && !pediatric && patient.heightCm !== null && !isDevineBaselineMet(patient.heightCm);
 
   const mlPerKg = vent.mlPerKgPbw;
-  const vt = !isPediatricContext && pbw !== null && mlPerKg !== null ? calculateTidalVolumeMl(pbw, mlPerKg) : null;
+  const vt = pbw !== null && mlPerKg !== null ? calculateTidalVolumeMl(pbw, mlPerKg) : null;
   const mv = vt !== null && vent.respiratoryRate !== null ? calculateMinuteVentilationLMin(vt, vent.respiratoryRate) : null;
   const driving =
     vent.plateauCmH2O !== null && vent.peepCmH2O !== null ? calculateDrivingPressure(vent.plateauCmH2O, vent.peepCmH2O) : null;
 
   const vtSeverity: Severity = range && mlPerKg !== null ? tidalVolumeSeverity(mlPerKg, range) : 'ok';
-  const limit = scenario.plateauPressureLimit;
-  const plateauSev: Severity = vent.plateauCmH2O !== null && limit ? plateauSeverity(vent.plateauCmH2O, limit) : 'ok';
+  const limit = scenario.plateauPressureLimit ?? PLATEAU_LIMIT_CMH2O;
+  const plateauSev: Severity = vent.plateauCmH2O !== null ? plateauSeverity(vent.plateauCmH2O, limit) : 'ok';
   const advice =
     scenario.id === 'ards' && vent.plateauCmH2O !== null && mlPerKg !== null ? ardsPlateauAdvice(vent.plateauCmH2O, mlPerKg, limit) : {};
 
@@ -160,6 +164,10 @@ export const VentilationView: React.FC = () => {
               {patient.ageYears !== null ? ` · ${patient.ageYears} y` : ''}
             </p>
           </div>
+        ) : ageUnknown ? (
+          <WarningBanner level="amber">Enter age above before choosing adult or pediatric ventilation. Adult PBW is withheld until age is known.</WarningBanner>
+        ) : isPediatricContext ? (
+          <WarningBanner level="info">PBW is not used in pediatric ventilation because the Devine formula is adult-only.</WarningBanner>
         ) : (
           <WarningBanner level="info">Enter height and sex above. Tidal volume is calculated from PBW, never actual body weight.</WarningBanner>
         )}
@@ -167,7 +175,7 @@ export const VentilationView: React.FC = () => {
 
       {isPediatricContext && (
         <WarningBanner level="red" title="Pediatric: PBW formula not valid">
-          The Devine PBW formula applies to adults. Calculated PBW tidal volume is withheld to avoid delivering adult volumes. Set pediatric tidal volume per clinical protocol (typically 6-8 mL/kg actual weight).
+          The Devine PBW formula applies to adults. Calculated PBW tidal volume is withheld to avoid delivering adult volumes. Set pediatric tidal volume from a current pediatric protocol; this app does not provide one.
         </WarningBanner>
       )}
       {shortStature && (
@@ -256,10 +264,10 @@ export const VentilationView: React.FC = () => {
           <UnitValue label="Plateau" value={vent.plateauCmH2O !== null ? String(vent.plateauCmH2O) : '--'} unit="cmH2O" size="lg" tone={TONE[plateauSev]} />
           <UnitValue label="Driving pressure" value={driving !== null ? String(driving) : '--'} unit="cmH2O" size="lg" align="end" />
         </div>
-        {limit !== undefined && plateauSev === 'amber' && (
+        {plateauSev === 'amber' && (
           <WarningBanner level="amber" title="Approaching plateau limit">Plateau pressure is within 2 cmH2O of the {limit} cmH2O limit.</WarningBanner>
         )}
-        {limit !== undefined && plateauSev === 'red' && (
+        {plateauSev === 'red' && (
           <WarningBanner level="red" title={`Plateau above ${limit} cmH2O`}>Plateau pressure exceeds the safety limit.</WarningBanner>
         )}
         {advice.suggestReduceTowardMlPerKg !== undefined && (

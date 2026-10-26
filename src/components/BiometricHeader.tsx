@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, RotateCcw, X } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useBiometricResult } from '../store/useBiometrics';
-import { MAX_HEIGHT_CM, MAX_WEIGHT_KG, MIN_HEIGHT_CM } from '../lib/calc/biometrics';
+import { isDevineBaselineMet, MAX_HEIGHT_CM, MAX_WEIGHT_KG, MIN_HEIGHT_CM } from '../lib/calc/biometrics';
 import { formatKg } from '../lib/calc/format';
 import { KeypadModal } from './KeypadModal';
 import { NumericStepper } from './ui/NumericStepper';
@@ -93,8 +93,13 @@ export const BiometricHeader: React.FC = () => {
           ) : (
             <span className="text-xs text-slate-400">Body-weight scalars appear here once weight, height and sex are entered.</span>
           )}
-          <button type="button" onClick={() => setAgeKeypad(true)} className={actionButton}>
-            Age {patient.ageYears !== null ? `${patient.ageYears} y` : '(optional)'}
+          <button
+            type="button"
+            onClick={() => setAgeKeypad(true)}
+            title="Required before dosing or ventilation"
+            className={actionButton}
+          >
+            Age {patient.ageYears !== null ? `${patient.ageYears} y` : '(required)'}
           </button>
           {patient.ageYears !== null && (
             <button type="button" aria-label="Clear age" onClick={() => setPatient({ ageYears: null })} className={`${actionButton} min-w-[48px] justify-center px-0`}>
@@ -122,7 +127,7 @@ export const BiometricHeader: React.FC = () => {
             PBW and IBW use the adult Devine formula, which is not valid for children. Check the source before using IBW- or PBW-based values.
           </WarningBanner></div>
         )}
-        {!pediatric && patient.heightCm !== null && patient.heightCm < 152.4 && (
+        {!pediatric && patient.heightCm !== null && !isDevineBaselineMet(patient.heightCm) && (
           <div className="mt-1"><WarningBanner level="amber" title="Height below Devine 152.4 cm (5 ft) baseline">
             Devine formula hit its floor ({patient.sex === 'male' ? '50 kg' : patient.sex === 'female' ? '45.5 kg' : '45.5 kg female, 50 kg male'}) and does not scale below 152.4 cm. Verify tidal volume and IBW against your protocol.
           </WarningBanner></div>

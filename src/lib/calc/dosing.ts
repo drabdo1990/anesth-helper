@@ -3,9 +3,6 @@
 export type DoseUnit = 'mg/kg' | 'mcg/kg' | 'mg' | 'mcg';
 export type MassUnit = 'mg' | 'mcg';
 
-export const isRateUnit = (unit: string): unit is RateUnit =>
-  unit === 'mcg/kg/min' || unit === 'mcg/min';
-
 export const calculateVolumeMl = (doseMg: number, concentrationMgPerMl: number): number =>
   doseMg / concentrationMgPerMl;
 

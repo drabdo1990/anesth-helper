@@ -10,9 +10,7 @@ import {
   PEDS_ETT_AGE_RANGE_YEARS,
   PEDS_ETT_DEPTH_FACTOR,
   PEDS_ETT_FORMULAS,
-  type AdultAirwayRule,
   type BladeBand,
-  type DltBand,
   type LmaSizeBand,
 } from '../../data/airwayDevices';
 
@@ -46,7 +44,7 @@ export const pedsEtt = (ageYears: number, formulaId: string): PedsEttResult | Un
     formulaId,
     idMm,
     idRoundedMm: roundToHalf(idMm),
-    depthCm: PEDS_ETT_DEPTH_FACTOR * idMm,
+    depthCm: PEDS_ETT_DEPTH_FACTOR * roundToHalf(idMm),
   };
 };
 
@@ -113,8 +111,11 @@ export const dltSizeForHeight = (heightCm: number | null, ageYears: number | nul
   if (heightCm === null || !Number.isFinite(heightCm) || heightCm <= 0) {
     return { ok: false, reason: 'Enter patient height to determine double-lumen tube size.' };
   }
+  if (ageYears === null || !Number.isFinite(ageYears)) {
+    return { ok: false, reason: 'Enter patient age before selecting an adult double-lumen tube size.' };
+  }
   // App safety rule (DLT_SAFETY_FLOOR), not from a named source: say so in the message.
-  if (ageYears !== null && Number.isFinite(ageYears) && ageYears < DLT_SAFETY_FLOOR.minAgeYears) {
+  if (ageYears < DLT_SAFETY_FLOOR.minAgeYears) {
     return {
       ok: false,
       reason: `App safety rule (no source, needs clinician review): no adult double-lumen tube size is shown for age < ${DLT_SAFETY_FLOOR.minAgeYears} years. Consider a bronchial blocker.`,

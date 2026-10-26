@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useAppStore, type EmergencyKind } from '../store/useAppStore';
 import { MAX_WEIGHT_KG } from '../lib/calc/biometrics';
+import { useDialogFocus } from '../lib/useDialogFocus';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { CicoPanel } from './emergency/CicoPanel';
 import { LastPanel } from './emergency/LastPanel';
@@ -23,11 +24,20 @@ export const EmergencyOverlay: React.FC = () => {
   const close = useAppStore((s) => s.closeEmergency);
   const weight = useAppStore((s) => s.patient.tbwKg);
   const setPatient = useAppStore((s) => s.setPatient);
+  const cicoRunning = useAppStore((s) => s.timers.cico?.running ?? false);
+  const dialogRef = useDialogFocus<HTMLDivElement>(open, close);
 
   if (!open) return null;
 
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label="Emergency support" className="fixed inset-0 z-[60] flex flex-col bg-[#090d16]">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Emergency support"
+      tabIndex={-1}
+      className="fixed inset-0 z-[60] flex flex-col bg-[#090d16]"
+    >
       <div className="flex items-center gap-2 border-b-4 border-red-500 bg-red-950 px-3 py-2">
         <h2 className="flex-1 text-xl font-black uppercase tracking-wide text-red-100">Emergency</h2>
         <button type="button" onClick={close} aria-label="Close emergency support" className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl border border-red-400 bg-red-900 text-red-100">
@@ -57,6 +67,11 @@ export const EmergencyOverlay: React.FC = () => {
           {kind === 'last' && (weight !== null ? <LastPanel weightKg={weight} /> : <NeedWeight />)}
           {kind === 'mh' && (weight !== null ? <MhPanel weightKg={weight} /> : <NeedWeight />)}
           {kind === 'cico' && <CicoPanel />}
+          {kind !== 'cico' && cicoRunning && (
+            <div className="hidden" aria-hidden="true">
+              <CicoPanel />
+            </div>
+          )}
         </div>
       </div>
       <DisclaimerBanner />

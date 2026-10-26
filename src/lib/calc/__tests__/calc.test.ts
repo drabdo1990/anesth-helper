@@ -8,7 +8,7 @@ import {
   isDevineBaselineMet,
 } from '../biometrics';
 import { calculateDose, calculateVolumeMl, checkAbsoluteMax } from '../dosing';
-import { formatMcg, formatMg, formatMl } from '../format';
+import { decimalPlaces, formatMcg, formatMg, formatMl, maxDecimalPlaces } from '../format';
 import {
   combinedToxicityFraction,
   localAnestheticDoseMg,
@@ -148,6 +148,16 @@ describe('display formatting', () => {
   });
   it('mL: 1 dp', () => {
     expect(formatMl(11)).toBe('11.0');
+  });
+  it('counts the decimal places needed to show a dose exactly', () => {
+    expect(decimalPlaces(2)).toBe(0);
+    expect(decimalPlaces(0.25)).toBe(2);
+    expect(decimalPlaces(0.05)).toBe(2);
+    expect(decimalPlaces(0.001)).toBe(3);
+  });
+  it('keeps a dose visible when the step is coarser than its starting value', () => {
+    expect(maxDecimalPlaces(0.1, 0.05, 2, 0.05)).toBe(2);
+    expect(maxDecimalPlaces(0.1, 0.25, 2, 0.25)).toBe(2);
   });
 });
 

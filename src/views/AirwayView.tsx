@@ -44,8 +44,10 @@ export const AirwayView: React.FC = () => {
 
   const ageYears = patient.ageYears;
   const ageMonths = ageYears === null ? null : ageYears * 12;
+  const pedsBlade = ageMonths === null ? null : pedsBladeForAge(ageMonths);
+  const adultAgeOk = ageYears !== null && ageYears >= 18;
   const lma = patient.tbwKg !== null ? lmaSizeForWeight(patient.tbwKg) : null;
-  const adultAirway = patient.sex !== null ? adultEttAndBlade(patient.sex) : null;
+  const adultAirway = adultAgeOk && patient.sex !== null ? adultEttAndBlade(patient.sex) : null;
   const dlt = patient.heightCm !== null ? dltSizeForHeight(patient.heightCm, patient.ageYears) : null;
   const summary = airwaySummary({
     population,
@@ -103,8 +105,14 @@ export const AirwayView: React.FC = () => {
               unit="mm ID"
               sourceIds={'sourceIds' in summary.ett ? summary.ett.sourceIds : ['msd-peds-ett']}
             />
-          ) : (population === 'pediatric' ? ageYears : patient.sex) === null ? (
-            <p className="text-sm text-slate-400">{population === 'pediatric' ? 'Enter age for ETT sizing.' : 'Select sex above for ETT sizing.'}</p>
+          ) : population === 'pediatric' ? (
+            <p className="text-sm text-slate-400">{ageYears === null ? 'Enter age for ETT sizing.' : 'No sourced pediatric ETT size for this age.'}</p>
+          ) : !adultAgeOk ? (
+            <p className="text-sm text-slate-400">
+              {ageYears === null ? 'Enter age before adult ETT sizing.' : 'Adult ETT sizing is withheld under age 18.'}
+            </p>
+          ) : patient.sex === null ? (
+            <p className="text-sm text-slate-400">Select sex above for ETT sizing.</p>
           ) : (
             <NoSourceValue topic="ETT" compact />
           )}
@@ -120,6 +128,10 @@ export const AirwayView: React.FC = () => {
           {population === 'adult' ? (
             summary.blade && 'ok' in summary.blade && summary.blade.ok ? (
               <BigValue label="Blade" value={summary.blade.blade} sourceIds={summary.blade.sourceIds} />
+            ) : !adultAgeOk ? (
+              <p className="text-sm text-slate-400">
+                {ageYears === null ? 'Enter age before adult blade sizing.' : 'Adult blade sizing is withheld under age 18.'}
+              </p>
             ) : patient.sex === null ? (
               <p className="text-sm text-slate-400">Select sex above for blade sizing.</p>
             ) : (
@@ -146,6 +158,10 @@ export const AirwayView: React.FC = () => {
               <BigValue label="DLT" value={summary.dlt.sizeFr} unit="Fr" sourceIds={summary.dlt.sourceIds} />
             ) : patient.heightCm === null ? (
               <p className="text-sm text-slate-400">Enter height for DLT sizing.</p>
+            ) : !adultAgeOk ? (
+              <p className="text-sm text-slate-400">
+                {ageYears === null ? 'Enter age before DLT sizing.' : 'Adult DLT sizing is withheld under age 18.'}
+              </p>
             ) : (
               <NoSourceValue topic="DLT" compact />
             )
@@ -209,22 +225,14 @@ export const AirwayView: React.FC = () => {
                     </div>
                   );
                 })}
-                {(() => {
-                  const alt = pedsEtt(ageYears, 'cuffed-iowa');
-                  return alt.ok ? (
-                    <WarningBanner level="amber" title="Sources differ (cuffed)">
-                      The alternate cuffed formula (age/4 + 3) gives {alt.idRoundedMm.toFixed(1)} mm. Have the adjacent sizes ready.
-                    </WarningBanner>
-                  ) : null;
-                })()}
                 <p className="text-xs text-slate-400">
                   Source formulas cover ages {PEDS_ETT_AGE_RANGE_YEARS.min} to {PEDS_ETT_AGE_RANGE_YEARS.max} years. Confirm tube position with capnography and auscultation and check cuff pressure.
                 </p>
               </Panel>
 
               <Panel title="Laryngoscope blade (pediatric)" basis="age" sourceIds={['wikem-peds-airway']}>
-                {ageMonths !== null && pedsBladeForAge(ageMonths) ? (
-                  <UnitValue label={pedsBladeForAge(ageMonths)?.label ?? ''} value={pedsBladeForAge(ageMonths)?.blade ?? ''} unit="" size="lg" tone="cyan" />
+                {pedsBlade ? (
+                  <UnitValue label={pedsBlade.label} value={pedsBlade.blade} unit="" size="lg" tone="cyan" />
                 ) : (
                   <NoSourceValue topic="Blade for this age" />
                 )}
@@ -250,6 +258,12 @@ export const AirwayView: React.FC = () => {
                     Standard adult tracheal intubation sizing (Oxford Handbook & Miller&apos;s Anesthesia). Verify bilateral breath sounds and maintain cuff pressure at 20–30 cmH2O.
                   </p>
                 </>
+              ) : !adultAgeOk ? (
+                <WarningBanner level="amber" title={ageYears === null ? 'Age required' : 'Pediatric patient'}>
+                  {ageYears === null
+                    ? 'Enter age before using adult ETT and blade sizing.'
+                    : 'Adult ETT and blade sizing is withheld for a patient under 18. Use the Pediatric view.'}
+                </WarningBanner>
               ) : patient.sex === null ? (
                 <WarningBanner level="info">Select biological sex to display adult ETT sizing and blade recommendations.</WarningBanner>
               ) : (
@@ -327,7 +341,7 @@ export const AirwayView: React.FC = () => {
         onClick={() => useAppStore.getState().setReferencesOpen(true)}
         className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-cyan-800/60 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 hover:bg-cyan-950/60 touch-manipulation transition-colors"
       >
-        <BookOpen className="h-4 w-4" /> Open Full Airway Sizing & Equipment Benchmarks Guide
+        <BookOpen className="h-4 w-4" /> Open sources and derived airway values
       </button>
 
       <section className="flex flex-col gap-2" aria-label="Items without a sourced value">

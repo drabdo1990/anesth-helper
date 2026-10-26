@@ -9,11 +9,11 @@ interface SourceBadgeProps {
 /** One chip per distinct source tag. Amber dot = primary text not accessed in this build. */
 export const SourceBadge: React.FC<SourceBadgeProps> = ({ sourceIds }) => {
   const setReferencesOpen = useAppStore((s) => s.setReferencesOpen);
-  const seen = new Map<string, { names: string[]; secondary: boolean; tier: number }>();
+  const seen = new Map<string, { names: string[]; secondary: boolean }>();
   for (const id of sourceIds) {
     const s = SOURCE_BY_ID[id];
     if (!s) continue;
-    const entry = seen.get(s.tag) ?? { names: [], secondary: false, tier: s.tier };
+    const entry = seen.get(s.tag) ?? { names: [], secondary: false };
     entry.names.push(`${s.name} (${s.year})`);
     entry.secondary = entry.secondary || s.verification === 'secondary';
     seen.set(s.tag, entry);
