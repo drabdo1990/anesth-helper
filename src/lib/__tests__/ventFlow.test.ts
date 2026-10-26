@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ventSteps } from '../ventFlow';
+import { currentStepIndex } from '../flow';
 import { PLATEAU_LIMIT_CMH2O } from '../calc/ventilation';
 
 const base = { scenario: undefined, heightCm: null, sex: null, mlPerKgPbw: null, respiratoryRate: null, peepCmH2O: null, plateauCmH2O: null, ageYears: 40 } as const;
@@ -19,15 +20,22 @@ describe('ventSteps', () => {
   });
   it('plateau at limit ok, above not', () => {
     expect(done(ventSteps({ ...base, plateauCmH2O: PLATEAU_LIMIT_CMH2O }), 'plateau')).toBe(true);
-    expect(done(ventSteps({ ...base, plateauCmH2O: PLATEAU_LIMIT_CMH2O + 1 }), 'plateau')).toBe(false);
+    const over = ventSteps({ ...base, plateauCmH2O: PLATEAU_LIMIT_CMH2O + 1 });
+    expect(done(over, 'plateau')).toBe(false);
+    expect(over.find((x) => x.id === 'plateau')?.tone).toBe('red');
+    expect(over.find((x) => x.id === 'plateau')?.hint).toMatch(/High airway pressure/);
   });
-  it('pediatric never marks VT done', () => {
-    expect(done(ventSteps({ ...base, ageYears: 8, heightCm: 130, sex: 'male', scenario: ards, mlPerKgPbw: 6 }), 'vt')).toBe(false);
+  it('pediatric never marks VT done and does not block currentStepIndex', () => {
+    const s = ventSteps({ ...base, ageYears: 8, heightCm: 130, sex: 'male', scenario: ards, mlPerKgPbw: 6, respiratoryRate: 20, peepCmH2O: 5 });
+    expect(done(s, 'vt')).toBe(false);
+    // pbw (0) done, vt (1) manual, rate-peep (2) done -> next undone non-manual is plateau (3)
+    expect(currentStepIndex(s)).toBe(3);
   });
-  it('scenario without VT range is not auto-done and says so', () => {
+  it('scenario without VT range is not auto-done and does not block currentStepIndex', () => {
     const sc = { id: 'laparoscopic', name: 'l', sourceIds: [] };
-    const s = ventSteps({ ...base, heightCm: 170, sex: 'male', scenario: sc, mlPerKgPbw: 6 });
+    const s = ventSteps({ ...base, heightCm: 170, sex: 'male', scenario: sc, mlPerKgPbw: 6, respiratoryRate: 14, peepCmH2O: 5 });
     expect(done(s, 'vt')).toBe(false);
     expect(s.find((x) => x.id === 'vt')!.hint).toMatch(/judgement/);
+    expect(currentStepIndex(s)).toBe(3);
   });
 });

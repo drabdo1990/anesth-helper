@@ -113,6 +113,10 @@ export const AirwayView: React.FC = () => {
             <BigValue label="ETT uncuffed" value={summary.ettUncuffed.idRoundedMm.toFixed(1)} unit="mm ID" sourceIds={['msd-peds-ett']} />
           )}
 
+          {population === 'pediatric' && summary.ett.ok && 'depthCm' in summary.ett && (
+            <BigValue label="Oral depth" value={summary.ett.depthCm.toFixed(1)} unit="cm" sourceIds={['msd-peds-ett']} />
+          )}
+
           {population === 'adult' ? (
             summary.blade && 'ok' in summary.blade && summary.blade.ok ? (
               <BigValue label="Blade" value={summary.blade.blade} sourceIds={summary.blade.sourceIds} />
