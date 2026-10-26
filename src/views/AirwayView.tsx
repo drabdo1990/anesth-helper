@@ -69,7 +69,7 @@ export const AirwayView: React.FC = () => {
         onChange={setPopulation}
       />
 
-      {population === 'pediatric' ? (
+      {population === 'pediatric' && (
         <Panel title="Patient">
           <SegmentedControl<'years' | 'months'>
             ariaLabel="Age unit"
@@ -92,32 +92,6 @@ export const AirwayView: React.FC = () => {
             keypadTitle="Enter age"
           />
         </Panel>
-      ) : (
-        <Panel title="Patient">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Biological sex</span>
-            <div className="flex gap-1.5">
-              <button
-                type="button"
-                onClick={() => setPatient({ sex: 'female' })}
-                className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
-                  patient.sex === 'female' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
-                }`}
-              >
-                Female (7.0–7.5 mm)
-              </button>
-              <button
-                type="button"
-                onClick={() => setPatient({ sex: 'male' })}
-                className={`min-h-[48px] rounded-lg border px-3 text-xs font-bold touch-manipulation ${
-                  patient.sex === 'male' ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-900 text-slate-300'
-                }`}
-              >
-                Male (8.0–8.5 mm)
-              </button>
-            </div>
-          </div>
-        </Panel>
       )}
 
       <Panel title="Airway summary">
@@ -130,7 +104,7 @@ export const AirwayView: React.FC = () => {
               sourceIds={'sourceIds' in summary.ett ? summary.ett.sourceIds : ['msd-peds-ett']}
             />
           ) : (population === 'pediatric' ? ageYears : patient.sex) === null ? (
-            <p className="text-sm text-slate-400">{population === 'pediatric' ? 'Enter age for ETT sizing.' : 'Select sex for ETT sizing.'}</p>
+            <p className="text-sm text-slate-400">{population === 'pediatric' ? 'Enter age for ETT sizing.' : 'Select sex above for ETT sizing.'}</p>
           ) : (
             <NoSourceValue topic="ETT" compact />
           )}
@@ -143,7 +117,7 @@ export const AirwayView: React.FC = () => {
             summary.blade && 'ok' in summary.blade && summary.blade.ok ? (
               <BigValue label="Blade" value={summary.blade.blade} sourceIds={summary.blade.sourceIds} />
             ) : patient.sex === null ? (
-              <p className="text-sm text-slate-400">Select sex for blade sizing.</p>
+              <p className="text-sm text-slate-400">Select sex above for blade sizing.</p>
             ) : (
               <NoSourceValue topic="Blade" compact />
             )
