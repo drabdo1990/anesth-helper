@@ -43,7 +43,7 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 | **Dosing** | Adult drug cards in eight categories. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the dose-specific concentration, single/cumulative maximum warnings and source badges. Cumulative ceilings for ephedrine and labetalol have a local dose log. Dosing is withheld for a known patient under 18 because this build has no pediatric dose set. |
 | **Airway** | Adult and pediatric ETT/blade summaries, age-gated DLT sizing, LMA size by weight, OPA/NPA landmarks, ASA difficult-airway principles. |
 | **Vent** | Scenario selector, tidal volume from **PBW** (adult age required; never actual weight), minute ventilation, I:E timing, plateau and driving-pressure warnings, mode/alarm/troubleshooting prompts. |
-| **Lists** | Pre-induction, machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary built only from fixed choices and numeric fields. |
+| **Lists** | Pre-induction, a sourced Fasting / NPO checklist (routine, pediatric, obstetric, GLP-1 and urgent/unscheduled scenarios), machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary built only from fixed choices and numeric fields. |
 | **SOS** (red, bottom bar) | Full-screen LAST, MH and CICO support from any tab. |
 | **References** (book icon) | Source registry, verification status and the values derived from each source. The old prose guide is archived in `docs/reference-archive-2026-10-14.md` and is not a dosing source. |
 
@@ -100,4 +100,4 @@ Settings (gear icon) has an **Active reference set** switch.
 
 ## Tests
 
-`npm test` runs 200+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); single and cumulative maximum-dose flags; infusion rates; ETT/LMA/DLT sizing; pediatric age guards; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; anonymous handoff construction; and source traceability of every clinical record. CI and Vercel run `npm run verify`.
+`npm test` runs 200+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); single and cumulative maximum-dose flags; infusion rates; ETT/LMA/DLT sizing; pediatric age guards; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; the fasting/NPO checklist and its source coverage; anonymous handoff construction; and source traceability of every clinical record. CI and Vercel run `npm run verify`.

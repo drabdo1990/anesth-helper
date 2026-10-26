@@ -1,6 +1,6 @@
-// OR checklists. Structure only: no device-specific steps and no numeric thresholds, because no
-// named checklist source was supplied. Replace or extend these with your institutional checklists
-// (tag them 'local-protocol'). Items are anonymous: progress is stored without any patient data.
+// Generic OR checklists use 'app-generic'. The Fasting / NPO checklist is sourced to named guidelines.
+// Replace or extend these with your institutional checklists (tag them 'local-protocol').
+// Items are anonymous: progress is stored without any patient data.
 
 import type { ChecklistRecord } from './types';
 
@@ -25,6 +25,128 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
       { id: 'pre-drugs', text: 'Drugs prepared and labeled', sourceIds: generic },
       { id: 'pre-suction', text: 'Suction available and working', sourceIds: generic },
       { id: 'pre-dif-airway', text: 'Difficult-airway equipment available', sourceIds: generic },
+    ],
+  },
+  {
+    id: 'fasting-npo',
+    title: 'Fasting / NPO',
+    note: 'Draft for clinician review. Times are minimum fasting intervals before anesthesia or sedation for healthy elective patients; special scenarios and local protocols change them. Avoid routine NPO after midnight. GLP-1 guidance conflicts: use one locally adopted protocol, not a mix.',
+    items: [
+      {
+        id: 'fasting-assessment',
+        text: 'Record the time, type and amount of last oral intake, procedure urgency and aspiration risk. Fasting does not guarantee an empty stomach.',
+        sourceIds: ['adult-fasting-2026', 'acep-unscheduled-2026'],
+      },
+      {
+        id: 'fasting-solids',
+        text: 'Solid food / light meal: at least 6 h. Large, fatty, fried or meat-containing meals: at least 8 h; assess amount and type.',
+        sourceIds: ['asa-fasting-2017', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-nonclear',
+        text: 'Non-clear liquids: at least 6 h, including milk, milk products, meal-replacement drinks and enteral formulas.',
+        sourceIds: ['asa-fasting-2017', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-clear',
+        text: 'Clear liquids: until 2 h before anesthesia or sedation. Examples: water, pulp-free clear juice, tea/coffee, lemonade, clear carbohydrate drinks; no alcohol. The 2026 international consensus counts tea/coffee with milk up to one-fifth of total volume as clear; otherwise follow the local definition.',
+        sourceIds: ['asa-fasting-2017', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-clear-liberal',
+        text: 'Clear liquids <2 h, including "Sip Til Send": only under an explicit institutional protocol; not an individual clinician shortcut.',
+        sourceIds: ['adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-carbohydrate',
+        text: 'Healthy adults: simple or complex carbohydrate clear liquids may be taken until 2 h; up to 400 mL is considered an appropriate volume (ASA 2023). Protein-added clear liquids are not preferred for lack of evidence; do not confuse them with milk or meal-replacement drinks, which need 6 h.',
+        sourceIds: ['asa-fasting-2023', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-gum',
+        text: 'Gum or lollipops may be used until transfer under the 2026 adult consensus, but remove before induction or sedation. Do not delay a healthy adult solely because of gum (ASA 2023).',
+        sourceIds: ['asa-fasting-2023', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-peds-clear',
+        text: 'Children: allow clear liquids as close to 2 h as possible. ASA 2023 found insufficient evidence to choose 1 h over 2 h; use a shorter interval only under a pediatric protocol or clinical judgment.',
+        sourceIds: ['asa-fasting-2023'],
+      },
+      {
+        id: 'fasting-breast-milk',
+        text: 'Neonates and infants: breast milk for at least 4 h.',
+        sourceIds: ['asa-fasting-2017'],
+      },
+      {
+        id: 'fasting-formula',
+        text: 'Infants: formula or nonhuman milk for at least 6 h.',
+        sourceIds: ['asa-fasting-2017'],
+      },
+      {
+        id: 'fasting-enteral',
+        text: 'Enteral feeding: at least 6 h, but preprocedural discontinuation is not required for most patients with an already secure airway (for example, cuffed tracheostomy or tracheal tube in situ).',
+        sourceIds: ['adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-risk-conditions',
+        text: 'Do not apply healthy-patient intervals automatically with: significant uncontrolled reflux or supine regurgitation, hiatal hernia, Zenker diverticulum, achalasia or stricture; previous gastric surgery; gastroparesis; diabetes; end-stage kidney disease; opioid use; GI obstruction or acute abdomen; pregnancy; obesity; frailty/comorbidity; emergency status. Individualize the aspiration plan.',
+        sourceIds: ['asa-fasting-2023', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-bariatric',
+        text: 'Obesity or previous gastric/bariatric surgery: individualize fasting and aspiration risk; gastric ultrasound may be technically harder after gastric surgery.',
+        sourceIds: ['asa-fasting-2023', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-glp-assessment',
+        text: 'GLP-1 RA or tirzepatide: document drug, dose, schedule, last dose, escalation phase, GI symptoms and other delayed-emptying risks. Most patients continue therapy rather than routinely withholding it; use the locally adopted protocol.',
+        sourceIds: ['glp1-multisociety-2024', 'glp1-spaqi-2025'],
+      },
+      {
+        id: 'fasting-glp-symptoms',
+        text: 'GLP-1 escalation phase or significant GI symptoms: defer elective care until resolved (2024 multisociety). SPAQI 2025 defines significant as severe nausea, vomiting or inability to tolerate oral intake (not fullness or early satiety) and requires prescriber review before elective care.',
+        sourceIds: ['glp1-multisociety-2024', 'glp1-spaqi-2025'],
+      },
+      {
+        id: 'fasting-glp-high-risk',
+        text: 'Higher GLP-1 dose or another cause of delayed emptying: consider a 24 h liquid-only diet, aspiration-plan changes and trained gastric ultrasound; delay in selected cases when risk is expected to decrease (2024 multisociety).',
+        sourceIds: ['glp1-multisociety-2024'],
+      },
+      {
+        id: 'fasting-glp-spaqi',
+        text: 'If the SPAQI 2025 protocol is locally adopted: continue GLP-1 RA if there are no significant GI symptoms; solids 24 h (clear liquids only); clear liquids <10% glucose 4 h and ≥10% glucose 8 h. Do not mix these times with another GLP-1 protocol.',
+        sourceIds: ['glp1-spaqi-2025'],
+      },
+      {
+        id: 'fasting-elective-obstetric',
+        text: 'Uncomplicated elective cesarean or obstetric surgery: moderate clear liquids until 2 h; solids 6-8 h depending on fat content (ASA 2016).',
+        sourceIds: ['asa-obstetric-2016'],
+      },
+      {
+        id: 'fasting-labor',
+        text: 'Active labor: avoid solid food; encourage clear liquids, especially electrolyte-containing drinks, in uncomplicated labor. High-risk patients may need stricter limits, and never deny neuraxial analgesia or anesthesia solely for NPO status.',
+        sourceIds: ['asa-labor-2022'],
+      },
+      {
+        id: 'fasting-emergency',
+        text: 'Emergency or urgent anesthesia: elective minimums do not apply automatically. Document last intake, assess aspiration risk and let urgency plus the anesthesia plan determine any delay.',
+        sourceIds: ['asa-fasting-2023', 'adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-unscheduled-sedation',
+        text: 'Unscheduled procedural sedation: assess timing and nature of intake plus aspiration risk; do not delay urgent or emergent procedures solely for fasting. Refer moderate-risk patients for prompt anesthesia care when available (ACEP 2026).',
+        sourceIds: ['acep-unscheduled-2026'],
+      },
+      {
+        id: 'fasting-pocus',
+        text: 'Gastric ultrasound: a trained provider may use it when additional information would change management; do not treat it as routine screening or a guarantee of an empty stomach.',
+        sourceIds: ['adult-fasting-2026'],
+      },
+      {
+        id: 'fasting-bowel-prep',
+        text: 'Bowel preparation or a procedure requiring specific gastric conditions: follow the procedure-specific diet and fasting instructions; routine intervals are not a substitute.',
+        sourceIds: ['adult-fasting-2026'],
+      },
     ],
   },
   {

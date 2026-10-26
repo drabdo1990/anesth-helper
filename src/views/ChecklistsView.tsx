@@ -191,7 +191,7 @@ export const ChecklistsView: React.FC = () => {
               ))}
             </div>
             <p className="text-xs text-slate-400">Tick marks are saved on this device and contain no patient data. &quot;New case&quot; clears them.</p>
-            <SourceBadge sourceIds={['app-generic']} />
+            <SourceBadge sourceIds={[...new Set(list.items.flatMap((item) => item.sourceIds))]} />
           </>
         )
       )}
