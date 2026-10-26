@@ -97,7 +97,7 @@ export const VENT_ADVANCED_REFERENCE: ReferenceItem[] = [
     points: [
       'HFPV: tidal volume 3-4 mL/kg at 60-100 breaths/min.',
       'Thoracic HFV: tidal volume below 2 mL/kg at 60-2400 breaths/min.',
-      'Low-flow apneic oxygenation: 100% O2 with 5-10 cmH2O CPAP maintains adequate PaO2 for at least 20 minutes.',
+      'Low-flow apneic oxygenation: 100% O2 with 5-10 cmH2O CPAP can maintain adequate PaO2 for at least 20 minutes, but PaCO2 rises about 6 mmHg in the first minute and 3-4 mmHg each minute after (reported PaCO2 103-250 mmHg, pH 6.72-6.97). The safe period is well below 10 minutes. Monitor SpO2.',
     ],
     sourceIds: ['miller-6e'],
   },

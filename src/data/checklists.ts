@@ -72,20 +72,29 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
 ];
 
 // Notebook-sourced checklists (sections 5.2-5.4). Item text is quoted from the notebook; no step is added to it.
-const FDA_AAGBI = ['fda-1993', 'aagbi-2012'];
 const ASA_MONITORING = ['asa-1986', 'miller-6e'];
 const NORA = ['asa-1994-nora', 'miller-6e'];
 
 const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'two-bag-test',
-    title: 'Pre-case "two-bag" test (FDA 1993 / AAGBI 2012)',
-    note: 'Transcribed from the project notebook. Follow your institutional checklist for your machine.',
+    title: 'Pre-case "two-bag" test (AAGBI 2012)',
+    note: 'Do this after the breathing system, vaporisers and ventilator have been checked individually (Fundamentals of Anesthesia 4e, Ch 46, p. 905). Follow your institutional checklist for your machine.',
     items: [
-      { id: 'twobag-testlung', text: 'Attach a test lung bag to the Y-piece', sourceIds: FDA_AAGBI },
-      { id: 'twobag-vent', text: 'Ventilator ON: ascending bellows rise during expiration and deliver the set tidal volume without leaks', sourceIds: FDA_AAGBI },
-      { id: 'twobag-valves', text: 'Verify unidirectional valves, vaporizer interlocks, and vaporizer fit, fill and leaks', sourceIds: FDA_AAGBI },
-      { id: 'twobag-analyzers', text: 'Calibrate the capnometer and O2 analyzers', sourceIds: FDA_AAGBI },
+      { id: 'twobag-attach', text: 'Attach the patient end of the breathing system (including angle piece and filter) to a test lung or bag', sourceIds: ['aagbi-2012'] },
+      { id: 'twobag-manual', text: 'Set fresh gas flow to 5 L/min and ventilate manually. Check the whole breathing system is patent and the unidirectional valves are moving. Check the APL valve by squeezing both bags', sourceIds: ['aagbi-2012'] },
+      { id: 'twobag-vent-vaporisers', text: 'Turn on the ventilator to ventilate the test lung. Turn off the fresh gas flow, or reduce it to a minimum. Open and close each vaporiser in turn. There should be no loss of volume in the system', sourceIds: ['aagbi-2012'] },
+    ],
+  },
+  {
+    id: 'fda-ventilator-check',
+    title: 'Pre-case ventilator check (FDA 1993 excerpts)',
+    note: 'Excerpts from the FDA 1993 apparatus checkout (step 12 ventilator test, step 13 monitors). The vaporizer interlock, fit, fill and leak item was transcribed earlier and was not located in the notebook text retrieved: confirm it against the full checkout. Follow your institutional checklist for your machine.',
+    items: [
+      { id: 'fda-second-bag', text: 'Attach a second breathing bag to the Y-piece', sourceIds: ['fda-1993'] },
+      { id: 'fda-bellows', text: 'Ventilator ON: bellows deliver the appropriate tidal volume on inspiration and fill completely on expiration', sourceIds: ['fda-1993'] },
+      { id: 'fda-valves', text: 'Verify unidirectional valves, vaporizer interlocks, and vaporizer fit, fill and leaks', sourceIds: ['fda-1993'] },
+      { id: 'fda-analyzers', text: 'Check and calibrate the capnometer and O2 analyzer', sourceIds: ['fda-1993'] },
     ],
   },
   {

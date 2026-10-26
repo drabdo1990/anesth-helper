@@ -228,7 +228,7 @@ export const REFERENCE_DRUGS: ReferenceDrug[] = [
     doses: [],
     infusions: [
       { indication: 'TIVA Maintenance (Miller Table 11-8)', rateMin: 2, rateMax: 10, unit: 'mcg/kg/h', loadingDose: '4–20 mcg/kg' },
-      { indication: 'Intraoperative Analgesia (Miller Table 12-3)', rateMin: 0.01, rateMax: 0.1, unit: 'mcg/kg/min' },
+      { indication: 'Intraoperative Analgesia (Miller Table 12-6)', rateMin: 0.01, rateMax: 0.1, unit: 'mcg/kg/min' },
       { indication: 'ICU Sedation (ALN 2025)', rateMin: 100, unit: 'mcg/h', notes: '100 mcg/h fixed continuous infusion' },
     ],
     tivaTargets: {
@@ -249,7 +249,8 @@ export const REFERENCE_DRUGS: ReferenceDrug[] = [
     scalar: 'LBW',
     concentrationsMgPerMl: [0.5],
     doses: [
-      { population: 'adult', route: 'IV', min: 10, max: 25, unit: 'mcg/kg', scalar: 'LBW', note: 'Analgesic / Intubation bolus' },
+      { population: 'adult', route: 'IV', min: 10, max: 20, unit: 'mcg/kg', scalar: 'LBW', note: 'Analgesic bolus (MAC-reducing)' },
+      { population: 'adult', route: 'IV', min: 25, max: 50, unit: 'mcg/kg', scalar: 'LBW', note: 'Blunting the intubation response' },
       { population: 'adult', route: 'IV', min: 25, max: 100, unit: 'mcg/kg', scalar: 'LBW', note: 'TIVA loading dose (Additional boluses 5–10 mcg/kg)' },
     ],
     infusions: [
@@ -283,7 +284,7 @@ export const REFERENCE_DRUGS: ReferenceDrug[] = [
     ],
     infusions: [
       { indication: 'TIVA Maintenance (Miller Table 11-8)', rateMin: 0.5, rateMax: 1.5, unit: 'mcg/kg/h' },
-      { indication: 'Intraoperative Infusion (Miller Table 12-3)', rateMin: 0.005, rateMax: 0.05, unit: 'mcg/kg/min' },
+      { indication: 'Intraoperative Infusion (Miller Table 12-6)', rateMin: 0.005, rateMax: 0.05, unit: 'mcg/kg/min' },
     ],
     tivaTargets: {
       predominantAgent: '5–10',
@@ -555,7 +556,6 @@ export const REFERENCE_DRUGS: ReferenceDrug[] = [
         max: 1,
         unit: 'mg/kg',
         scalar: 'TBW',
-        maxAbsolute: { value: 10, unit: 'mg' },
         note: 'Pediatric dose (Table 77.4)',
       },
     ],

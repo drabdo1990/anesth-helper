@@ -24,12 +24,12 @@
 
 ### 2.1 Premedication & Sedation
 * **Midazolam:**
-  * Premedication (Adult): 2–4 mg PO 1–2 h preop; 1.5–2.5 mg IV/IM[cite: 8]; or 2.5–5 mg (0.03–0.07 mg/kg IM)[cite: 4].
-  * Premedication (Pediatric): 0.1 mg/kg IV (max 4 mg)[cite: 8].
+  * Premedication (Adult): 1–2 mg IV (Miller Table 68-5); 2.5–5 mg (0.03–0.07 mg/kg) IM[cite: 4] or 5–7 mg IM (Miller Table 68-5); 7.5–15 mg PO (Miller Table 68-5).
+  * Premedication (Pediatric): incremental IV boluses of 0.05–0.1 mg/kg, up to a maximum total of 0.4 mg/kg (Oxford p. 948).
   * Infusion Rate: 3–5 mg/h (IV sedation) or 1–4 mg/h (volatile sedation)[cite: 1].
 * **Clonidine:**
   * Premedication: 0.5 mg (5 mcg/kg PO)[cite: 4].
-  * Regional/Neuraxial Adjunct: 1–1.5 mcg/kg[cite: 7].
+  * Regional/Neuraxial Adjunct: 1–2 mcg/kg pediatric caudal (Hadzic Ch 42, Oxford Table 36.12); adult epidural 150–450 mcg (Miller Table 16-10)[cite: 7].
 * **Lorazepam:**
   * Premedication: 1–4 mg PO; 1.5–2.5 mg IV/IM[cite: 8]; or 2–4 mg (0.03–0.06 mg/kg PO/IM)[cite: 4].
 * **Morphine (Premedication):** 5–15 mg (0.2 mg/kg IM)[cite: 4].
@@ -42,15 +42,15 @@
 
 ### 2.2 Induction & Hypnotic Agents
 * **Propofol:**
-  * Adult Induction: 1.5–2.5 mg/kg (scaled to LBW)[cite: 8].
-  * Pediatric Induction: 2.5–3.5 mg/kg TBW.
+  * Adult Induction: 1.0–2.5 mg/kg (scaled to LBW; 1.0–1.75 mg/kg if elderly or high-risk) (Miller Table 10-3)[cite: 8].
+  * Pediatric Induction: ED95 about 2.9 mg/kg in infants under 2 years and 2.2 mg/kg at 6–12 years (Miller 6e Ch 10); Oxford gives 3–5 mg/kg. Weight basis not stated in the sources.
   * Target Blood Concentrations:
     * Skin Incision: 2–6 mcg/mL[cite: 2].
     * Minor Surgery: 2.5–7.5 mcg/mL[cite: 2].
     * Major Surgery: 2–6 mcg/mL[cite: 2].
     * Awakening: 0.8–1.8 mcg/mL[cite: 2].
     * Sedation: 1.0–3.0 mcg/mL[cite: 2].
-  * Maintenance Infusion: 43–58 mcg/kg/min[cite: 1] or continuous nomogram rates (50–200 mcg/kg/min)[cite: 2].
+  * Maintenance Infusion: 43–58 mcg/kg/min[cite: 1] or continuous nomogram rates (25–300 mcg/kg/min across the curves, Miller Fig 12-15; about 50–150 for balanced anesthesia, 100–200 as sole agent)[cite: 2].
 * **Ketamine:**
   * Adult Induction: IV 1–2 mg/kg; IM 5–10 mg/kg[cite: 8].
   * Pediatric Induction: IV 0.5–2 mg/kg; IM 5–10 mg/kg[cite: 8].
@@ -67,13 +67,13 @@
 ### 2.3 Opioid Plasma Targets & Infusions
 * **Fentanyl:**
   * Target Plasma Concentrations: Incision 3–6 ng/mL; Major surgery 2–5 ng/mL; Awakening < 1–2 ng/mL; Analgesia 1–2 ng/mL[cite: 2].
-  * Maintenance Infusion: 100 mcg/h fixed ICU sedation rate[cite: 1]; or continuous nomogram titration (0.9–3.0 mcg/kg/h)[cite: 2].
+  * Maintenance Infusion: 100 mcg/h fixed ICU sedation rate[cite: 1]; or maintenance infusion 0.03–0.1 mcg/kg/min (1.8–6.0 mcg/kg/h) for anesthesia, 0.01–0.03 mcg/kg/min for sedation or analgesia (Miller Table 12-6)[cite: 2].
 * **Alfentanil:**
   * Target Plasma Concentrations: Incision 200–300 ng/mL; Awakening < 200–250 ng/mL; Analgesia 50–100 ng/mL[cite: 2].
-  * Infusion Nomogram: 0.25–1.5 mcg/kg/min[cite: 2].
+  * Maintenance Infusion: 0.5–3 mcg/kg/min for anesthesia, 0.25–1 mcg/kg/min for sedation or analgesia (Miller Table 12-6)[cite: 2].
 * **Sufentanil:**
   * Target Plasma Concentrations: Incision 1–3 ng/mL; Awakening < 0.2 ng/mL; Analgesia 0.02–0.2 ng/mL[cite: 2].
-  * Infusion Nomogram: 0.15–1.0 mcg/kg/h[cite: 2].
+  * Maintenance Infusion: 0.01–0.05 mcg/kg/min (0.6–3.0 mcg/kg/h) for anesthesia, 0.005–0.01 mcg/kg/min for sedation or analgesia (Miller Table 12-6)[cite: 2].
 * **Remifentanil:** Target plasma concentration 4–8 ng/mL (incision/minor surgery); 2–4 ng/mL (major surgery); < 1–3 ng/mL (awakening)[cite: 2].
 
 ---
@@ -107,10 +107,10 @@
   * With Epinephrine: 2.5–3.0 mg/kg (Max: 225 mg)[cite: 2, 7, 10].
   * Neonates: Reduce maximum dose by 50%[cite: 10].
   * Continuous Epidural Infusion: 0.2–0.4 mg/kg/h[cite: 10].
-* **Levobupivacaine:** Max 2 mg/kg (IBW)[cite: 8] (or 2.5 mg/kg, pediatric plain 3 mg/kg, with epi 4 mg/kg)[cite: 7, 10].
-* **Ropivacaine:** Max 3 mg/kg (Max: 225–250 mg)[cite: 2, 7, 8, 10].
+* **Levobupivacaine:** Max 2 mg/kg (IBW)[cite: 8] (or 2.5 mg/kg; pediatric: usual dose 3 mg/kg, maximum 4 mg/kg plain and with epi, Miller Table 45-5)[cite: 7, 10].
+* **Ropivacaine:** Max 3 mg/kg (Max: 250 mg single dose; 675 mg/24 h, Fundamentals p. 665)[cite: 2, 7, 8, 10].
 * **Prilocaine:** Plain: 6 mg/kg[cite: 8] (or 8 mg/kg with epinephrine, max 600 mg)[cite: 2, 8]. Treat methemoglobinemia (> 600 mg) with methylene blue 1–2 mg/kg[cite: 8].
-* **Chloroprocaine:** 8–11 mg/kg plain[cite: 6, 10]; 10–14 mg/kg with epinephrine (Max 900 mg)[cite: 2, 6, 10].
+* **Chloroprocaine:** 8–11 mg/kg plain[cite: 6, 10]; 10–14 mg/kg with epinephrine (adult infiltration max 800 mg plain, 1000 mg with epinephrine; epidural total 300–900 mg with epinephrine, Miller Tables 14-4, 14-7)[cite: 2, 6, 10].
 
 #### Systemic IV Lidocaine Infusion Protocol
 * **Antiarrhythmic:** 0.5–1 mg/kg bolus, then 10–50 mcg/kg/min (or 1–4 mg/min in adults)[cite: 8, 9].
@@ -130,7 +130,7 @@
 ---
 
 ### 2.6 Vasopressors & Inotropes
-* **Norepinephrine:** Infusion range 0.02–0.5 mcg/kg/min (clinical median 0.07–0.11 mcg/kg/min)[cite: 1].
+* **Norepinephrine:** Infusion range 0.05–0.2 mcg/kg/min (Fundamentals p. 671; Oxford Table 42.1; Miller Table 16-10 lists up to 1.0); ICU trial clinical median 0.07–0.11 mcg/kg/min[cite: 1].
 * **Phenylephrine:**
   * Bolus: 20–100 mcg increments (dilute 10 mg in 500 mL 0.9% NaCl = 20 mcg/mL)[cite: 8].
   * Infusion: 30–60 mcg/min (dilute 5 mg in 50 mL 0.9% NaCl = 100 mcg/mL, run at 0–30 mL/h)[cite: 8].
@@ -147,7 +147,7 @@
 * **Acetaminophen (Paracetamol):**
   * Adult: 1 g IV q6h (max 4 g/24 h)[cite: 14]. Dose on LBW in obesity[cite: 8].
   * Pediatric: 15 mg/kg IV[cite: 8].
-* **Ketorolac:** 15–30 mg IV[cite: 6, 14]. Contraindicated in post-Roux-en-Y gastric bypass due to GI ulceration risk[cite: 14].
+* **Ketorolac:** 10–30 mg IV every 4–6 h (max 90 mg/day; 60 mg/day if elderly or renal impairment) (Fundamentals p. 643)[cite: 6, 14]. Contraindicated in post-Roux-en-Y gastric bypass due to GI ulceration risk[cite: 14].
 * **Labetalol:** 5 mg increments IV up to 100 mg; infusion 20–160 mg/h[cite: 8]. Pediatric: 0.2 mg/kg boluses up to 0.5 mg/kg (max 20 mg)[cite: 8].
 * **Magnesium Sulfate:**
   * Eclampsia: 4 g IV over 10 min, then 1 g/h for 24 h[cite: 8].
@@ -270,7 +270,7 @@
 ### 7.2 High-Frequency & Apneic Modalities (Miller 6e, p. 1061, 1451)
 * **HFPV (High-Frequency Positive-Pressure Ventilation):** $V_T$ `3–4 mL/kg`, RR `60–100 breaths/min`.
 * **HFV (High-Frequency Ventilation Thoracic):** $V_T$ `< 2 mL/kg`, RR `60–2400 breaths/min`.
-* **Apneic Insufflation (Low-Flow Apneic Oxygenation):** 100% O2 with `5–10 cm H2O CPAP` maintains adequate PaO2 for at least `20 minutes`.
+* **Apneic Insufflation (Low-Flow Apneic Oxygenation):** 100% O2 with `5–10 cm H2O CPAP` can maintain adequate PaO2 for at least `20 minutes`, but PaCO2 rises about 6 mmHg in the first minute and 3-4 mmHg each minute after (reported PaCO2 103-250 mmHg, pH 6.72-6.97); the safe period is well below `10 minutes` (Miller 6e, Ch 49).
 
 ### 7.3 Physiological Thresholds & Laparoscopy (Miller 6e, p. 168, 1702)
 * **Apneic Threshold:** Highest PaCO2 at which a patient remains apneic = `4–5 mmHg below resting PaCO2`.
@@ -300,9 +300,15 @@
 * Full ASA monitors + self-inflating hand resuscitator bag (AMBU).
 * MR Safe, MR Conditional, MR Unsafe verification.
 
-### 7.8 FDA 1993 & AAGBI 2012 Pre-Case "Two-Bag" Test
-* Attach test lung bag to Y-piece.
-* Ventilator ON; verify ascending bellows rise during expiration and deliver set TV without leaks.
-* Verify unidirectional valves, vaporizer interlocks, fit/fill/leaks, and calibrate capnometer/O2 analyzers.
+### 7.8 Pre-Case Breathing-System Checks: AAGBI 2012 "Two-Bag" Test & FDA 1993 Ventilator Test
+* **AAGBI 2012 two-bag test** (after checking the breathing system, vaporisers and ventilator individually; Fundamentals of Anesthesia 4e, Ch 46, p. 905):
+  * Attach the patient end of the breathing system (including angle piece and filter) to a test lung or bag.
+  * Set fresh gas flow to 5 L/min and ventilate manually. Check the breathing system is patent and the unidirectional valves are moving. Check the APL valve by squeezing both bags.
+  * Turn on the ventilator to ventilate the test lung. Turn off the fresh gas flow or reduce it to a minimum. Open and close each vaporiser in turn. There should be no loss of volume in the system.
+* **FDA 1993 checkout excerpts** (step 12 ventilator test, step 13 monitors; Miller 6e Appendix 1, Anesthesia Equipment Simplified Table 13-1):
+  * Attach a second breathing bag to the Y-piece.
+  * Verify the bellows deliver the appropriate tidal volume on inspiration and fill completely on expiration; check unidirectional valves.
+  * Check and calibrate the capnometer and O2 analyzer.
+  * Vaporizer interlocks, fit, fill and leaks: listed here previously, not located in the notebook text retrieved. Confirm against the full checkout.
 
 ---
