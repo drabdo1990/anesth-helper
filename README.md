@@ -105,3 +105,7 @@ Settings (gear icon) has an **Active reference set** switch.
 ## Tests
 
 `npm test` runs 200+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); single and cumulative maximum-dose flags; infusion rates; ETT/LMA/DLT sizing; pediatric age guards; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; the fasting/NPO checklist and its source coverage; anonymous handoff construction; and source traceability of every clinical record. CI and Vercel run `npm run verify`.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The software is provided as is, and the clinical-use disclaimer above still applies.
