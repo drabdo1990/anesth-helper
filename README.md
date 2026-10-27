@@ -2,6 +2,10 @@
 
 An offline, mobile-first cognitive aid for anesthesia providers in the operating room: dosing, airway sizing, ventilation settings, checklists and emergency pathways (LAST, malignant hyperthermia, CICO).
 
+**Live demo:** _add deployed URL here_ (load once online, then it works offline; add to home screen to install).
+
+**Feedback welcome:** clinicians are invited to challenge doses, safety wording and usability. Please open an issue and cite a source for any correction.
+
 > **Educational and cognitive aid. Clinical judgment supercedes all calculated suggestions.**
 >
 > It is not an electronic health record, a patient monitor, a prescribing system or a remote decision-making tool.
@@ -10,14 +14,14 @@ An offline, mobile-first cognitive aid for anesthesia providers in the operating
 
 The reference layer in `src/data/` was transcribed from product labels (DailyMed) and published references. Several primary texts could not be read in the build session (ASRA, MHAUS, EMHG, ASA 2022 full texts). Each source carries a `verification` field (`primary`, `label` or `secondary`) and an `accessNote`, and the in-app **References** view lists every source with the values derived from it.
 
-**A qualified clinician must review the data before any clinical use.** Where no high-quality source value was available, the app shows **"No high-quality source value specified."** instead of a number. That includes face-mask sizing by contour, video-laryngoscope geometry, aspiration prophylaxis, metaraminol, epinephrine bolus, PONV doses and most scenario-specific ventilation settings.
+**A qualified clinician must review the data before any clinical use.** Where no high-quality source value was available, the app shows **"No high-quality source value specified."** instead of a number. That includes face-mask sizing by contour, video-laryngoscope geometry and most scenario-specific ventilation settings. Aspiration prophylaxis, metaraminol, epinephrine bolus and PONV agents have **no calculated dose**; their label or guideline figures are listed in the in-app reference list instead.
 
 ## Run locally
 
 ```bash
 npm ci
 npm run dev        # http://localhost:5173
-npm test           # unit tests (clinical calculations and data integrity)
+npm test           # unit tests (clinical calculations and data integrity; 212 tests)
 npm run verify     # tests + type-check + production build
 ```
 
@@ -40,7 +44,7 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 
 | Tab / control | What it does |
 |---|---|
-| **Dosing** | Adult drug cards in eight categories. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the dose-specific concentration, single/cumulative maximum warnings and source badges. Cumulative ceilings for ephedrine and labetalol have a local dose log. Dosing is withheld for a known patient under 18 because this build has no pediatric dose set. |
+| **Dosing** | Adult drug cards in eight categories. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the dose-specific concentration, single/cumulative maximum warnings and source badges. Cumulative ceilings for ephedrine and labetalol have a local dose log. Dosing is withheld for a known patient under 18 because this build has no pediatric dose set. The tab also holds a local anesthetic calculator, a neuraxial reference and a searchable reference-drug list. |
 | **Airway** | Adult and pediatric ETT/blade summaries, age-gated DLT sizing, LMA size by weight, OPA/NPA landmarks, ASA difficult-airway principles. |
 | **Vent** | Scenario selector, tidal volume from **PBW** (adult age required; never actual weight), minute ventilation, I:E timing, plateau and driving-pressure warnings, mode/alarm/troubleshooting prompts. |
 | **Lists** | Pre-induction, a sourced Fasting / NPO checklist (routine, pediatric, obstetric, GLP-1 and urgent/unscheduled scenarios), machine check (generic structure), intraoperative prompts, emergence/extubation, and an anonymous handoff summary built only from fixed choices and numeric fields. |
