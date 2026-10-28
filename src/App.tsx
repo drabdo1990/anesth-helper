@@ -37,8 +37,8 @@ export const App: React.FC = () => {
     'flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl border border-clinical-border bg-clinical-card text-slate-300 touch-manipulation';
 
   return (
-    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-clinical-bg font-sans text-slate-100 selection:bg-cyan-500 selection:text-black">
-      <div className="border-b border-clinical-border/80 px-3 py-1.5">
+    <div className="flex min-h-screen min-h-[100dvh] w-full max-w-full flex-col overflow-x-hidden bg-clinical-bg font-sans text-slate-100 selection:bg-cyan-500 selection:text-black">
+      <div className="border-b border-clinical-border/80 px-3 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 text-slate-950">
