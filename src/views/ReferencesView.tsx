@@ -84,9 +84,14 @@ const ProtocolRow: React.FC<{ protocol: Glp1ProtocolReference }> = ({ protocol }
             <ExternalLink className="h-3.5 w-3.5" /> {source.tag}
           </a>
         ) : (
-          <span className="text-xs font-bold text-amber-300">{source?.tag ?? 'Local protocol'}</span>
+          <span className="text-xs font-bold text-amber-300">{source?.tag ?? 'Source missing'}</span>
         )}
       </div>
+      {source && (
+        <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase ${VERIFICATION[source.verification].cls}`}>
+          {VERIFICATION[source.verification].text}
+        </span>
+      )}
       <dl className="mt-1 grid gap-2 text-xs text-slate-300">
         <div>
           <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Medication</dt>
