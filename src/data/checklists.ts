@@ -2,6 +2,7 @@
 // Replace or extend these with your institutional checklists (tag them 'local-protocol').
 // Items are anonymous: progress is stored without any patient data.
 
+import { QRH_CHECKLISTS } from './checklistsQrh';
 import type { ChecklistGroup, ChecklistRecord } from './types';
 
 /** Display order of the Lists-tab groups. */
@@ -351,7 +352,7 @@ const CLINICAL_CHECKLISTS: ChecklistRecord[] = [
   },
 ];
 
-export const CHECKLISTS: ChecklistRecord[] = [...BASE_CHECKLISTS, ...NOTEBOOK_CHECKLISTS, ...CLINICAL_CHECKLISTS];
+export const CHECKLISTS: ChecklistRecord[] = [...BASE_CHECKLISTS, ...NOTEBOOK_CHECKLISTS, ...CLINICAL_CHECKLISTS, ...QRH_CHECKLISTS];
 
 /** Selectable options for the handoff generator. These are categories, not clinical values. */
 export const HANDOFF_OPTIONS = {

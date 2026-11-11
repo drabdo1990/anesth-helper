@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.11-draft12';
+export const DATA_VERSION = '2026.11.11-draft13';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1006,6 +1006,58 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['preoperative multimodal analgesia: gabapentinoid dosing and acetaminophen'],
     verification: 'primary',
     accessNote: 'Open-access guideline. Preoperative oral gabapentin 300 to 600 mg.',
+  },
+  {
+    id: 'qrh-anaphylaxis-2022',
+    tag: 'QRH Anaphylaxis',
+    name: 'Quick Reference Handbook: 3-1 Anaphylaxis',
+    publisher: 'Association of Anaesthetists',
+    year: '2022',
+    version: 'v5',
+    url: 'https://anaesthetists.org/Portals/0/PDFs/QRH/QRH_3-1_Anaphylaxis_v5.pdf',
+    tier: 1,
+    scope: ['anaphylaxis crisis steps, adrenaline doses'],
+    verification: 'primary',
+    accessNote: 'One-page guideline read in full (2026-11). Licensed CC BY-NC-SA 4.0; the checklist in this app is a shortened adaptation, so check it against the original.',
+  },
+  {
+    id: 'qrh-blood-loss-2018',
+    tag: 'QRH Blood loss',
+    name: 'Quick Reference Handbook: 3-2 Massive blood loss',
+    publisher: 'Association of Anaesthetists',
+    year: '2018',
+    version: 'v2',
+    url: 'https://anaesthetists.org/Portals/0/PDFs/QRH/QRH_3-2_Massive_blood_loss_v2.pdf',
+    tier: 1,
+    scope: ['massive haemorrhage steps, transfusion goals, calcium and tranexamic acid doses'],
+    verification: 'primary',
+    accessNote: 'One-page guideline read in full (2026-11). Licensed CC BY-NC-SA 4.0; the checklist in this app is a shortened adaptation, so check it against the original.',
+  },
+  {
+    id: 'qrh-bronchospasm-2023',
+    tag: 'QRH Bronchospasm',
+    name: 'Quick Reference Handbook: 3-4 Bronchospasm',
+    publisher: 'Association of Anaesthetists',
+    year: '2023',
+    version: 'v3',
+    url: 'https://anaesthetists.org/Portals/0/PDFs/QRH/QRH_3-4_Bronchospasm_v3_June%202023.pdf',
+    tier: 1,
+    scope: ['bronchospasm crisis steps, bronchodilator doses'],
+    verification: 'primary',
+    accessNote: 'One-page guideline read in full (2026-11). Licensed CC BY-NC-SA 4.0; the checklist in this app is a shortened adaptation, so check it against the original.',
+  },
+  {
+    id: 'qrh-laryngospasm-2018',
+    tag: 'QRH Laryngospasm',
+    name: 'Quick Reference Handbook: 3-6 Laryngospasm and stridor',
+    publisher: 'Association of Anaesthetists',
+    year: '2018',
+    version: 'v1',
+    url: 'https://anaesthetists.org/Portals/0/PDFs/QRH/QRH_3-6_Laryngospasm_and_stridor_v1.pdf',
+    tier: 1,
+    scope: ['laryngospasm crisis steps and drug doses'],
+    verification: 'primary',
+    accessNote: 'One-page guideline read in full (2026-11). Licensed CC BY-NC-SA 4.0; the checklist in this app is a shortened adaptation, so check it against the original.',
   },
   // ---- Tier 4: local / app-generated ----
   {

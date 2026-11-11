@@ -20,6 +20,12 @@ describe('checklists', () => {
     }
   });
 
+  it('gives every crisis checklist a named source, never the generic tag alone', () => {
+    const crises = CHECKLISTS.filter((c) => c.group === 'Crises');
+    expect(crises.map((c) => c.id)).toEqual(['crisis-anaphylaxis', 'crisis-blood-loss', 'crisis-bronchospasm', 'crisis-laryngospasm']);
+    for (const c of crises) for (const i of c.items) expect(i.sourceIds, i.id).not.toContain('app-generic');
+  });
+
   // Ticks are stored by item id, so a duplicate would tick two unrelated items at once.
   it('has item ids that are unique across checklists and emergency steps', () => {
     const ids = [
