@@ -2,13 +2,17 @@
 // Replace or extend these with your institutional checklists (tag them 'local-protocol').
 // Items are anonymous: progress is stored without any patient data.
 
-import type { ChecklistRecord } from './types';
+import type { ChecklistGroup, ChecklistRecord } from './types';
+
+/** Display order of the Lists-tab groups. */
+export const CHECKLIST_GROUPS: ChecklistGroup[] = ['Pre-op', 'Machine', 'Airway', 'Ventilation', 'Regional', 'Intra/post-op', 'Crises'];
 
 const generic = ['app-generic'];
 
 const BASE_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'pre-induction',
+    group: 'Pre-op',
     title: 'Pre-induction',
     items: [
       { id: 'pre-patient', text: 'Patient identity confirmed', sourceIds: generic },
@@ -29,6 +33,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'fasting-npo',
+    group: 'Pre-op',
     title: 'Fasting / NPO',
     note: 'Draft for clinician review. Times are minimum fasting intervals before anesthesia or sedation for healthy elective patients; special scenarios and local protocols change them. Avoid routine NPO after midnight. GLP-1 guidance conflicts: use one locally adopted protocol, not a mix.',
     items: [
@@ -151,6 +156,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'machine-check',
+    group: 'Machine',
     title: 'Anesthesia machine / breathing system',
     note: 'Use your institutional checklist. This is a generic structure only and contains no device-specific steps.',
     items: [
@@ -165,6 +171,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'intra-op',
+    group: 'Intra/post-op',
     title: 'Intraoperative safety prompts',
     items: [
       { id: 'intra-position', text: 'Positioning and pressure points', sourceIds: generic },
@@ -179,6 +186,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'emergence',
+    group: 'Intra/post-op',
     title: 'Emergence and extubation',
     items: [
       { id: 'em-reversal', text: 'Reversal given or blockade resolved', sourceIds: generic },
@@ -200,6 +208,7 @@ const NORA = ['asa-1994-nora', 'miller-6e'];
 const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'two-bag-test',
+    group: 'Machine',
     title: 'Pre-case "two-bag" test (AAGBI 2012)',
     note: 'Do this after the breathing system, vaporisers and ventilator have been checked individually (Fundamentals of Anesthesia 4e, Ch 46, p. 905). Follow your institutional checklist for your machine.',
     items: [
@@ -210,6 +219,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'fda-ventilator-check',
+    group: 'Machine',
     title: 'Pre-case ventilator check (FDA 1993 excerpts)',
     note: 'Excerpts from the FDA 1993 apparatus checkout (step 12 ventilator test, step 13 monitors). The vaporizer interlock, fit, fill and leak item was transcribed earlier and was not located in the notebook text retrieved: confirm it against the full checkout. Follow your institutional checklist for your machine.',
     items: [
@@ -221,6 +231,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'asa-monitoring',
+    group: 'Intra/post-op',
     title: 'ASA basic monitoring standards',
     note: 'Transcribed from the project notebook (Miller 6e p. 2027).',
     items: [
@@ -233,6 +244,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'nora-mri',
+    group: 'Machine',
     title: 'Non-operating-room anesthesia (NORA / MRI)',
     note: 'Transcribed from the project notebook (Miller 6e p. 2025).',
     items: [

@@ -149,9 +149,13 @@ export interface ChecklistItemRecord {
   sourceIds: string[];
 }
 
+export type ChecklistGroup = 'Pre-op' | 'Machine' | 'Airway' | 'Ventilation' | 'Regional' | 'Intra/post-op' | 'Crises';
+
 export interface ChecklistRecord {
   id: string;
   title: string;
+  /** Lists-tab group the checklist is filed under. */
+  group: ChecklistGroup;
   note?: string;
   items: ChecklistItemRecord[];
 }

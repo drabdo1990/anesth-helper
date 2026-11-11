@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Check, ClipboardCopy, RotateCcw } from 'lucide-react';
-import { CHECKLISTS, HANDOFF_OPTIONS } from '../data/checklists';
+import { CHECKLISTS, CHECKLIST_GROUPS, HANDOFF_OPTIONS } from '../data/checklists';
+import type { ChecklistGroup } from '../data/types';
 import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
 import { useAppStore } from '../store/useAppStore';
@@ -9,7 +10,16 @@ import { ChecklistItem } from '../components/ui/ChecklistItem';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { WarningBanner } from '../components/ui/WarningBanner';
 
-type SubTab = (typeof CHECKLISTS)[number]['id'] | 'handoff';
+type GroupTab = ChecklistGroup | 'handoff';
+
+// Groups with no lists yet are hidden.
+const GROUP_TABS: { id: GroupTab; label: string }[] = [
+  ...CHECKLIST_GROUPS.filter((g) => CHECKLISTS.some((c) => c.group === g)).map((g) => ({ id: g as GroupTab, label: g })),
+  { id: 'handoff', label: 'Handoff summary' },
+];
+
+const chipClass = (on: boolean): string =>
+  `min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`;
 
 const baseName = (name: string): string => name.split(' (')[0];
 const namesFor = (category: string): string[] => [...new Set(MEDICATIONS.filter((m) => m.category === category).map((m) => baseName(m.name)))];
@@ -139,32 +149,36 @@ const HandoffForm: React.FC = () => {
 };
 
 export const ChecklistsView: React.FC = () => {
-  const [sub, setSub] = useState<SubTab>('pre-induction');
+  const [group, setGroup] = useState<GroupTab>(GROUP_TABS[0].id);
+  const [sub, setSub] = useState<string>(CHECKLISTS[0].id);
   const checks = useAppStore((s) => s.checks);
   const toggle = useAppStore((s) => s.toggleCheck);
   const resetChecks = useAppStore((s) => s.resetChecks);
 
-  const list = CHECKLISTS.find((c) => c.id === sub);
+  const lists = CHECKLISTS.filter((c) => c.group === group);
+  const list = lists.find((c) => c.id === sub) ?? lists[0];
   const done = list ? list.items.filter((i) => checks[i.id]).length : 0;
 
   return (
     <div className="flex flex-col gap-3 pb-8">
-      <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklists">
-        {[...CHECKLISTS.map((c) => ({ id: c.id as SubTab, label: c.title })), { id: 'handoff' as SubTab, label: 'Handoff summary' }].map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={sub === t.id}
-            onClick={() => setSub(t.id)}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${sub === t.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`}
-          >
+      <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklist groups">
+        {GROUP_TABS.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={group === t.id} onClick={() => setGroup(t.id)} className={chipClass(group === t.id)}>
             {t.label}
           </button>
         ))}
       </div>
+      {lists.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklists">
+          {lists.map((c) => (
+            <button key={c.id} type="button" role="tab" aria-selected={list?.id === c.id} onClick={() => setSub(c.id)} className={chipClass(list?.id === c.id)}>
+              {c.title}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {sub === 'handoff' ? (
+      {group === 'handoff' ? (
         <HandoffForm />
       ) : (
         list && (
