@@ -19,7 +19,7 @@ export const GLP1_PROTOCOLS: Glp1ProtocolReference[] = [
     sourceId: 'asa-glp1-2023',
     drugRule: 'Consider holding daily GLP-1 on the day of the procedure and weekly GLP-1 for 1 week before, regardless of indication, dose or procedure.',
     fastingRule: 'No GLP-1-specific interval. Follow standard ASA fasting; treat urgent or emergent cases as full stomach.',
-    distinction: 'Precautionary withholding; the source notes there is no evidence for an optimal GLP-1 fasting duration.',
+    distinction: 'Superseded: the ASA page now points to the 2024 multisociety guidance, which ASA co-authored. Precautionary withholding; the source notes there is no evidence for an optimal GLP-1 fasting duration.',
   },
   {
     id: 'multisociety-glp1-2024',

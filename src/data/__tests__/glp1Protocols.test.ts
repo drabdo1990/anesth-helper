@@ -31,6 +31,7 @@ describe('GLP-1 protocol reference', () => {
       return `${p?.drugRule} ${p?.fastingRule}`;
     };
     expect(text('asa-glp1-2023')).toContain('hold');
+    expect(GLP1_PROTOCOLS[0].distinction).toContain('Superseded');
     expect(text('multisociety-glp1-2024')).toContain('Most patients continue');
     expect(text('spaqi-glp1-2025')).toContain('24 h');
     expect(text('uk-glp1-2025')).toContain('standard');
