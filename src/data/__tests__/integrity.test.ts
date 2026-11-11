@@ -30,8 +30,6 @@ describe('source registry', () => {
       'aagbi-2012',
       'aln-2025',
       'app-generic',
-      'asa-1986',
-      'asa-1994-nora',
       'asa-airway-2022',
       'clinical-cases-anesth',
       'dunn-2017',
