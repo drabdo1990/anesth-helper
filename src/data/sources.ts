@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.11-draft13';
+export const DATA_VERSION = '2026.11.11-draft14';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -42,7 +42,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['airway strategy', 'capnography confirmation', 'limit airway attempts', 'escalation', 'CICO'],
     verification: 'secondary',
     accessNote:
-      'Full guideline text not accessed in this build. Principles (oxygenation, capnography, limiting attempts, escalation) confirmed from APSF/commentary summaries. No numeric attempt limit is encoded.',
+      'Full guideline text not accessed in this build. Principles (oxygenation, capnography, limiting attempts, escalation) confirmed from APSF/commentary summaries. No numeric attempt limit is encoded. Audit 2026-11: no newer ASA edition found. The separate Difficult Airway Society 2025 guidelines (Br J Anaesth 2026;136:283-307, doi 10.1016/j.bja.2025.10.006) exist; only their abstract was read and they are not used here.',
   },
   {
     id: 'asra-last-2020',
@@ -56,7 +56,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['LAST lipid emulsion dosing', 'LAST management steps'],
     verification: 'secondary',
     accessNote:
-      'Primary text returned HTTP 403 in this build. Lipid dosing (100 mL bolus then 250 mL over 15-20 min for >70 kg; 12 mL/kg ceiling; repeat bolus / double infusion) is corroborated by UCSF and APSF summaries and by the project specification. Weight-based (<70 kg) figures come from the specification.',
+      'Primary text returned HTTP 403 in this build. Lipid dosing (100 mL bolus then 250 mL over 15-20 min for >70 kg; 12 mL/kg ceiling; repeat bolus / double infusion) is corroborated by UCSF and APSF summaries and by the project specification. Weight-based (<70 kg) figures come from the specification. Audit 2026-11: still the latest published checklist per a web search, which also reports that ASRA has a review in progress.',
   },
   {
     id: 'mhaus',
@@ -83,7 +83,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['MH recognition', 'dantrolene dosing'],
     verification: 'secondary',
     accessNote:
-      'EMHG page excerpt confirms the 2024 revision updated dantrolene dosing but did not show the figures. A secondary summary gives 2-2.5 mg/kg initial; NOT encoded because it could not be verified. Obtain the full text before relying on EMHG figures.',
+      'EMHG page excerpt confirms the 2024 revision updated dantrolene dosing but did not show the figures. A secondary summary gives 2-2.5 mg/kg initial; NOT encoded because it could not be verified. Obtain the full text before relying on EMHG figures. Audit 2026-11: v2024 is still the current crisis guideline per a web search.',
   },
   {
     id: 'ats-ards-2017',
@@ -210,7 +210,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['RSI doses studied: rocuronium 0.6-1.2 mg/kg, succinylcholine >= 1 mg/kg'],
     verification: 'secondary',
-    accessNote: 'Inclusion criteria read from search summaries.',
+    accessNote: 'Inclusion criteria read from search summaries. Audit 2026-11: pub3 (2015) is still listed as the current version.',
   },
   {
     id: 'samba-ponv-2020',
@@ -334,7 +334,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['neuraxial regimens (Tables 14-7, 14-8)', 'high-frequency ventilation, apneic threshold, laparoscopy CO2', 'facemask, OPA and portable airway kit', 'ASA monitoring and NORA summaries'],
     verification: 'secondary',
     accessNote:
-      'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit.',
+      'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit. Audit 2026-11: a 10th edition was published in 2024; it was not read, so these values remain from the 2005 edition.',
   },
   {
     id: 'oxford-handbook',
@@ -345,7 +345,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['neuraxial regimens', 'drug formulary tables 42.1 and 42.2'],
     verification: 'secondary',
-    accessNote: 'Transcribed from the project notebook. Edition and page numbers were not verified in this build.',
+    accessNote: 'Transcribed from the project notebook. Edition and page numbers were not verified in this build. Audit 2026-11: a 5th edition was published in 2022; it was not read.',
   },
 
   {
@@ -357,7 +357,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['pre-case two-bag test'],
     verification: 'secondary',
-    accessNote: 'Superseded by manufacturer checklists. Quoted from the project notebook; the original was not opened in this build.',
+    accessNote: 'Superseded by manufacturer checklists. Quoted from the project notebook; the original was not opened in this build. Audit 2026-11: the 1993 checkout was replaced by the ASA 2008 Recommendations for Pre-Anesthesia Checkout Procedures, which ask each department to build machine-specific procedures (per the APSF summary; the ASA text is not reproduced).',
   },
   {
     id: 'aagbi-2012',
@@ -369,7 +369,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 1,
     scope: ['pre-case equipment check, two-bag test'],
     verification: 'secondary',
-    accessNote: 'Quoted from the project notebook, which prints the volume as 66; the guideline itself was not opened in this build.',
+    accessNote: 'Quoted from the project notebook, which prints the volume as 66; the guideline itself was not opened in this build. Audit 2026-11: no successor edition was found in a web search; confirm on the Association of Anaesthetists guidelines page.',
   },
   {
     id: 'asa-1986',
@@ -506,7 +506,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 1,
     scope: ['peri-operative anaphylaxis epinephrine IV bolus and infusion'],
     verification: 'primary',
-    accessNote: 'Open PDF read by two readers. Adult card only (patients 12 years and over).',
+    accessNote: 'Open PDF read by two readers. Adult card only (patients 12 years and over). Audit 2026-11: no newer version found in a web search; the 2022 update followed a five-yearly review.',
   },
   {
     id: 'periop-anaphylaxis-card',
@@ -659,7 +659,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 1,
     scope: ['one-lung ventilation PEEP and FiO2'],
     verification: 'primary',
-    accessNote: 'Open PDF. Gives no respiratory rate, I:E ratio or plateau limit for one-lung ventilation.',
+    accessNote: 'Open PDF. Gives no respiratory rate, I:E ratio or plateau limit for one-lung ventilation. Audit 2026-11: no newer edition found in a web search.',
   },
   {
     id: 'who-ssi-2018',
@@ -736,7 +736,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['ventilator modes (VC, PC, PSV, SIMV), alarm triggers and circuit troubleshooting algorithms'],
     verification: 'secondary',
-    accessNote: 'Textbook reference on mechanical ventilator modes and troubleshooting.',
+    accessNote: 'Textbook reference on mechanical ventilator modes and troubleshooting. Audit 2026-11: a 10th edition was published in 2024; it was not read.',
   },
   {
     id: 'slinger-campos-dlt-2011',
@@ -918,7 +918,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 1,
     scope: ['elective cesarean fasting', 'oral intake during labor', 'obstetric aspiration prevention'],
     verification: 'primary',
-    accessNote: 'Official PDF excerpts reviewed. For uncomplicated elective cesarean delivery, moderate clear liquids may be allowed up to 2 h and solids should be fasted for 6-8 h depending on fat content.',
+    accessNote: 'Official PDF excerpts reviewed. For uncomplicated elective cesarean delivery, moderate clear liquids may be allowed up to 2 h and solids should be fasted for 6-8 h depending on fat content. Audit 2026-11: no newer edition found in a web search.',
   },
   {
     id: 'asa-labor-2022',
