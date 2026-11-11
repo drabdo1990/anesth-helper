@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.11-draft11';
+export const DATA_VERSION = '2026.11.11-draft12';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 

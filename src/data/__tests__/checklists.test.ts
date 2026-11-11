@@ -12,6 +12,14 @@ describe('checklists', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('offers checklists for airway, ventilation and regional topics', () => {
+    for (const group of ['Airway', 'Ventilation', 'Regional']) {
+      const lists = CHECKLISTS.filter((c) => c.group === group);
+      expect(lists.length, group).toBeGreaterThan(0);
+      for (const c of lists) expect(c.items.length, c.id).toBeGreaterThan(0);
+    }
+  });
+
   // Ticks are stored by item id, so a duplicate would tick two unrelated items at once.
   it('has item ids that are unique across checklists and emergency steps', () => {
     const ids = [
