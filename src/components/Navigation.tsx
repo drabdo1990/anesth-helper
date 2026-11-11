@@ -18,7 +18,7 @@ export const Navigation: React.FC = () => {
   const emergencyOpen = useAppStore((s) => s.emergencyOpen);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-clinical-border bg-clinical-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
+    <div className="fixed inset-x-0 bottom-0 z-50 transform-gpu border-t border-clinical-border bg-clinical-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
       {/* Permanent disclaimer: pinned directly above the nav so it is visible on every screen. */}
       <DisclaimerBanner />
       <nav aria-label="Main" className="mx-auto flex max-w-4xl items-stretch gap-1 px-1.5 py-1.5">
