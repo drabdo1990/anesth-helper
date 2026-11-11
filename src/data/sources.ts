@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.10.27-draft10';
+export const DATA_VERSION = '2026.11.11-draft11';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -97,7 +97,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['ARDS tidal volume 4-8 mL/kg PBW', 'plateau pressure < 30 cmH2O'],
     verification: 'secondary',
     accessNote:
-      'Recommendation (tidal volume 4-8 mL/kg PBW and plateau pressure below 30 cmH2O) confirmed from guideline summaries. The 6 mL/kg default and "<= 30" wording come from the project specification and the ARDSNet trial.',
+      'Recommendation (tidal volume 4-8 mL/kg PBW and plateau pressure below 30 cmH2O) confirmed from guideline summaries. The 6 mL/kg default and "<= 30" wording come from the project specification and the ARDSNet trial. Audit 2026-11: a 2024 ATS update exists (Qadir et al., Am J Respir Crit Care Med 2024;209:24-36, doi 10.1164/rccm.202311-2011ST; abstract read). It adds recommendations on corticosteroids, VV-ECMO, neuromuscular blockers and higher PEEP, and its abstract lists no new tidal-volume or plateau-pressure question.',
   },
   {
     id: 'cas-2025',
@@ -111,7 +111,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['cumulative local anesthetic dose documentation'],
     verification: 'secondary',
     accessNote:
-      'Only the 2023 edition wording (total cumulative local anesthetic dosage should be discussed and documented) was seen; not confirmed for 2025.',
+      'Only the 2023 edition wording (total cumulative local anesthetic dosage should be discussed and documented) was seen; not confirmed for 2025. Audit 2026-11: these guidelines are revised yearly and a Revised Edition 2026 is listed by the CAS (Can J Anesth vol 73 no 1); it was not read.',
   },
 
   // ---- Tier 2: drug references (product labels) ----
@@ -221,7 +221,7 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['PONV'],
     verification: 'secondary',
-    accessNote: 'Existence confirmed; dosing tables could not be retrieved, so no PONV doses are encoded.',
+    accessNote: 'Existence confirmed; dosing tables could not be retrieved, so no PONV doses are encoded. Audit 2026-11: superseded by the Fifth Consensus Guidelines (2025), registered here as ASER PONV 2025.',
   },
   {
     id: 'msd-peds-ett',
