@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Check, ClipboardCopy, RotateCcw } from 'lucide-react';
-import { CHECKLISTS, HANDOFF_OPTIONS } from '../data/checklists';
+import { CHECKLISTS, CHECKLIST_GROUPS, HANDOFF_OPTIONS } from '../data/checklists';
+import type { ChecklistGroup } from '../data/types';
+import { CICO_PLANS, LAST_STEPS, MH_STEPS } from '../data/emergencies';
 import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
 import { useAppStore } from '../store/useAppStore';
@@ -9,7 +11,66 @@ import { ChecklistItem } from '../components/ui/ChecklistItem';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { WarningBanner } from '../components/ui/WarningBanner';
 
-type SubTab = (typeof CHECKLISTS)[number]['id'] | 'handoff';
+type GroupTab = ChecklistGroup | 'handoff' | 'overview';
+
+// Counts of what the app contains, read from the data files. Nothing about usage is recorded or sent anywhere.
+const Overview: React.FC = () => {
+  const checks = useAppStore((s) => s.checks);
+  const sosSteps = LAST_STEPS.length + MH_STEPS.length + CICO_PLANS.reduce((n, p) => n + p.steps.length, 0);
+  const tiles = [
+    { label: 'Checklists', value: CHECKLISTS.length, sub: `${CHECKLISTS.reduce((n, c) => n + c.items.length, 0)} items` },
+    { label: 'SOS checklists', value: 3, sub: `${sosSteps} steps (LAST, MH, CICO)` },
+    { label: 'Forms', value: 1, sub: 'Handoff summary' },
+  ];
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        {tiles.map((t) => (
+          <div key={t.label} className="rounded-2xl border border-clinical-border-light bg-clinical-card p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t.label}</p>
+            <p className="font-mono text-3xl font-black text-cyan-200">{t.value}</p>
+            <p className="text-xs text-slate-400">{t.sub}</p>
+          </div>
+        ))}
+      </div>
+      <table className="w-full text-left text-sm text-slate-200">
+        <caption className="pb-1 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Checklists by group</caption>
+        <thead className="text-xs text-slate-400">
+          <tr>
+            <th scope="col" className="py-1">Group</th>
+            <th scope="col" className="py-1 text-right">Lists</th>
+            <th scope="col" className="py-1 text-right">Items</th>
+            <th scope="col" className="py-1 text-right">Ticked now</th>
+          </tr>
+        </thead>
+        <tbody className="font-mono">
+          {CHECKLIST_GROUPS.map((g) => {
+            const items = CHECKLISTS.filter((c) => c.group === g).flatMap((c) => c.items);
+            return (
+              <tr key={g} className="border-t border-clinical-border">
+                <th scope="row" className="py-2 font-sans font-bold">{g}</th>
+                <td className="py-2 text-right">{CHECKLISTS.filter((c) => c.group === g).length}</td>
+                <td className="py-2 text-right">{items.length}</td>
+                <td className="py-2 text-right">{items.filter((i) => checks[i.id]).length}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="text-xs text-slate-400">Totals are counted from the app&apos;s built-in content. No usage data is collected.</p>
+    </div>
+  );
+};
+
+// Groups with no lists yet are hidden.
+const GROUP_TABS: { id: GroupTab; label: string }[] = [
+  ...CHECKLIST_GROUPS.filter((g) => CHECKLISTS.some((c) => c.group === g)).map((g) => ({ id: g as GroupTab, label: g })),
+  { id: 'handoff', label: 'Handoff summary' },
+  { id: 'overview', label: 'Overview' },
+];
+
+const chipClass = (on: boolean): string =>
+  `min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`;
 
 const baseName = (name: string): string => name.split(' (')[0];
 const namesFor = (category: string): string[] => [...new Set(MEDICATIONS.filter((m) => m.category === category).map((m) => baseName(m.name)))];
@@ -139,32 +200,38 @@ const HandoffForm: React.FC = () => {
 };
 
 export const ChecklistsView: React.FC = () => {
-  const [sub, setSub] = useState<SubTab>('pre-induction');
+  const [group, setGroup] = useState<GroupTab>(GROUP_TABS[0].id);
+  const [sub, setSub] = useState<string>(CHECKLISTS[0].id);
   const checks = useAppStore((s) => s.checks);
   const toggle = useAppStore((s) => s.toggleCheck);
   const resetChecks = useAppStore((s) => s.resetChecks);
 
-  const list = CHECKLISTS.find((c) => c.id === sub);
+  const lists = CHECKLISTS.filter((c) => c.group === group);
+  const list = lists.find((c) => c.id === sub) ?? lists[0];
   const done = list ? list.items.filter((i) => checks[i.id]).length : 0;
 
   return (
     <div className="flex flex-col gap-3 pb-8">
-      <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklists">
-        {[...CHECKLISTS.map((c) => ({ id: c.id as SubTab, label: c.title })), { id: 'handoff' as SubTab, label: 'Handoff summary' }].map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={sub === t.id}
-            onClick={() => setSub(t.id)}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${sub === t.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`}
-          >
+      <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklist groups">
+        {GROUP_TABS.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={group === t.id} onClick={() => setGroup(t.id)} className={chipClass(group === t.id)}>
             {t.label}
           </button>
         ))}
       </div>
+      {lists.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklists">
+          {lists.map((c) => (
+            <button key={c.id} type="button" role="tab" aria-selected={list?.id === c.id} onClick={() => setSub(c.id)} className={chipClass(list?.id === c.id)}>
+              {c.title}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {sub === 'handoff' ? (
+      {group === 'overview' ? (
+        <Overview />
+      ) : group === 'handoff' ? (
         <HandoffForm />
       ) : (
         list && (

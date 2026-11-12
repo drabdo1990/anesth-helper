@@ -2,13 +2,18 @@
 // Replace or extend these with your institutional checklists (tag them 'local-protocol').
 // Items are anonymous: progress is stored without any patient data.
 
-import type { ChecklistRecord } from './types';
+import { QRH_CHECKLISTS } from './checklistsQrh';
+import type { ChecklistGroup, ChecklistRecord } from './types';
+
+/** Display order of the Lists-tab groups. */
+export const CHECKLIST_GROUPS: ChecklistGroup[] = ['Pre-op', 'Machine', 'Airway', 'Ventilation', 'Regional', 'Intra/post-op', 'Crises'];
 
 const generic = ['app-generic'];
 
 const BASE_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'pre-induction',
+    group: 'Pre-op',
     title: 'Pre-induction',
     items: [
       { id: 'pre-patient', text: 'Patient identity confirmed', sourceIds: generic },
@@ -29,6 +34,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'fasting-npo',
+    group: 'Pre-op',
     title: 'Fasting / NPO',
     note: 'Draft for clinician review. Times are minimum fasting intervals before anesthesia or sedation for healthy elective patients; special scenarios and local protocols change them. Avoid routine NPO after midnight. GLP-1 guidance conflicts: use one locally adopted protocol, not a mix.',
     items: [
@@ -151,6 +157,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'machine-check',
+    group: 'Machine',
     title: 'Anesthesia machine / breathing system',
     note: 'Use your institutional checklist. This is a generic structure only and contains no device-specific steps.',
     items: [
@@ -165,6 +172,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'intra-op',
+    group: 'Intra/post-op',
     title: 'Intraoperative safety prompts',
     items: [
       { id: 'intra-position', text: 'Positioning and pressure points', sourceIds: generic },
@@ -179,6 +187,7 @@ const BASE_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'emergence',
+    group: 'Intra/post-op',
     title: 'Emergence and extubation',
     items: [
       { id: 'em-reversal', text: 'Reversal given or blockade resolved', sourceIds: generic },
@@ -200,6 +209,7 @@ const NORA = ['asa-1994-nora', 'miller-6e'];
 const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   {
     id: 'two-bag-test',
+    group: 'Machine',
     title: 'Pre-case "two-bag" test (AAGBI 2012)',
     note: 'Do this after the breathing system, vaporisers and ventilator have been checked individually (Fundamentals of Anesthesia 4e, Ch 46, p. 905). Follow your institutional checklist for your machine.',
     items: [
@@ -210,6 +220,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'fda-ventilator-check',
+    group: 'Machine',
     title: 'Pre-case ventilator check (FDA 1993 excerpts)',
     note: 'Excerpts from the FDA 1993 apparatus checkout (step 12 ventilator test, step 13 monitors). The vaporizer interlock, fit, fill and leak item was transcribed earlier and was not located in the notebook text retrieved: confirm it against the full checkout. Follow your institutional checklist for your machine.',
     items: [
@@ -221,6 +232,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'asa-monitoring',
+    group: 'Intra/post-op',
     title: 'ASA basic monitoring standards',
     note: 'Transcribed from the project notebook (Miller 6e p. 2027).',
     items: [
@@ -233,6 +245,7 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
   {
     id: 'nora-mri',
+    group: 'Machine',
     title: 'Non-operating-room anesthesia (NORA / MRI)',
     note: 'Transcribed from the project notebook (Miller 6e p. 2025).',
     items: [
@@ -244,7 +257,102 @@ const NOTEBOOK_CHECKLISTS: ChecklistRecord[] = [
   },
 ];
 
-export const CHECKLISTS: ChecklistRecord[] = [...BASE_CHECKLISTS, ...NOTEBOOK_CHECKLISTS];
+// Checklists restating values the app already cites elsewhere (Airway, Vent and Dosing tabs). No new clinical value is introduced here.
+const VENT_GENERIC = ['app-generic', 'miller-vent-modes'];
+const LA_LIMITS = ['label-lidocaine', 'rosenberg-2004'];
+
+const CLINICAL_CHECKLISTS: ChecklistRecord[] = [
+  {
+    id: 'airway-plan',
+    group: 'Airway',
+    title: 'Airway management plan',
+    note: 'Principles from the ASA 2022 difficult airway guideline as already shown on the Airway tab. If oxygenation fails, open SOS > CICO for Plans A-D.',
+    items: [
+      { id: 'awp-sizes', text: 'Device sizes chosen and checked for this patient (Airway tab)', sourceIds: generic },
+      { id: 'awp-preox', text: 'Preoxygenate and keep supplemental oxygen going throughout airway management', sourceIds: ['asa-airway-2022'] },
+      { id: 'awp-capno', text: 'Confirm tracheal intubation with capnography', sourceIds: ['asa-airway-2022'] },
+      { id: 'awp-attempts', text: 'Limit repeated attempts at any one technique; track time and oxygen saturation', sourceIds: ['asa-airway-2022'] },
+      { id: 'awp-escalate', text: 'Escalate early when ventilation or oxygenation fails; do not delay invasive airway access when CICO is declared', sourceIds: ['asa-airway-2022'] },
+    ],
+  },
+  {
+    id: 'vent-lung-protective',
+    group: 'Ventilation',
+    title: 'Lung-protective setup',
+    note: 'Intraoperative settings from the 2019 international expert consensus. It recommends no respiratory rate, I:E ratio or mode. Use the Vent tab for the tidal volume in mL.',
+    items: [
+      { id: 'vlp-pbw', text: 'Tidal volume set from predicted body weight, never actual weight (Vent tab)', sourceIds: ['young-bja-2019'] },
+      { id: 'vlp-vt', text: 'Tidal volume 6-8 mL/kg predicted body weight', sourceIds: ['young-bja-2019'] },
+      { id: 'vlp-peep', text: 'PEEP started at 5 cmH2O or more, then individualized', sourceIds: ['young-bja-2019'] },
+      { id: 'vlp-fio2', text: 'FiO2 0.4 after intubation, then the lowest FiO2 that keeps SpO2 at 94% or higher', sourceIds: ['young-bja-2019'] },
+      { id: 'vlp-pressures', text: 'Plateau pressure below 30 cmH2O; driving pressure (plateau minus PEEP) below 14-15 cmH2O', sourceIds: ['young-bja-2019', 'esaic-periop-vent'] },
+    ],
+  },
+  {
+    id: 'vent-olv',
+    group: 'Ventilation',
+    title: 'One-lung ventilation',
+    note: 'From the ERAS/ESTS 2019 lung surgery guideline, which gives no respiratory rate, I:E ratio or plateau limit and notes that large trials of low tidal volume are lacking.',
+    items: [
+      { id: 'olv-fio2', text: 'FiO2 1.0 immediately before starting one-lung ventilation (speeds collapse of the non-ventilated lung)', sourceIds: ['eras-ests-lung-2019'] },
+      { id: 'olv-vt', text: 'Tidal volume lowered towards 4-6 mL/kg ideal body weight (described as likely less injurious than the traditional 10 mL/kg)', sourceIds: ['eras-ests-lung-2019'] },
+      { id: 'olv-peep', text: 'PEEP usually in the range of 5-10 cmH2O', sourceIds: ['eras-ests-lung-2019'] },
+    ],
+  },
+  {
+    id: 'vent-high-pressure',
+    group: 'Ventilation',
+    title: 'High airway pressure',
+    note: 'Generic troubleshooting prompts, as on the Vent tab. Treat the alarm as a real problem until excluded.',
+    items: [
+      { id: 'vhp-hand', text: 'Disconnect and hand-ventilate to separate a patient problem from a machine problem', sourceIds: VENT_GENERIC },
+      { id: 'vhp-tube', text: 'Tube position or kink, and secretions, checked', sourceIds: VENT_GENERIC },
+      { id: 'vhp-lungs', text: 'Bronchospasm and pneumothorax considered', sourceIds: VENT_GENERIC },
+      { id: 'vhp-external', text: 'Abdominal or positioning cause, and depth of block, considered', sourceIds: VENT_GENERIC },
+      { id: 'vhp-autopeep', text: 'Auto-PEEP: expiratory flow returns to zero; if not, allow longer expiration and disconnect briefly if unstable', sourceIds: VENT_GENERIC },
+    ],
+  },
+  {
+    id: 'vent-hypoxemia',
+    group: 'Ventilation',
+    title: 'Hypoxemia on the ventilator',
+    note: 'Generic troubleshooting prompts, as on the Vent tab.',
+    items: [
+      { id: 'vhx-o2', text: 'Give 100% oxygen and confirm ventilation (capnography waveform and chest movement)', sourceIds: VENT_GENERIC },
+      { id: 'vhx-tube', text: 'Tube position and the circuit checked before other causes', sourceIds: VENT_GENERIC },
+      { id: 'vhx-leak', text: 'Leak or disconnection excluded (cuff, circuit, mask); self-inflating bag available as backup', sourceIds: VENT_GENERIC },
+      { id: 'vhx-manual', text: 'No waveform or chest movement: start manual ventilation', sourceIds: VENT_GENERIC },
+    ],
+  },
+  {
+    id: 'regional-la-dose',
+    group: 'Regional',
+    title: 'Local anesthetic dose check',
+    note: 'Use Dosing > Local anesthetics for the maximum in mg for this patient. If toxicity is suspected, open SOS > LAST.',
+    items: [
+      { id: 'lad-max', text: 'Maximum dose worked out for this agent and weight, plain or with epinephrine, before drawing up', sourceIds: LA_LIMITS },
+      { id: 'lad-combined', text: 'More than one local anesthetic: the fractions of each maximum add up to less than 1.0', sourceIds: generic },
+      { id: 'lad-document', text: 'Total cumulative local anesthetic dose discussed with the team and documented', sourceIds: ['cas-2025'] },
+      { id: 'lad-lido-repeat', text: 'Lidocaine by continuous epidural or caudal: maximum dose not repeated at intervals under 90 minutes', sourceIds: ['label-lidocaine'] },
+      { id: 'lad-lipid', text: 'Location of the 20% lipid emulsion / LAST kit known', sourceIds: ['asra-last-2020'] },
+    ],
+  },
+  {
+    id: 'neuraxial-prep',
+    group: 'Regional',
+    title: 'Spinal / epidural preparation',
+    note: 'Generic structure only; follow your institutional neuraxial and anticoagulation policy. Reference regimens are for a 70 kg adult as printed and are never scaled by weight.',
+    items: [
+      { id: 'nxp-consent', text: 'Consent, indication and contraindications reviewed', sourceIds: generic },
+      { id: 'nxp-coag', text: 'Coagulation status and anticoagulant timing checked against local policy', sourceIds: generic },
+      { id: 'nxp-ready', text: 'IV access, monitoring, oxygen, suction and resuscitation drugs ready', sourceIds: generic },
+      { id: 'nxp-regimen', text: 'Agent, concentration, volume and baricity checked against a reference regimen (Dosing tab)', sourceIds: ['miller-6e'] },
+      { id: 'nxp-asepsis', text: 'Aseptic technique and drug labels confirmed', sourceIds: generic },
+    ],
+  },
+];
+
+export const CHECKLISTS: ChecklistRecord[] = [...BASE_CHECKLISTS, ...NOTEBOOK_CHECKLISTS, ...CLINICAL_CHECKLISTS, ...QRH_CHECKLISTS];
 
 /** Selectable options for the handoff generator. These are categories, not clinical values. */
 export const HANDOFF_OPTIONS = {
