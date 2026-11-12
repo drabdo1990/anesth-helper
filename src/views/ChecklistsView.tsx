@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Check, ClipboardCopy, RotateCcw } from 'lucide-react';
 import { CHECKLISTS, CHECKLIST_GROUPS, HANDOFF_OPTIONS } from '../data/checklists';
 import type { ChecklistGroup } from '../data/types';
+import { CICO_PLANS, LAST_STEPS, MH_STEPS } from '../data/emergencies';
 import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
 import { useAppStore } from '../store/useAppStore';
@@ -10,12 +11,62 @@ import { ChecklistItem } from '../components/ui/ChecklistItem';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { WarningBanner } from '../components/ui/WarningBanner';
 
-type GroupTab = ChecklistGroup | 'handoff';
+type GroupTab = ChecklistGroup | 'handoff' | 'overview';
+
+// Counts of what the app contains, read from the data files. Nothing about usage is recorded or sent anywhere.
+const Overview: React.FC = () => {
+  const checks = useAppStore((s) => s.checks);
+  const sosSteps = LAST_STEPS.length + MH_STEPS.length + CICO_PLANS.reduce((n, p) => n + p.steps.length, 0);
+  const tiles = [
+    { label: 'Checklists', value: CHECKLISTS.length, sub: `${CHECKLISTS.reduce((n, c) => n + c.items.length, 0)} items` },
+    { label: 'SOS checklists', value: 3, sub: `${sosSteps} steps (LAST, MH, CICO)` },
+    { label: 'Forms', value: 1, sub: 'Handoff summary' },
+  ];
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        {tiles.map((t) => (
+          <div key={t.label} className="rounded-2xl border border-clinical-border-light bg-clinical-card p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t.label}</p>
+            <p className="font-mono text-3xl font-black text-cyan-200">{t.value}</p>
+            <p className="text-xs text-slate-400">{t.sub}</p>
+          </div>
+        ))}
+      </div>
+      <table className="w-full text-left text-sm text-slate-200">
+        <caption className="pb-1 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Checklists by group</caption>
+        <thead className="text-xs text-slate-400">
+          <tr>
+            <th scope="col" className="py-1">Group</th>
+            <th scope="col" className="py-1 text-right">Lists</th>
+            <th scope="col" className="py-1 text-right">Items</th>
+            <th scope="col" className="py-1 text-right">Ticked now</th>
+          </tr>
+        </thead>
+        <tbody className="font-mono">
+          {CHECKLIST_GROUPS.map((g) => {
+            const items = CHECKLISTS.filter((c) => c.group === g).flatMap((c) => c.items);
+            return (
+              <tr key={g} className="border-t border-clinical-border">
+                <th scope="row" className="py-2 font-sans font-bold">{g}</th>
+                <td className="py-2 text-right">{CHECKLISTS.filter((c) => c.group === g).length}</td>
+                <td className="py-2 text-right">{items.length}</td>
+                <td className="py-2 text-right">{items.filter((i) => checks[i.id]).length}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="text-xs text-slate-400">Totals are counted from the app&apos;s built-in content. No usage data is collected.</p>
+    </div>
+  );
+};
 
 // Groups with no lists yet are hidden.
 const GROUP_TABS: { id: GroupTab; label: string }[] = [
   ...CHECKLIST_GROUPS.filter((g) => CHECKLISTS.some((c) => c.group === g)).map((g) => ({ id: g as GroupTab, label: g })),
   { id: 'handoff', label: 'Handoff summary' },
+  { id: 'overview', label: 'Overview' },
 ];
 
 const chipClass = (on: boolean): string =>
@@ -178,7 +229,9 @@ export const ChecklistsView: React.FC = () => {
         </div>
       )}
 
-      {group === 'handoff' ? (
+      {group === 'overview' ? (
+        <Overview />
+      ) : group === 'handoff' ? (
         <HandoffForm />
       ) : (
         list && (
