@@ -9,6 +9,7 @@ import { CHECKLISTS } from './checklists';
 import { GLP1_PROTOCOLS } from './glp1Protocols';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { REFERENCE_DRUGS } from './referenceDrugs';
+import { RISK_SCORES } from './riskScores';
 import { SOURCES } from './sources';
 
 const range = (min: number | undefined, max: number | undefined, def: number | undefined): string => {
@@ -27,6 +28,7 @@ const PRINCIPLE_SOURCES: Record<string, string[]> = {
   // Negative findings: the label was read and contains no usable value, so none is encoded.
   'label-dexamethasone': ['Label has no PONV indication or dose: no dexamethasone PONV dose is encoded (shown as "No high-quality source value specified")'],
   'label-mepivacaine': ['Label lists volumes by procedure and gives no mg or mg/kg maximum: the mepivacaine maximum comes from Rosenberg 2004 instead'],
+  'cockcroft-gault-1976': ['Creatinine clearance (mL/min) = (140 - age) x actual weight (kg) / (72 x serum creatinine in mg/dL), x 0.85 for women; adults only (shown in the Pre-op Assess section)'],
 };
 
 export const derivedValuesBySource = (): Record<string, string[]> => {
@@ -88,10 +90,29 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
   for (const p of GLP1_PROTOCOLS) add([p.sourceId], `GLP-1 protocol ${p.label}: ${p.drugRule} Fasting: ${p.fastingRule}`);
   for (const s of [...LAST_STEPS, ...MH_STEPS, ...CICO_PLANS.flatMap((p) => p.steps)]) add(s.sourceIds, `Emergency step: ${s.text}`);
 
+  for (const s of RISK_SCORES) {
+    add(s.sourceIds, `Risk score ${s.name}: ${s.items.length} items; bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
+  }
+
   for (const [id, lines] of Object.entries(PRINCIPLE_SOURCES)) for (const l of lines) out[id]?.push(l);
 
   return out;
 };
 
 /** Sources that intentionally have no derived value (kept for traceability or future local data). */
-export const SOURCES_WITHOUT_DERIVED_VALUES = ['local-protocol', 'project-notebook', 'samba-ponv-2020'];
+export const SOURCES_WITHOUT_DERIVED_VALUES = [
+  'local-protocol',
+  'project-notebook',
+  'samba-ponv-2020',
+  // Registered ahead of the perioperative guide records (spec 2026-11-17); remove each id once a record cites it.
+  'dasi-hlatky-1989',
+  'ariscat-canet-2010',
+  'cfs-rockwood-2005',
+  'apfel-1999',
+  'aldrete-1995',
+  'padss-chung-1995',
+  '4at-bellelli-2014',
+  'aha-acc-periop-2024',
+  'esc-ncs-2022',
+  'asra-anticoag-2025',
+];

@@ -17,7 +17,7 @@ describe('migratePersisted (upgrade from the previous app version)', () => {
     const json = JSON.stringify(next);
     expect(json).not.toMatch(/tbwKg|heightCm|patient|localAdmins|bupivacaine|selectedTiers|disclaimer/i);
     expect(Object.keys(next).sort()).toEqual(
-      ['audioEnabled', 'checks', 'concentrationChoice', 'guidelineSet', 'mhContact', 'preferredScalar', 'recents', 'ventScenarioId'].sort(),
+      ['audioEnabled', 'checks', 'concentrationChoice', 'creatinineUnit', 'guidelineSet', 'mhContact', 'preferredScalar', 'recents', 'ventScenarioId'].sort(),
     );
   });
 
@@ -48,5 +48,11 @@ describe('migratePersisted (upgrade from the previous app version)', () => {
     const next = migratePersisted(garbage);
     expect(next.guidelineSet).toBe('international');
     expect(next.checks).toEqual({});
+  });
+
+  it('keeps a valid creatinine unit and defaults an invalid one to mg/dL', () => {
+    expect(migratePersisted({ creatinineUnit: 'umol' }).creatinineUnit).toBe('umol');
+    expect(migratePersisted({ creatinineUnit: 'bogus' }).creatinineUnit).toBe('mgdl');
+    expect(migratePersisted(undefined).creatinineUnit).toBe('mgdl');
   });
 });
