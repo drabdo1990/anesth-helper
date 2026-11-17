@@ -94,4 +94,21 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
 };
 
 /** Sources that intentionally have no derived value (kept for traceability or future local data). */
-export const SOURCES_WITHOUT_DERIVED_VALUES = ['local-protocol', 'project-notebook', 'samba-ponv-2020'];
+export const SOURCES_WITHOUT_DERIVED_VALUES = [
+  'local-protocol',
+  'project-notebook',
+  'samba-ponv-2020',
+  // Registered ahead of the perioperative guide records (spec 2026-11-17); remove each id once a record cites it.
+  'rcri-lee-1999',
+  'dasi-hlatky-1989',
+  'stop-chung-2008',
+  'ariscat-canet-2010',
+  'cfs-rockwood-2005',
+  'apfel-1999',
+  'aldrete-1995',
+  'padss-chung-1995',
+  '4at-bellelli-2014',
+  'aha-acc-periop-2024',
+  'esc-ncs-2022',
+  'asra-anticoag-2025',
+];

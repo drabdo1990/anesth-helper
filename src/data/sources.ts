@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.11-draft14';
+export const DATA_VERSION = '2026.11.17-draft15';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1082,6 +1082,176 @@ export const SOURCES: ClinicalSource[] = [
     verification: 'secondary',
     accessNote:
       'Non-numeric prompts written for this app from general practice. Not taken from a named guideline: requires clinician review before use.',
+  },
+
+  // ---- Perioperative guide (docs/superpowers/specs/2026-11-17-perioperative-guide-design.md) ----
+  // Registered 2026-11-17, ahead of the records that will cite them. Citations confirmed by web search
+  // (PubMed or publisher page); the full texts were not opened. Thresholds in accessNote are the spec's
+  // working values and must be checked against the full text before any record encodes them.
+  {
+    id: 'rcri-lee-1999',
+    tag: 'RCRI 1999',
+    name: 'Derivation and prospective validation of a simple index for prediction of cardiac risk of major noncardiac surgery',
+    publisher: 'Lee TH et al.',
+    year: '1999',
+    version: 'Circulation 1999;100:1043-1049, doi 10.1161/01.cir.100.10.1043',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/10477528/',
+    tier: 3,
+    scope: ['Revised Cardiac Risk Index: six predictors', 'RCRI bands 0 / 1 / 2 / >=3'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract and secondary summaries read; full text not opened. Six predictors: high-risk surgery, ischemic heart disease, heart failure, cerebrovascular disease, insulin treatment, creatinine > 2.0 mg/dL. Event rates by 0/1/2/>=3 factors differ between derivation and validation cohorts.',
+  },
+  {
+    id: 'dasi-hlatky-1989',
+    tag: 'DASI 1989',
+    name: 'A brief self-administered questionnaire to determine functional capacity (the Duke Activity Status Index)',
+    publisher: 'Hlatky MA et al.',
+    year: '1989',
+    version: 'Am J Cardiol 1989;64:651-654, doi 10.1016/0002-9149(89)90496-7',
+    url: 'https://doi.org/10.1016/0002-9149(89)90496-7',
+    tier: 3,
+    scope: ['functional capacity: Duke Activity Status Index (12 items)'],
+    verification: 'secondary',
+    accessNote: 'Citation and abstract summary read; full text not opened. Item weights and any METs cut-off must be taken from the full text.',
+  },
+  {
+    id: 'stop-chung-2008',
+    tag: 'STOP 2008',
+    name: 'STOP questionnaire: a tool to screen patients for obstructive sleep apnea',
+    publisher: 'Chung F et al.',
+    year: '2008',
+    version: 'Anesthesiology 2008;108:812-821, doi 10.1097/ALN.0b013e31816d83e4',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/18431116/',
+    tier: 3,
+    scope: ['STOP-Bang OSA screening (8 items)', 'risk bands 0-2 low / 3-4 intermediate / 5-8 high'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract read; full text not opened. The paper adds BMI, age, neck circumference and gender to STOP. The 3/5 band cut-offs come from later STOP-Bang work and must be sourced before encoding.',
+  },
+  {
+    id: 'ariscat-canet-2010',
+    tag: 'ARISCAT 2010',
+    name: 'Prediction of postoperative pulmonary complications in a population-based surgical cohort (ARISCAT)',
+    publisher: 'Canet J et al., ARISCAT Group',
+    year: '2010',
+    version: 'Anesthesiology 2010;113:1338-1350, doi 10.1097/ALN.0b013e3181fc6e0a',
+    url: 'https://doi.org/10.1097/ALN.0b013e3181fc6e0a',
+    tier: 3,
+    scope: ['postoperative pulmonary complication risk: seven predictors', 'bands <26 low / 26-44 intermediate / >=45 high'],
+    verification: 'secondary',
+    accessNote: 'Citation and summaries read; full text not opened. Point weights and band cut-offs must be checked against the paper before encoding.',
+  },
+  {
+    id: 'cfs-rockwood-2005',
+    tag: 'CFS 2005',
+    name: 'A global clinical measure of fitness and frailty in elderly people (Clinical Frailty Scale)',
+    publisher: 'Rockwood K et al.',
+    year: '2005',
+    version: 'CMAJ 2005;173:489-495, doi 10.1503/cmaj.050051',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/1188185',
+    tier: 3,
+    scope: ['Clinical Frailty Scale', 'frail at CFS >= 5 (working threshold)'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract read; full text open on PMC but not read. This paper describes the original 7-point scale; the current 9-point CFS 2.0 and the >=5 frailty threshold come from later work and need their own source.',
+  },
+  {
+    id: 'apfel-1999',
+    tag: 'Apfel 1999',
+    name: 'A simplified risk score for predicting postoperative nausea and vomiting: conclusions from cross-validations between two centers',
+    publisher: 'Apfel CC et al.',
+    year: '1999',
+    version: 'Anesthesiology 1999;91:693-700, doi 10.1097/00000542-199909000-00022',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/10485781/',
+    tier: 3,
+    scope: ['Apfel simplified PONV risk score: four predictors (0-4)'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract read; full text not opened. Predictors: female sex, history of motion sickness or PONV, non-smoker, postoperative opioids. Risk per score and prophylaxis advice must come from the ASER PONV 2025 consensus, not this paper.',
+  },
+  {
+    id: 'aldrete-1995',
+    tag: 'Aldrete 1995',
+    name: 'The post-anesthesia recovery score revisited (modified Aldrete score)',
+    publisher: 'Aldrete JA',
+    year: '1995',
+    version: 'J Clin Anesth 1995;7:89-91, doi 10.1016/0952-8180(94)00001-k',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/7772368/',
+    tier: 3,
+    scope: ['modified Aldrete PACU recovery score (SpO2 replaces colour)', 'discharge at >= 9 (working threshold)'],
+    verification: 'secondary',
+    accessNote: 'Letter; PubMed record read, text not opened. The >= 9 discharge threshold must be confirmed in the text before encoding.',
+  },
+  {
+    id: 'padss-chung-1995',
+    tag: 'PADSS 1995',
+    name: 'A Post-Anesthetic Discharge Scoring System for home readiness after ambulatory surgery',
+    publisher: 'Chung F, Chan VWS, Ong D',
+    year: '1995',
+    version: 'J Clin Anesth 1995;7:500-506, doi 10.1016/0952-8180(95)00130-A',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/8534468/',
+    tier: 3,
+    scope: ['PADSS home-readiness score after ambulatory surgery', 'discharge at >= 9 (working threshold)'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract read; full text paywalled. A separate Chung paper, "Discharge criteria - a new trend" (Can J Anaesth 1995;42:1056-8), covers the modified PADSS and is not registered here.',
+  },
+  {
+    id: '4at-bellelli-2014',
+    tag: '4AT 2014',
+    name: 'Validation of the 4AT, a new instrument for rapid delirium screening: a study in 234 hospitalised older people',
+    publisher: 'Bellelli G et al.',
+    year: '2014',
+    version: 'Age Ageing 2014;43:496-502, doi 10.1093/ageing/afu021 (corrigendum doi 10.1093/ageing/afu181)',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/4066613/',
+    tier: 3,
+    scope: ['4AT delirium screen', 'possible delirium at >= 4 (working threshold)'],
+    verification: 'secondary',
+    accessNote:
+      'Abstract read; full text open on PMC but not read. Validated in hospitalised adults aged >= 70, not specifically after surgery. A 2015 corrigendum fixes Table 1.',
+  },
+  {
+    id: 'aha-acc-periop-2024',
+    tag: 'AHA/ACC 2024',
+    name: '2024 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery',
+    publisher: 'American Heart Association / American College of Cardiology (Thompson A et al.)',
+    year: '2024',
+    version: 'Circulation 2024;150:e351-e442, doi 10.1161/CIR.0000000000001285; JACC doi 10.1016/j.jacc.2024.06.013',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/39316661/',
+    tier: 1,
+    scope: ['perioperative cardiovascular risk assessment', 'perioperative cardiac medications', 'SGLT2 inhibitor hold before surgery'],
+    verification: 'secondary',
+    accessNote:
+      'Citation and AHA "Top things to know" summary read; full text not opened. Summary states SGLT2 inhibitors are stopped 3-4 days before surgery. Supersedes the 2014 ACC/AHA guideline. An AHA web page with a 2026 date was seen in search; check whether a newer edition exists.',
+  },
+  {
+    id: 'esc-ncs-2022',
+    tag: 'ESC 2022',
+    name: '2022 ESC Guidelines on cardiovascular assessment and management of patients undergoing non-cardiac surgery',
+    publisher: 'European Society of Cardiology (Halvorsen S et al.), endorsed by ESAIC',
+    year: '2022',
+    version: 'Eur Heart J 2022;43:3826-3924, doi 10.1093/eurheartj/ehac270',
+    url: 'https://doi.org/10.1093/eurheartj/ehac270',
+    tier: 1,
+    scope: ['pre-operative cardiac assessment by surgical risk', 'functional capacity assessment', 'perioperative cardiac medications'],
+    verification: 'secondary',
+    accessNote:
+      'Citation, ESC press release and ACC key-points summary read; full text not opened. Summaries state no cardiac testing before low-risk surgery and functional capacity assessment for intermediate- and high-risk surgery (Class IIa).',
+  },
+  {
+    id: 'asra-anticoag-2025',
+    tag: 'ASRA 2025',
+    name: 'Regional anesthesia in the patient receiving antithrombotic or thrombolytic therapy: ASRA Pain Medicine evidence-based guidelines (fifth edition)',
+    publisher: 'American Society of Regional Anesthesia and Pain Medicine',
+    year: '2025',
+    version: 'Reg Anesth Pain Med 2025 (fifth edition)',
+    url: 'https://asra.com/guidelines-articles/guidelines/guideline-item/guidelines/2025/01/31/regional-anesthesia-in-the-patient-receiving-antithrombotic-or-thrombolytic-therapy-american-society-of-regional-anesthesia-and-pain-medicine-evidence-based-guidelines-(fifth-edition)',
+    tier: 1,
+    scope: ['neuraxial and deep block timing with anticoagulants and antiplatelets', 'DOAC interruption intervals'],
+    verification: 'secondary',
+    accessNote:
+      'ASRA announcement (2025-01-31) and ESRA newsletter summaries read; full text not opened. Moves from "prophylactic/therapeutic" to "low/high dose" terms. A search summary gave doi 10.1136/rapm-2024-105766, not confirmed. No interval is encoded until the full text is read.',
   },
 ];
 
