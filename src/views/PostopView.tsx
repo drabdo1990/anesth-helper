@@ -1,5 +1,5 @@
 import React from 'react';
-import { FOUR_AT } from '../data/choiceScores';
+import { FOUR_AT, MODIFIED_ALDRETE, PADSS } from '../data/choiceScores';
 import { PONV_PLAN } from '../data/ponvPlan';
 import { POSTOP_SCORES } from '../data/riskScores';
 import { calculateBmi } from '../lib/calc/biometrics';
@@ -11,7 +11,7 @@ import { ScorePanel } from '../components/ScorePanel';
 const linkBtn =
   'min-h-[48px] rounded-xl border border-clinical-border-light bg-clinical-card px-3 text-sm font-bold text-slate-200 touch-manipulation';
 
-/** Post-op tools: PONV risk and what the 2025 consensus advises, and the 4AT delirium screen. All inputs live in memory only. */
+/** Post-op tools: PONV risk and what the 2025 consensus advises, the PACU discharge scores and the 4AT delirium screen. All inputs live in memory only. */
 export const PostopView: React.FC = () => {
   const patient = useAppStore((s) => s.patient);
   const answers = useAppStore((s) => s.scoreAnswers);
@@ -52,6 +52,8 @@ export const PostopView: React.FC = () => {
         )}
       </Panel>
 
+      <ChoiceScorePanel score={MODIFIED_ALDRETE} answers={choiceAnswers} onAnswer={setChoice} />
+      <ChoiceScorePanel score={PADSS} answers={choiceAnswers} onAnswer={setChoice} />
       <ChoiceScorePanel score={FOUR_AT} answers={choiceAnswers} onAnswer={setChoice} />
     </div>
   );
