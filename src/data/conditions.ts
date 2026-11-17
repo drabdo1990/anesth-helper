@@ -49,7 +49,14 @@ export const STOELTING_CHAPTERS: Record<number, string> = {
 export const PROJECT_NOTEBOOK_URL = 'https://notebooklm.google.com/notebook/1ce36864-79d5-4dbc-b3fa-51b63c6a401f';
 
 /** Conditions with a written plan. Task 2 of the conditions plan fills these in. */
-export const PLANNED_CONDITION_IDS: string[] = [];
+export const PLANNED_CONDITION_IDS = [
+  'mh-susceptibility',
+  'acute-porphyria',
+  'myasthenia-gravis',
+  'myotonic-dystrophy',
+  'pheochromocytoma',
+  'carcinoid-syndrome',
+];
 
 const entry = (id: string, name: string, chapter: number, aliases: string[] = []): ConditionRecord => ({
   id,
@@ -98,8 +105,67 @@ export const CONDITIONS: ConditionRecord[] = [
   entry('crigler-najjar', 'Crigler-Najjar syndrome', 16),
   entry('achalasia', 'Achalasia', 17),
   entry('zollinger-ellison', 'Zollinger-Ellison syndrome', 17, ['gastrinoma']),
-  entry('carcinoid-syndrome', 'Carcinoid syndrome', 17, ['carcinoid tumor', 'carcinoid crisis', 'neuroendocrine tumor']),
-  entry('acute-porphyria', 'Acute porphyrias', 18, ['porphyria', 'acute intermittent porphyria', 'aip', 'variegate porphyria', 'hereditary coproporphyria']),
+  {
+    id: 'carcinoid-syndrome',
+    name: 'Carcinoid syndrome',
+    aliases: ['carcinoid tumor', 'carcinoid crisis', 'neuroendocrine tumor'],
+    chapter: 17,
+    plan: {
+      preop: [
+        'Give octreotide 24 to 48 hours before surgery and continue it through the procedure: somatostatin analogues can prevent a carcinoid crisis.',
+        'Look for right-sided heart disease (fibrosis of the tricuspid and pulmonary valves), dehydration and electrolyte loss from diarrhea, and wheezing.',
+      ],
+      intraop: [
+        'Use invasive arterial pressure monitoring: blood pressure can change rapidly.',
+        'Give octreotide again before the tumor is handled; it attenuates most adverse hemodynamic responses.',
+        'Carcinoid crisis: intense flushing, diarrhea, tachycardia, and hypertension or hypotension, sometimes with bronchospasm.',
+        'Bronchospasm is often resistant to treatment, and beta agonists can worsen it through mediator release; octreotide and antihistamines with ipratropium have been used.',
+        'Drugs not known to release mediators: propofol, etomidate, vecuronium, cisatracurium, rocuronium, fentanyl, sufentanil, alfentanil, remifentanil and all inhalation agents (desflurane may suit liver metastases).',
+        'Epidural analgesia is safe after adequate octreotide treatment if the local anesthetic is given gradually with careful hemodynamic monitoring.',
+      ],
+      avoid: [
+        'Histamine-releasing drugs.',
+        'Drugs that may provoke mediator release: succinylcholine, mivacurium, atracurium, epinephrine, norepinephrine, dopamine, isoproterenol and thiopental.',
+      ],
+      postop: [
+        'Delayed awakening has been described; plan ICU monitoring when needed.',
+        'Symptoms can persist after palliative surgery or with metastases.',
+        'Ondansetron is a good antiemetic for these patients.',
+      ],
+    },
+    sourceIds: ['stoelting-8e'],
+  },
+  {
+    id: 'acute-porphyria',
+    name: 'Acute porphyrias',
+    aliases: ['porphyria', 'acute intermittent porphyria', 'aip', 'variegate porphyria', 'hereditary coproporphyria'],
+    chapter: 18,
+    plan: {
+      preop: [
+        'Ask about family history: a silent porphyria can present for the first time after a triggering drug.',
+        'Examine and record any neuropathy and autonomic instability, especially before a regional block.',
+        'Keep fasting short; if a long fast is unavoidable, give a glucose-containing infusion, because caloric restriction can precipitate an attack.',
+        'Decide before surgery which drug in each class you may need (antibiotics, antihypertensives, antiarrhythmics and others) is safe. The American Porphyria Foundation keeps a drug database.',
+      ],
+      intraop: [
+        'Regional anesthesia is not contraindicated, and no local anesthetic is known to have triggered an attack; watch for hypotension with autonomic neuropathy or hypovolemia.',
+        'Propofol is well tolerated for induction. Nitrous oxide, isoflurane, sevoflurane and desflurane are considered safe, as are most IV opioids, depolarizing and nondepolarizing relaxants and their reversal drugs.',
+        'Benzodiazepines, proton pump inhibitors and H2 blockers can be used before surgery.',
+        'Expect blood pressure lability from autonomic dysfunction.',
+        'Several possible triggers together are more dangerous than any single drug.',
+      ],
+      avoid: [
+        'Barbiturates (thiopental, methohexital), etomidate and ketamine.',
+        'Ketorolac, amiodarone and many calcium channel blockers (check each one before giving it).',
+      ],
+      postop: [
+        'If an attack is suspected, watch skeletal muscle strength and cranial nerve function: weakness warns of respiratory failure and aspiration. Postoperative ventilation is rarely needed.',
+        'Ondansetron or scopolamine for PONV; codeine, oxycodone, hydrocodone, acetaminophen and many NSAIDs for pain. Tramadol has insufficient evidence.',
+        'Treating a crisis: remove triggers, hydrate, give carbohydrate, correct electrolytes including magnesium, and give IV heme early in a severe attack.',
+      ],
+    },
+    sourceIds: ['stoelting-8e'],
+  },
   entry('lesch-nyhan', 'Lesch-Nyhan syndrome', 18),
   entry('hemochromatosis', 'Hemochromatosis', 18, ['haemochromatosis']),
   entry('wilson-disease', 'Wilson disease', 18, ['hepatolenticular degeneration']),
@@ -109,7 +175,38 @@ export const CONDITIONS: ConditionRecord[] = [
   entry('bartter-gitelman', 'Bartter and Gitelman syndromes', 21, ['bartter syndrome', 'gitelman syndrome']),
   entry('fanconi-syndrome', 'Fanconi syndrome', 21),
   // Endocrine
-  entry('pheochromocytoma', 'Pheochromocytoma', 22, ['phaeochromocytoma', 'pheo', 'catecholamine-secreting tumor']),
+  {
+    id: 'pheochromocytoma',
+    name: 'Pheochromocytoma',
+    aliases: ['phaeochromocytoma', 'pheo', 'catecholamine-secreting tumor'],
+    chapter: 22,
+    plan: {
+      preop: [
+        'Start alpha blockade first (phenoxybenzamine most often; prazosin or doxazosin are alternatives). Aim for normal blood pressure, relief of symptoms and resolution of ST-T changes and arrhythmias. The best duration is unknown: 3 days to 2 weeks or longer.',
+        'Add a beta blocker only after alpha blockade, for heart rate above 120 or arrhythmias.',
+        'Phenoxybenzamine has been stopped 24 to 48 hours before surgery to avoid vascular unresponsiveness after the tumor is removed.',
+        'Correct hypovolemia. A calcium channel blocker or metyrosine can be added in resistant cases.',
+      ],
+      intraop: [
+        'Place an arterial line before induction. A central venous line is usually enough; a PA catheter or TEE helps with very active tumors or cardiac involvement.',
+        'Expect systolic pressure above 200 mmHg during pneumoperitoneum and tumor handling even after alpha blockade. Have nitroprusside (the agent of choice), phentolamine, nitroglycerin, labetalol, esmolol and magnesium ready.',
+        'Expect hypotension after the tumor veins are ligated: a large positive fluid balance and vasopressors are usually needed, and the response to vasopressors may be blunted. Lightening anesthesia helps.',
+        'Treat ventricular arrhythmias with lidocaine or a beta blocker such as esmolol.',
+        'Minimize fear, stress, pain, shivering, hypoxia and hypercarbia: all release catecholamines.',
+      ],
+      avoid: [
+        'A nonselective beta blocker before alpha blockade: unopposed alpha vasoconstriction can cause a hypertensive crisis.',
+        'Histamine releasers (morphine, atracurium).',
+        'Vagolytic or sympathomimetic drugs: atropine, ketamine, pancuronium, succinylcholine.',
+      ],
+      postop: [
+        'Check blood glucose: insulin rises after resection and hypoglycemia can occur.',
+        'Give glucocorticoids after bilateral adrenalectomy or when hypoadrenalism is possible.',
+        'About half of patients stay hypertensive for several days, because catecholamines take 7 to 10 days to normalize. If hypertension persists, consider a missed tumor, renal ischemia or essential hypertension.',
+      ],
+    },
+    sourceIds: ['stoelting-8e'],
+  },
   entry('insulinoma', 'Insulinoma', 22),
   entry('cushing', 'Cushing syndrome (hypercortisolism)', 22, ['hypercortisolism', 'cushing disease']),
   entry('conn', 'Primary hyperaldosteronism (Conn syndrome)', 22, ['conn syndrome', 'hyperaldosteronism']),
@@ -139,7 +236,34 @@ export const CONDITIONS: ConditionRecord[] = [
   entry('fshd', 'Facioscapulohumeral muscular dystrophy', 24, ['fshd']),
   entry('oculopharyngeal', 'Oculopharyngeal dystrophy', 24),
   entry('emery-dreifuss', 'Emery-Dreifuss muscular dystrophy', 24),
-  entry('myotonic-dystrophy', 'Myotonic dystrophy', 24, ['myotonia dystrophica', 'dystrophia myotonica', 'steinert disease', 'dm1']),
+  {
+    id: 'myotonic-dystrophy',
+    name: 'Myotonic dystrophy',
+    aliases: ['myotonia dystrophica', 'dystrophia myotonica', 'steinert disease', 'dm1'],
+    chapter: 24,
+    plan: {
+      preop: [
+        'Look for cardiomyopathy and conduction disease: first-degree heart block is common, and complete heart block can cause sudden death.',
+        'Assess respiratory muscle weakness. Pharyngeal and chest wall weakness raise aspiration risk; central sleep apnea and hypersomnolence add to sensitivity to sedatives.',
+        'Many patients reach surgery with the myotonia unrecognized.',
+      ],
+      intraop: [
+        'Keep the patient warm and prevent shivering: cold and shivering trigger myotonia.',
+        'TIVA may be preferable to volatile agents, which can aggravate cardiomyopathy and conduction problems. Expect increased sensitivity to propofol, opioids and benzodiazepines.',
+        'The response to nondepolarizing relaxants is normal, but existing weakness may make them unnecessary, which also avoids neostigmine.',
+        'Myotonic contraction from surgical handling or diathermy is not relieved by relaxants or general or regional anesthesia; local anesthetic infiltration of the muscle, phenytoin, quinine or procainamide may help (quinine and procainamide can worsen conduction).',
+        'Epidural anesthesia is considered safe.',
+      ],
+      avoid: [
+        'Succinylcholine: it can cause prolonged myotonia that relaxants and anesthesia cannot reverse.',
+        'Other myotonia triggers: methohexital, etomidate, neostigmine, hypothermia, and mechanical or electrical stimulation.',
+      ],
+      postop: [
+        'Watch breathing closely: weak respiratory muscles add to any residual opioid, benzodiazepine or propofol effect. Perioperative complications are mainly cardiopulmonary.',
+      ],
+    },
+    sourceIds: ['stoelting-8e'],
+  },
   entry('nemaline', 'Nemaline rod myopathy', 24),
   entry('myotonia-congenita', 'Myotonia congenita', 24),
   entry('paramyotonia-congenita', 'Paramyotonia congenita', 24),
@@ -147,9 +271,64 @@ export const CONDITIONS: ConditionRecord[] = [
   entry('central-core', 'Central core disease', 24, ['ccd']),
   entry('centronuclear', 'Centronuclear myopathy', 24, ['myotubular myopathy']),
   entry('mitochondrial-myopathy', 'Mitochondrial myopathies', 24, ['mitochondrial disease']),
-  entry('myasthenia-gravis', 'Myasthenia gravis', 24, ['mg']),
+  {
+    id: 'myasthenia-gravis',
+    name: 'Myasthenia gravis',
+    aliases: ['mg'],
+    chapter: 24,
+    plan: {
+      preop: [
+        'Tell the patient they may stay intubated and ventilated after surgery.',
+        'After transsternal thymectomy, the need for ventilation correlated with disease longer than 6 years, pyridostigmine above 750 mg a day, vital capacity below 2.9 L and COPD unrelated to myasthenia.',
+        'Bulbar weakness brings a high aspiration risk. Look for associated thyroid and other autoimmune disease.',
+        'Infection, electrolyte disturbance, stress, surgery and some antibiotics (especially aminoglycosides) can worsen weakness.',
+      ],
+      intraop: [
+        'Patients are very sensitive to nondepolarizing relaxants: if one is needed, reduce the initial dose by one-half to two-thirds and titrate with a nerve stimulator.',
+        'Patients are resistant to succinylcholine (ED95 about 2.6 times normal), but usual doses still usually give adequate intubating conditions.',
+        'Intubation is often possible without a relaxant, and volatile agents can reduce or remove the need for one.',
+        'After rocuronium, sugammadex may reverse more reliably than neostigmine with glycopyrrolate.',
+      ],
+      avoid: [
+        'Nondepolarizing relaxants in usual doses or without neuromuscular monitoring.',
+        'Opioids for maintenance where possible: their respiratory effects can last into recovery.',
+      ],
+      postop: [
+        'Delay extubation until respiratory function is clearly good: strength can seem adequate early and fall again a few hours later.',
+        'Plan postoperative ventilation for patients who meet the risk criteria.',
+      ],
+    },
+    sourceIds: ['stoelting-8e'],
+  },
   entry('lambert-eaton', 'Lambert-Eaton myasthenic syndrome', 24, ['eaton-lambert syndrome', 'myasthenic syndrome', 'lems']),
-  entry('mh-susceptibility', 'Malignant hyperthermia susceptibility', 24, ['mh', 'mhs', 'malignant hyperthermia']),
+  {
+    id: 'mh-susceptibility',
+    name: 'Malignant hyperthermia susceptibility',
+    aliases: ['mh', 'mhs', 'malignant hyperthermia'],
+    chapter: 24,
+    plan: {
+      preop: [
+        'Plan a trigger-free anesthetic: any combination of sedation, TIVA or regional anesthesia.',
+        'Have the MH cart with dantrolene immediately available.',
+        'Treat central core disease and King-Denborough syndrome as MH susceptible unless proven otherwise; Duchenne and Becker muscular dystrophies are also highly associated.',
+      ],
+      intraop: [
+        'Prepare the machine: remove the vaporizers, change the CO2 absorbent and the breathing circuit, and fit activated charcoal filters on the inspiratory and expiratory limbs.',
+        'Flush with fresh gas at 10 to 15 L/min for 10 to 15 minutes (some authors suggest up to 60 minutes for modern machines), then confirm the gas analyzer reads zero volatile agent in both limbs.',
+        'Early signs of a crisis: rising EtCO2, tachycardia, tachypnea, masseter or generalized rigidity, mixed acidosis, sweating, mottled skin, arrhythmias and labile blood pressure. A rising temperature is a later sign.',
+      ],
+      avoid: [
+        'All halogenated volatile anesthetics: sevoflurane, desflurane, isoflurane, halothane, enflurane and methoxyflurane.',
+        'Succinylcholine.',
+      ],
+      postop: [
+        'After masseter rigidity from succinylcholine, observe for 12 to 24 hours (EtCO2, urine, creatine kinase, potassium and blood gases). MHAUS advises creatine kinase and urine myoglobin every 6 hours for 36 hours.',
+        'After a crisis, admit to ICU for at least 24 hours and continue dantrolene, because recurrence is common. Crisis steps and dantrolene doses are in SOS › MH.',
+      ],
+    },
+    crisis: 'mh',
+    sourceIds: ['stoelting-8e'],
+  },
   // Bone and joints
   entry('kyphoscoliosis', 'Kyphoscoliosis', 24, ['scoliosis']),
   entry('ankylosing-spondylitis', 'Ankylosing spondylitis', 24, ['bamboo spine']),
