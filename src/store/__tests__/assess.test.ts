@@ -22,7 +22,7 @@ describe('assess state', () => {
     const persisted = useAppStore.persist.getOptions().partialize!(useAppStore.getState()) as Record<string, unknown>;
     const keys = Object.keys(persisted);
     expect(keys).toContain('creatinineUnit');
-    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers']) expect(keys).not.toContain(forbidden);
+    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers', 'medsTaken']) expect(keys).not.toContain(forbidden);
   });
 
   it('toggles a score item on and off', () => {
@@ -38,5 +38,18 @@ describe('assess state', () => {
     useAppStore.getState().newCase();
     expect(useAppStore.getState().patient.creatinineUmolL).toBeNull();
     expect(useAppStore.getState().scoreAnswers).toEqual({});
+  });
+
+  it('toggles a medication class on and off', () => {
+    useAppStore.getState().toggleMedTaken('doac');
+    expect(useAppStore.getState().medsTaken.doac).toBe(true);
+    useAppStore.getState().toggleMedTaken('doac');
+    expect(useAppStore.getState().medsTaken.doac).toBe(false);
+  });
+
+  it('New case clears the ticked medications', () => {
+    useAppStore.getState().toggleMedTaken('sglt2i');
+    useAppStore.getState().newCase();
+    expect(useAppStore.getState().medsTaken).toEqual({});
   });
 });

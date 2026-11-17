@@ -8,6 +8,7 @@ import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES
 import { CHECKLISTS } from './checklists';
 import { GLP1_PROTOCOLS } from './glp1Protocols';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
+import { PERIOP_RULES } from './periopMeds';
 import { REFERENCE_DRUGS } from './referenceDrugs';
 import { RISK_SCORES } from './riskScores';
 import { SOURCES } from './sources';
@@ -92,6 +93,11 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
 
   for (const s of RISK_SCORES) {
     add(s.sourceIds, `Risk score ${s.name}: ${s.items.length} items; bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
+  }
+
+  for (const r of PERIOP_RULES) {
+    for (const d of r.drugs) add([d.sourceId], `Perioperative ${r.drugClass}: ${d.name}: ${d.timings.map((t) => t.text).join(' | ')}`);
+    if (r.drugs.length === 0) add(r.sourceIds, `Perioperative ${r.drugClass}: ${r.summary}`);
   }
 
   for (const [id, lines] of Object.entries(PRINCIPLE_SOURCES)) for (const l of lines) out[id]?.push(l);
