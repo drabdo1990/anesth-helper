@@ -10,6 +10,7 @@ import { CicoPanel } from './components/emergency/CicoPanel';
 import { SegmentedControl } from './components/ui/SegmentedControl';
 import { listsFor, needsBiometrics, type IntraopView } from './lib/phases';
 import { AirwayView } from './views/AirwayView';
+import { AssessView } from './views/AssessView';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
@@ -103,6 +104,7 @@ export const App: React.FC = () => {
         {activeTab === 'intraop' && intraopView === 'vent' && <VentilationView />}
         {/* Checklist views stay mounted and are only hidden, so the handoff form keeps what was typed. */}
         <div className={activeTab === 'preop' ? '' : 'hidden'} aria-hidden={activeTab !== 'preop'}>
+          <AssessView />
           <ChecklistsView phaseLists={listsFor('preop')} />
         </div>
         <div className={activeTab === 'intraop' && intraopView === 'lists' ? '' : 'hidden'} aria-hidden={!(activeTab === 'intraop' && intraopView === 'lists')}>

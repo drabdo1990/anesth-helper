@@ -8,6 +8,7 @@ import type { Sex } from '../lib/calc/biometrics';
 import type { WeightScalar } from '../data/types';
 import type { GuidelineSet } from '../data/resolve';
 import type { AppTab, IntraopView } from '../lib/phases';
+import type { CreatinineUnit } from '../lib/calc/units';
 
 export type { AppTab, IntraopView };
 export type EmergencyKind = 'last' | 'mh' | 'cico';
@@ -19,6 +20,8 @@ export interface PatientInput {
   /** Unset until the user chooses: the app never assumes a sex. */
   sex: Sex | null;
   ageYears: number | null;
+  /** Serum creatinine in micromol/L, whatever unit was typed. In memory only. */
+  creatinineUmolL: number | null;
 }
 
 export interface LaAdmin {
@@ -44,7 +47,7 @@ export interface TimerState {
   accumulatedMs: number;
 }
 
-export const EMPTY_PATIENT: PatientInput = { tbwKg: null, heightCm: null, sex: null, ageYears: null };
+export const EMPTY_PATIENT: PatientInput = { tbwKg: null, heightCm: null, sex: null, ageYears: null, creatinineUmolL: null };
 
 const DEFAULT_VENT: VentState = {
   scenarioId: 'ards',
@@ -65,6 +68,7 @@ export interface PersistedPrefs {
   mhContact: string;
   checks: Record<string, boolean>;
   audioEnabled: boolean;
+  creatinineUnit: CreatinineUnit;
 }
 
 interface AppState extends PersistedPrefs {
@@ -72,6 +76,7 @@ interface AppState extends PersistedPrefs {
   patient: PatientInput;
   activeTab: AppTab;
   intraopView: IntraopView;
+  scoreAnswers: Record<string, boolean>;
   emergencyOpen: boolean;
   emergencyKind: EmergencyKind;
   settingsOpen: boolean;
@@ -113,6 +118,8 @@ interface AppState extends PersistedPrefs {
   setConcentrationChoice: (doseId: string, mgPerMl: number) => void;
   setMhContact: (value: string) => void;
   setAudioEnabled: (value: boolean) => void;
+  setCreatinineUnit: (unit: CreatinineUnit) => void;
+  toggleScoreItem: (id: string) => void;
   touchRecent: (id: string) => void;
 
   setSelectedDose: (medicationId: string, doseId: string) => void;
@@ -163,6 +170,7 @@ export const migratePersisted = (persisted: unknown): PersistedPrefs => {
     mhContact: typeof p.mhContact === 'string' ? p.mhContact : '',
     checks: {},
     audioEnabled: p.audioEnabled !== false && p.cprAudioAlert !== false,
+    creatinineUnit: p.creatinineUnit === 'umol' ? 'umol' : 'mgdl',
   };
 };
 
@@ -178,11 +186,13 @@ export const useAppStore = create<AppState>()(
       mhContact: '',
       checks: {},
       audioEnabled: true,
+      creatinineUnit: 'mgdl',
 
       // session
       patient: EMPTY_PATIENT,
       activeTab: 'intraop',
       intraopView: 'dosing',
+      scoreAnswers: {},
       emergencyOpen: false,
       emergencyKind: 'last',
       settingsOpen: false,
@@ -223,6 +233,7 @@ export const useAppStore = create<AppState>()(
           cicoAlertEvery: 0,
           timers: {},
           vent: { ...DEFAULT_VENT, scenarioId: get().ventScenarioId },
+          scoreAnswers: {},
           checks: {},
         }),
 
@@ -242,6 +253,8 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ concentrationChoice: { ...s.concentrationChoice, [doseId]: mgPerMl } })),
       setMhContact: (mhContact) => set({ mhContact }),
       setAudioEnabled: (audioEnabled) => set({ audioEnabled }),
+      setCreatinineUnit: (creatinineUnit) => set({ creatinineUnit }),
+      toggleScoreItem: (id) => set((s) => ({ scoreAnswers: { ...s.scoreAnswers, [id]: !s.scoreAnswers[id] } })),
       touchRecent: (id) =>
         set((s) => ({ recents: [id, ...s.recents.filter((r) => r !== id)].slice(0, 6) })),
 
@@ -358,6 +371,7 @@ export const useAppStore = create<AppState>()(
         mhContact: s.mhContact,
         checks: s.checks,
         audioEnabled: s.audioEnabled,
+        creatinineUnit: s.creatinineUnit,
       }),
       migrate: (persisted): PersistedPrefs => migratePersisted(persisted),
     },
