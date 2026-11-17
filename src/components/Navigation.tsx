@@ -1,10 +1,11 @@
 import React from 'react';
-import { BedDouble, ClipboardList, ShieldAlert, Syringe } from 'lucide-react';
+import { BedDouble, ClipboardList, LayoutGrid, ShieldAlert, Syringe } from 'lucide-react';
 import { useAppStore, type AppTab } from '../store/useAppStore';
 import { DisclaimerBanner } from './DisclaimerBanner';
 
 const TABS: { id: AppTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'preop', label: 'Pre-op', icon: ClipboardList },
+  { id: 'plans', label: 'Plans', icon: LayoutGrid },
   { id: 'intraop', label: 'Intra-op', icon: Syringe },
   { id: 'postop', label: 'Post-op', icon: BedDouble },
 ];
