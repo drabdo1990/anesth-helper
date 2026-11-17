@@ -13,7 +13,7 @@ interface ScoreItemProps {
 }
 
 // Not ChecklistItem: that one strikes through and turns green when "done", which would read as good news for a risk factor.
-const ScoreItem: React.FC<ScoreItemProps> = ({ label, checked, locked, onToggle }) => (
+export const ScoreItem: React.FC<ScoreItemProps> = ({ label, checked, locked, onToggle }) => (
   <button
     type="button"
     role="checkbox"
