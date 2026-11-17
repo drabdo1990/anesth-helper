@@ -42,6 +42,8 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 
 ## App structure
 
+The bottom bar has three case phases. **Pre-op** holds the Fasting / NPO checklist. **Intra-op** holds Dosing, Airway, Vent and Lists, with a switch at the top. **Post-op** holds the emergence checklist and the handoff summary. The rows below describe each tool.
+
 | Tab / control | What it does |
 |---|---|
 | **Dosing** | Adult drug cards in eight categories. Each card shows dose range, selected dose, weight scalar and kg, mass, exact mL at the dose-specific concentration, single/cumulative maximum warnings and source badges. Cumulative ceilings for ephedrine and labetalol have a local dose log. Dosing is withheld for a known patient under 18 because this build has no pediatric dose set. The tab also holds a local anesthetic calculator, a neuraxial reference and a searchable reference-drug list. |
