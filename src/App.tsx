@@ -12,6 +12,7 @@ import { listsFor, needsBiometrics, type IntraopView } from './lib/phases';
 import { AirwayView } from './views/AirwayView';
 import { AssessView } from './views/AssessView';
 import { MedsPanel } from './components/MedsPanel';
+import { PreopNotePanel } from './components/PreopNotePanel';
 import { PlansView } from './views/PlansView';
 import { PostopView } from './views/PostopView';
 import { ChecklistsView } from './views/ChecklistsView';
@@ -111,6 +112,7 @@ export const App: React.FC = () => {
           <AssessView />
           <MedsPanel />
           <ChecklistsView phaseLists={listsFor('preop')} />
+          <PreopNotePanel />
         </div>
         <div className={activeTab === 'intraop' && intraopView === 'lists' ? '' : 'hidden'} aria-hidden={!(activeTab === 'intraop' && intraopView === 'lists')}>
           <ChecklistsView phaseLists={listsFor('intraop')} extras={['overview']} />

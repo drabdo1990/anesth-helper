@@ -22,7 +22,7 @@ describe('assess state', () => {
     const persisted = useAppStore.persist.getOptions().partialize!(useAppStore.getState()) as Record<string, unknown>;
     const keys = Object.keys(persisted);
     expect(keys).toContain('creatinineUnit');
-    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers', 'medsTaken', 'choiceAnswers']) expect(keys).not.toContain(forbidden);
+    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers', 'medsTaken', 'choiceAnswers', 'asaClass', 'asaEmergency', 'fastingStatus']) expect(keys).not.toContain(forbidden);
   });
 
   it('toggles a score item on and off', () => {
@@ -60,5 +60,18 @@ describe('assess state', () => {
     expect(useAppStore.getState().choiceAnswers['4at-alertness']).toBe(0);
     useAppStore.getState().newCase();
     expect(useAppStore.getState().choiceAnswers).toEqual({});
+  });
+
+  it('records the ASA class, the E flag and the fasting status, and New case clears them', () => {
+    useAppStore.getState().setAsaClass('III');
+    useAppStore.getState().setAsaEmergency(true);
+    useAppStore.getState().setFastingStatus('Meets local fasting protocol');
+    expect(useAppStore.getState().asaClass).toBe('III');
+    expect(useAppStore.getState().asaEmergency).toBe(true);
+    expect(useAppStore.getState().fastingStatus).toBe('Meets local fasting protocol');
+    useAppStore.getState().newCase();
+    expect(useAppStore.getState().asaClass).toBeNull();
+    expect(useAppStore.getState().asaEmergency).toBe(false);
+    expect(useAppStore.getState().fastingStatus).toBeNull();
   });
 });
