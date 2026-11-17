@@ -1,7 +1,7 @@
 // Risk score definitions. Every score cites sourceIds that exist in sources.ts (enforced by tests).
 // Items are one point each. Add a `points` field when the first weighted score (ARISCAT) is added.
 
-export type DerivedKey = 'age>50' | 'male' | 'bmi>35' | 'creatinine>2.0mgdl';
+export type DerivedKey = 'age>50' | 'male' | 'female' | 'bmi>35' | 'creatinine>2.0mgdl';
 
 export interface RiskScoreItem {
   id: string;
@@ -23,6 +23,8 @@ export interface RiskScore {
   items: RiskScoreItem[];
   bands: RiskBand[];
   note?: string;
+  /** Only validated in adults (age 18 or over); children get "not applicable". */
+  adultOnly?: boolean;
   /** One-sentence rationale for trainees. */
   why?: string;
   sourceIds: string[];
@@ -77,3 +79,26 @@ export const STOP_BANG: RiskScore = {
 };
 
 export const RISK_SCORES: RiskScore[] = [RCRI, STOP_BANG];
+
+export const APFEL: RiskScore = {
+  id: 'apfel',
+  name: 'Apfel PONV risk score (adults)',
+  adultOnly: true,
+  items: [
+    { id: 'apfel-female', label: 'Female gender', derive: 'female' },
+    { id: 'apfel-history', label: 'History of PONV and/or motion sickness' },
+    { id: 'apfel-nonsmoker', label: 'Nonsmoking status' },
+    { id: 'apfel-opioids', label: 'Use of postoperative opioids' },
+  ],
+  bands: [
+    { min: 0, label: 'Low risk', detail: 'Postoperative nausea and vomiting occurs in approximately 10% of patients with no risk factor.' },
+    { min: 1, label: 'Medium risk', detail: 'Approximately 20% with one risk factor and 40% with two.' },
+    { min: 3, label: 'High risk', detail: 'Approximately 60% with three risk factors and 80% with four.' },
+  ],
+  note: 'The incidences are approximate. They and the low, medium and high classification (0, 1-2, 3 or more factors) come from the 2025 ASER consensus, which cites the 1999 Apfel paper. The consensus says adult models such as the Apfel score are poorly suited to pediatric postoperative vomiting.',
+  why: 'Four yes/no risk factors; each yes scores one point. More factors mean a higher chance of nausea and vomiting after surgery.',
+  sourceIds: ['aser-ponv-5th-2025', 'apfel-1999'],
+};
+
+/** Scores shown on the Post-op tab. RISK_SCORES stays the Pre-op Assess set. */
+export const POSTOP_SCORES: RiskScore[] = [APFEL];

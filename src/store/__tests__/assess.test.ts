@@ -22,7 +22,7 @@ describe('assess state', () => {
     const persisted = useAppStore.persist.getOptions().partialize!(useAppStore.getState()) as Record<string, unknown>;
     const keys = Object.keys(persisted);
     expect(keys).toContain('creatinineUnit');
-    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers', 'medsTaken']) expect(keys).not.toContain(forbidden);
+    for (const forbidden of ['patient', 'creatinineUmolL', 'scoreAnswers', 'medsTaken', 'choiceAnswers']) expect(keys).not.toContain(forbidden);
   });
 
   it('toggles a score item on and off', () => {
@@ -51,5 +51,14 @@ describe('assess state', () => {
     useAppStore.getState().toggleMedTaken('sglt2i');
     useAppStore.getState().newCase();
     expect(useAppStore.getState().medsTaken).toEqual({});
+  });
+
+  it('records a 4AT answer, overwrites it, and New case clears them', () => {
+    useAppStore.getState().setChoiceAnswer('4at-alertness', 2);
+    expect(useAppStore.getState().choiceAnswers['4at-alertness']).toBe(2);
+    useAppStore.getState().setChoiceAnswer('4at-alertness', 0);
+    expect(useAppStore.getState().choiceAnswers['4at-alertness']).toBe(0);
+    useAppStore.getState().newCase();
+    expect(useAppStore.getState().choiceAnswers).toEqual({});
   });
 });

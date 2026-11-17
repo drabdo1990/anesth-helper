@@ -32,7 +32,7 @@ describe('needsBiometrics', () => {
     ['intraop', 'lists', false],
     ['preop', 'dosing', true],
     ['plans', 'dosing', false],
-    ['postop', 'vent', false],
+    ['postop', 'vent', true],
   ] as const)('%s / %s -> %s', (tab, view, want) => {
     expect(needsBiometrics(tab, view)).toBe(want);
   });

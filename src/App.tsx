@@ -13,6 +13,7 @@ import { AirwayView } from './views/AirwayView';
 import { AssessView } from './views/AssessView';
 import { MedsPanel } from './components/MedsPanel';
 import { PlansView } from './views/PlansView';
+import { PostopView } from './views/PostopView';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
@@ -115,6 +116,7 @@ export const App: React.FC = () => {
           <ChecklistsView phaseLists={listsFor('intraop')} extras={['overview']} />
         </div>
         <div className={activeTab === 'postop' ? '' : 'hidden'} aria-hidden={activeTab !== 'postop'}>
+          <PostopView />
           <ChecklistsView phaseLists={listsFor('postop')} extras={['handoff']} />
         </div>
       </main>
