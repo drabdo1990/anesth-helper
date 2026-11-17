@@ -6,11 +6,13 @@ import { CICO_PLANS, LAST_STEPS, MH_STEPS } from './emergencies';
 import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING } from './ventilation';
 import { CHECKLISTS } from './checklists';
+import { CHOICE_SCORES } from './choiceScores';
 import { GLP1_PROTOCOLS } from './glp1Protocols';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { PERIOP_RULES } from './periopMeds';
+import { PONV_PLAN } from './ponvPlan';
 import { REFERENCE_DRUGS } from './referenceDrugs';
-import { RISK_SCORES } from './riskScores';
+import { POSTOP_SCORES, RISK_SCORES } from './riskScores';
 import { SOURCES } from './sources';
 
 const range = (min: number | undefined, max: number | undefined, def: number | undefined): string => {
@@ -94,6 +96,14 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
   for (const s of RISK_SCORES) {
     add(s.sourceIds, `Risk score ${s.name}: ${s.items.length} items; bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
   }
+  for (const s of POSTOP_SCORES) {
+    add(s.sourceIds, `Risk score ${s.name}: ${s.items.length} items; bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
+  }
+  for (const s of CHOICE_SCORES) {
+    const pts = s.items.map((i) => i.options.map((o) => o.points).join('/')).join('; ');
+    add(s.sourceIds, `Choice score ${s.name}: ${s.items.length} items (${pts}); bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
+  }
+  add(PONV_PLAN.sourceIds, `PONV plan: ${PONV_PLAN.adults.headline}`);
 
   for (const r of PERIOP_RULES) {
     for (const d of r.drugs) add([d.sourceId], `Perioperative ${r.drugClass}: ${d.name}: ${d.timings.map((t) => t.text).join(' | ')}`);
@@ -114,10 +124,8 @@ export const SOURCES_WITHOUT_DERIVED_VALUES = [
   'dasi-hlatky-1989',
   'ariscat-canet-2010',
   'cfs-rockwood-2005',
-  'apfel-1999',
   'aldrete-1995',
   'padss-chung-1995',
-  '4at-bellelli-2014',
   'aha-acc-periop-2024',
   'esc-ncs-2022',
   'asra-anticoag-2025',

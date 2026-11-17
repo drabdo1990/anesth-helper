@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft19';
+export const DATA_VERSION = '2026.11.17-draft20';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1168,7 +1168,7 @@ export const SOURCES: ClinicalSource[] = [
     scope: ['Apfel simplified PONV risk score: four predictors (0-4)'],
     verification: 'secondary',
     accessNote:
-      'Abstract read; full text not opened. Predictors: female sex, history of motion sickness or PONV, non-smoker, postoperative opioids. Risk per score and prophylaxis advice must come from the ASER PONV 2025 consensus, not this paper.',
+      'The 1999 paper was not opened. The four items, the incidence by number of factors (approximately 10%, 20%, 40%, 60%, 80%) and the low/medium/high classification were read in the ASER 2025 consensus appendix (aser-ponv-5th-2025), which cites it.',
   },
   {
     id: 'aldrete-1995',
@@ -1207,9 +1207,9 @@ export const SOURCES: ClinicalSource[] = [
     url: 'https://pmc.ncbi.nlm.nih.gov/articles/4066613/',
     tier: 3,
     scope: ['4AT delirium screen', 'possible delirium at >= 4 (working threshold)'],
-    verification: 'secondary',
+    verification: 'primary',
     accessNote:
-      'Abstract read; full text open on PMC but not read. Validated in hospitalised adults aged >= 70, not specifically after surgery. A 2015 corrigendum fixes Table 1.',
+      'Main text (open, PMC) and the supplementary 4AT form (version 1: item wording, points and bands) read in full on 2026-11-17. Validated in hospitalised patients aged 70 or over on an acute geriatrics ward and a rehabilitation department, not specifically after surgery; a 2015 corrigendum to the paper exists. The form on www.the4AT.com may be a newer version.',
   },
   {
     id: 'aha-acc-periop-2024',
