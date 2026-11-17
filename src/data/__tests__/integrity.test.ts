@@ -39,6 +39,7 @@ describe('source registry', () => {
       'oxford-handbook',
       'project-notebook',
       'samba-ponv-2020',
+      'stoelting-8e',
     ]);
   });
 
