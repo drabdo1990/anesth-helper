@@ -1,22 +1,13 @@
+import plugin from 'tailwindcss/plugin';
+import { colorTokens, themeVars } from './src/theme/palette.ts';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
-      colors: {
-        clinical: {
-          bg: '#090d16',
-          card: '#131b2e',
-          border: '#1e293b',
-          'border-light': '#334155',
-          cyan: '#06b6d4',
-          red: '#ef4444',
-          emerald: '#10b981',
-          amber: '#f59e0b',
-          purple: '#a855f7',
-        },
-      },
+      colors: colorTokens(),
       fontFamily: {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -29,5 +20,13 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Dark is the default (and what an element with data-theme="dark" gets, even inside a light page).
+    plugin(({ addBase }) => {
+      addBase({
+        ':root, [data-theme="dark"]': { 'color-scheme': 'dark', ...themeVars('dark') },
+        '[data-theme="light"]': { 'color-scheme': 'light', ...themeVars('light') },
+      });
+    }),
+  ],
 };
