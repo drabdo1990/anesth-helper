@@ -8,7 +8,7 @@ const span = (r: [number, number] | undefined, unit: string): string =>
   r === undefined ? '' : r[0] === r[1] ? `${r[0]} ${unit}` : `${r[0]}-${r[1]} ${unit}`;
 
 const Row: React.FC<{ r: NeuraxialRegimen }> = ({ r }) => (
-  <li className="flex flex-col gap-1 rounded-xl border border-slate-800 bg-[#131b2e] p-2.5">
+  <li className="flex flex-col gap-1 rounded-xl border border-slate-800 bg-clinical-card p-2.5">
     <div className="flex items-baseline justify-between gap-2">
       <span className="text-sm font-bold text-slate-100">{r.agent}</span>
       <span className="font-mono text-sm font-bold tabular-nums text-cyan-300">{r.concLabel}</span>

@@ -8,7 +8,7 @@ interface SegmentedControlProps<T extends string> {
 }
 
 export function SegmentedControl<T extends string>({ value, options, onChange, ariaLabel, tone = 'cyan' }: SegmentedControlProps<T>) {
-  const on = tone === 'red' ? 'bg-red-500 text-white border-red-400' : 'bg-cyan-500 text-slate-950 border-cyan-400';
+  const on = tone === 'red' ? 'bg-red-500 text-white border-red-400' : 'bg-cyan-500 text-black border-cyan-400';
   return (
     <div className="flex gap-1.5" role="radiogroup" aria-label={ariaLabel}>
       {options.map((o) => (

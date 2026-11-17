@@ -133,7 +133,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 touch-target flex items-center justify-center"
+            className="p-1.5 text-slate-400 hover:text-slate-100 rounded-lg active:bg-slate-800 touch-target flex items-center justify-center"
             title="Close"
           >
             <X className="w-5 h-5" />
@@ -142,13 +142,13 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
 
         {/* Display */}
         <div className="bg-slate-950 border border-cyan-500/30 rounded-xl p-3 flex items-baseline justify-end gap-2 shadow-inner">
-          <span className="text-3xl font-mono font-bold text-cyan-400">
+          <span className="text-3xl font-mono font-bold text-cyan-300">
             {valueStr || '0'}
           </span>
           <span className="text-sm font-semibold text-slate-400">{unit}</span>
         </div>
         {rangeError && (
-          <p role="alert" className="-mt-1 text-xs font-semibold text-red-400">
+          <p role="alert" className="-mt-1 text-xs font-semibold text-red-300">
             {rangeError}
           </p>
         )}
@@ -195,14 +195,14 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
         <div className="grid grid-cols-2 gap-2 mt-1">
           <button
             onClick={handleClear}
-            className="h-12 bg-slate-800 text-slate-400 hover:text-white font-semibold rounded-xl border border-slate-700 flex items-center justify-center"
+            className="h-12 bg-slate-800 text-slate-400 hover:text-slate-100 font-semibold rounded-xl border border-slate-700 flex items-center justify-center"
           >
             Clear
           </button>
           <button
             onClick={handleConfirm}
             disabled={!canConfirm}
-            className="h-12 bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl shadow-glow-cyan flex items-center justify-center gap-2"
+            className="h-12 bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold rounded-xl shadow-glow-cyan flex items-center justify-center gap-2"
           >
             <Check className="w-5 h-5 stroke-[2.5]" />
             Set

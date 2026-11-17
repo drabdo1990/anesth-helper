@@ -54,7 +54,7 @@ export const App: React.FC = () => {
       <div className="border-b border-clinical-border/80 px-3 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 text-slate-950">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-700 text-black">
               <Activity className="h-4 w-4 stroke-[2.8]" />
             </div>
             <div>
@@ -64,7 +64,7 @@ export const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-1.5">
             {!online && (
-              <span className="flex items-center gap-1 rounded-full border border-amber-800 bg-amber-950/60 px-2 py-0.5 font-mono text-[10px] text-amber-400">
+              <span className="flex items-center gap-1 rounded-full border border-amber-800 bg-amber-950/60 px-2 py-0.5 font-mono text-[10px] text-amber-300">
                 <WifiOff className="h-3 w-3" /> Offline
               </span>
             )}

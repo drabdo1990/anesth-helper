@@ -4,9 +4,9 @@ import { AlertOctagon, AlertTriangle, Info } from 'lucide-react';
 export type WarningLevel = 'info' | 'amber' | 'red';
 
 const STYLE: Record<WarningLevel, { box: string; icon: string }> = {
-  info: { box: 'bg-slate-900 border-slate-700 text-slate-200', icon: 'text-cyan-400' },
-  amber: { box: 'bg-amber-500/10 border-amber-500/50 text-amber-200', icon: 'text-amber-400' },
-  red: { box: 'bg-red-500/15 border-red-500 text-red-100', icon: 'text-red-400' },
+  info: { box: 'bg-slate-900 border-slate-700 text-slate-200', icon: 'text-cyan-300' },
+  amber: { box: 'bg-amber-500/10 border-amber-500/50 text-amber-200', icon: 'text-amber-300' },
+  red: { box: 'bg-red-500/15 border-red-500 text-red-100', icon: 'text-red-300' },
 };
 
 interface WarningBannerProps {

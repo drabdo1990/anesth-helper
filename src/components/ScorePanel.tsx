@@ -24,7 +24,7 @@ export const ScoreItem: React.FC<ScoreItemProps> = ({ label, checked, locked, on
       checked ? 'border-amber-500/60 bg-amber-950/30 text-amber-100' : 'border-clinical-border bg-clinical-card/50 text-slate-200'
     }`}
   >
-    {checked ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" /> : <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500" />}
+    {checked ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" /> : <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500" />}
     <span className="min-w-0 flex-1">
       {label}
       {locked && <span className="mt-1 block text-xs font-normal text-slate-400">Set from the patient inputs</span>}

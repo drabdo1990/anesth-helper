@@ -42,13 +42,15 @@ export const EmergencyOverlay: React.FC = () => {
   if (!open) return null;
 
   return createPortal(
+    // The crisis screen stays dark in both themes: red-on-dark contrast and no glare in a dim OR.
     <div
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label="Emergency support"
       tabIndex={-1}
-      className="fixed inset-x-0 top-0 z-[60] flex h-screen h-[100dvh] flex-col bg-[#090d16]"
+      data-theme="dark"
+      className="fixed inset-x-0 top-0 z-[60] flex h-screen h-[100dvh] flex-col bg-clinical-bg"
     >
       <div className="flex items-center gap-2 border-b-4 border-red-500 bg-red-950 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <h2 className="flex-1 text-xl font-black uppercase tracking-wide text-red-100">Emergency</h2>
@@ -86,7 +88,7 @@ export const EmergencyOverlay: React.FC = () => {
           )}
         </div>
       </div>
-      <div className="border-t border-slate-800 bg-[#090d16] px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <div className="border-t border-slate-800 bg-clinical-bg px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <button
           type="button"
           onClick={close}
