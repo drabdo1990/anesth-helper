@@ -42,7 +42,7 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 
 ## App structure
 
-The bottom bar has three case phases. **Pre-op** holds the Fasting / NPO checklist. **Intra-op** holds Dosing, Airway, Vent and Lists, with a switch at the top. **Post-op** holds the emergence checklist and the handoff summary. The rows below describe each tool.
+The bottom bar has three case phases. **Pre-op** holds an Assess section (serum creatinine, Cockcroft-Gault creatinine clearance, the RCRI and STOP-Bang) above the Fasting / NPO checklist. **Intra-op** holds Dosing, Airway, Vent and Lists, with a switch at the top. **Post-op** holds the emergence checklist and the handoff summary. The rows below describe each tool.
 
 | Tab / control | What it does |
 |---|---|
@@ -98,9 +98,9 @@ Settings (gear icon) has an **Active reference set** switch.
 
 ## What is and is not stored
 
-**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentration for each dose, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, and anonymous checklist tick marks.
+**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentration for each dose, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, the creatinine unit (mg/dL or µmol/L), and anonymous checklist tick marks.
 
-**Never stored:** patient weight, height, sex, age, dose selections, cumulative dose logs, local anesthetic entries, emergency logs, timers and handoff text. They live in memory and disappear when the app closes. **New case** clears them (and checklist ticks) on demand. Older saved data (including the previous version's patient values) is discarded on upgrade.
+**Never stored:** patient weight, height, sex, age, serum creatinine, risk-score answers, dose selections, cumulative dose logs, local anesthetic entries, emergency logs, timers and handoff text. They live in memory and disappear when the app closes. **New case** clears them (and checklist ticks) on demand. Older saved data (including the previous version's patient values) is discarded on upgrade.
 
 **Never done:** authentication, analytics or telemetry, clinical network calls, logging of clinical entries. The only background request is the service-worker update check. The handoff generator only uses fixed choices and numeric fields, has no free-text fields, and adds no weight, height or biometrics.
 

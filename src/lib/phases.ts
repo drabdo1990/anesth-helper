@@ -13,5 +13,6 @@ const phaseOf = (c: ChecklistRecord): AppTab =>
 /** Intra-op takes every list not claimed by pre-op or post-op, so a new list is never left out. */
 export const listsFor = (tab: AppTab): ChecklistRecord[] => CHECKLISTS.filter((c) => phaseOf(c) === tab);
 
-/** Dose and airway math need the biometric header; checklists and the handoff do not. */
-export const needsBiometrics = (tab: AppTab, view: IntraopView): boolean => tab === 'intraop' && view !== 'lists';
+/** Scores and dose math need the biometric header; checklists and the handoff do not. */
+export const needsBiometrics = (tab: AppTab, view: IntraopView): boolean =>
+  tab === 'preop' || (tab === 'intraop' && view !== 'lists');

@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft15';
+export const DATA_VERSION = '2026.11.17-draft17';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1097,10 +1097,10 @@ export const SOURCES: ClinicalSource[] = [
     version: 'Circulation 1999;100:1043-1049, doi 10.1161/01.cir.100.10.1043',
     url: 'https://pubmed.ncbi.nlm.nih.gov/10477528/',
     tier: 3,
-    scope: ['Revised Cardiac Risk Index: six predictors', 'RCRI bands 0 / 1 / 2 / >=3'],
-    verification: 'secondary',
+    scope: ['Revised Cardiac Risk Index: six predictors, definitions and rates by factor count (Table 3)'],
+    verification: 'primary',
     accessNote:
-      'Abstract and secondary summaries read; full text not opened. Six predictors: high-risk surgery, ischemic heart disease, heart failure, cerebrovascular disease, insulin treatment, creatinine > 2.0 mg/dL. Event rates by 0/1/2/>=3 factors differ between derivation and validation cohorts.',
+      'Full text read from the open eScholarship copy (2026-11-17). Table 3, validation cohort (n=1422): major cardiac complications 0.4%, 0.9%, 6.6%, 11.0% for 0, 1, 2, 3 or more factors; derivation cohort (n=2893): 0.5%, 1.3%, 3.6%, 9.1%. The abstract rounds the two-factor figures to 7% and 4%. High-risk surgery is intraperitoneal, intrathoracic or suprainguinal vascular. A 1999 single-centre cohort of patients aged 50 or over having elective major non-cardiac surgery.',
   },
   {
     id: 'dasi-hlatky-1989',
@@ -1252,6 +1252,34 @@ export const SOURCES: ClinicalSource[] = [
     verification: 'secondary',
     accessNote:
       'ASRA announcement (2025-01-31) and ESRA newsletter summaries read; full text not opened. Moves from "prophylactic/therapeutic" to "low/high dose" terms. A search summary gave doi 10.1136/rapm-2024-105766, not confirmed. No interval is encoded until the full text is read.',
+  },
+  {
+    id: 'cockcroft-gault-1976',
+    tag: 'Cockcroft-Gault',
+    name: 'Prediction of creatinine clearance from serum creatinine',
+    publisher: 'Cockcroft DW, Gault MH',
+    year: '1976',
+    version: 'Nephron 1976;16:31-41, doi 10.1159/000180580',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/1244564/',
+    tier: 3,
+    scope: ['creatinine clearance estimate for adults', 'weight convention for anticoagulant dosing'],
+    verification: 'secondary',
+    accessNote:
+      'Citation confirmed by web search (2026-11-17); the paper was not opened and PubMed blocked automated fetches. The formula and its SI constants (1.23 men, 1.04 women, creatinine in micromol/L) come from NKF and UK NHS summaries. This build uses ACTUAL body weight, as the DOAC trials and the US rivaroxaban label do according to secondary summaries (label not opened). The weight choice in obesity is contested: confirm against local protocol. Adults only: the paper studied patients aged 18 to 92.',
+  },
+  {
+    id: 'stop-bang-chung-2016',
+    tag: 'STOP-Bang 2016',
+    name: 'STOP-Bang Questionnaire: A Practical Approach to Screen for Obstructive Sleep Apnea',
+    publisher: 'Chung F, Abdullah HR, Liao P',
+    year: '2016',
+    version: 'Chest 2016;149:631-638, doi 10.1378/chest.15-0903',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/26378880/',
+    tier: 3,
+    scope: ['STOP-Bang: eight yes/no items, score bands 0-2 low, 3-4 intermediate, 5-8 high risk of moderate to severe OSA'],
+    verification: 'secondary',
+    accessNote:
+      'Citation, scoring bands and the neck circumference threshold (above 40 cm, 16 in) confirmed from web-search excerpts (2026-11-17); the full text was not opened and PubMed blocked automated fetches. Item wording is the standard questionnaire wording. The paper adds a second step for scores of 3 to 4; this build does not apply it.',
   },
 ];
 

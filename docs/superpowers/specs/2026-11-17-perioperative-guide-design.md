@@ -44,7 +44,7 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 The biometric header (age, sex, weight, height) is the single input for every score and dose. In the navigation step it shows on Intra-op › Dosing, Airway and Vent only (`needsBiometrics` in `lib/phases.ts`), because the checklists and handoff do not use it. Pre-op shows it from rollout step 2, when the first score needs age, sex and BMI.
 
 **Settings additions:**
-- **Units** setting: added in rollout step 2, together with the first score that reads a creatinine, so it is never a setting nobody uses.
+- **Units:** added in rollout step 2 as an inline mg/dL / µmol/L toggle beside the creatinine field in Assess (not in the Settings sheet), with the first score that reads a creatinine. Only the choice is persisted. Glucose and Hb units wait until something reads them.
 
 ## 3. Data model (`src/data/`)
 
@@ -174,7 +174,7 @@ Each step is one PR and ships on its own.
 - Not yet registered: the SGLT2 FDA labels, OAA/DAS obstetric, and the CFS 2.0 and STOP-Bang cut-off papers. Each content PR adds these before its records.
 
 1. **Navigation redesign** (plan: `docs/superpowers/plans/2026-11-17-phase-navigation.md`): the Pre-op, Intra-op and Post-op tabs, existing views moved, an intra-op sub-navigation. No new clinical content. Deferred from this step: Plans tab (step 4), units setting (step 2), `copyText` move (step 6), crisis lists into SOS (own task).
-2. **Assess:** scores and CrCl.
+2. **Assess** (plan: `docs/superpowers/plans/2026-11-17-assess-scores-crcl.md`): serum creatinine with a mg/dL / µmol/L toggle, Cockcroft-Gault CrCl (actual body weight, adults only), RCRI and STOP-Bang, and the biometric header on Pre-op. RCRI was verified against the paper's full text. Deferred to step 2b: DASI, ARISCAT and the Clinical Frailty Scale (their weight tables and scale text have not been read), the ASA picker and surgical-risk grade (no ASA source registered, and nothing reads them before the pre-op note), glucose and Hb units, and CrCl bands (step 3 defines them from ASRA and the drug labels).
 3. **Peri-op meds.**
 4. **Plan cards**, first batch.
 5. **Post-op tools.**
