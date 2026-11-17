@@ -42,7 +42,7 @@ PWA icons are generated from the favicon artwork by `python scripts/generate-ico
 
 ## App structure
 
-The bottom bar has three case phases. **Pre-op** holds an Assess section (serum creatinine, Cockcroft-Gault creatinine clearance, the RCRI and STOP-Bang) and a Medications section (SGLT2 inhibitors and DOACs, with the manufacturers' label wording, and a pointer for GLP-1 agonists) above the Fasting / NPO checklist. **Intra-op** holds Dosing, Airway, Vent and Lists, with a switch at the top. **Post-op** holds the emergence checklist and the handoff summary. The rows below describe each tool.
+The bottom bar has three case phases plus a **Plans** tab of rapid case-type cards (pediatric, obstetric cesarean under neuraxial, obesity, RSI / full stomach) that group items already in the app and add no new clinical statements. **Pre-op** holds an Assess section (serum creatinine, Cockcroft-Gault creatinine clearance, the RCRI and STOP-Bang) and a Medications section (SGLT2 inhibitors and DOACs, with the manufacturers' label wording, and a pointer for GLP-1 agonists) above the Fasting / NPO checklist. **Intra-op** holds Dosing, Airway, Vent and Lists, with a switch at the top. **Post-op** holds the emergence checklist and the handoff summary. The rows below describe each tool.
 
 | Tab / control | What it does |
 |---|---|
