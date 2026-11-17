@@ -9,6 +9,7 @@ import type { WeightScalar } from '../data/types';
 import type { GuidelineSet } from '../data/resolve';
 import type { AppTab, IntraopView } from '../lib/phases';
 import type { CreatinineUnit } from '../lib/calc/units';
+import type { AsaClass, FastingStatus } from '../lib/preopNote';
 
 export type { AppTab, IntraopView };
 export type EmergencyKind = 'last' | 'mh' | 'cico';
@@ -79,6 +80,9 @@ interface AppState extends PersistedPrefs {
   scoreAnswers: Record<string, boolean>;
   medsTaken: Record<string, boolean>;
   choiceAnswers: Record<string, number>;
+  asaClass: AsaClass | null;
+  asaEmergency: boolean;
+  fastingStatus: FastingStatus | null;
   emergencyOpen: boolean;
   emergencyKind: EmergencyKind;
   settingsOpen: boolean;
@@ -124,6 +128,9 @@ interface AppState extends PersistedPrefs {
   toggleScoreItem: (id: string) => void;
   toggleMedTaken: (id: string) => void;
   setChoiceAnswer: (itemId: string, optionIndex: number) => void;
+  setAsaClass: (value: AsaClass | null) => void;
+  setAsaEmergency: (value: boolean) => void;
+  setFastingStatus: (value: FastingStatus | null) => void;
   touchRecent: (id: string) => void;
 
   setSelectedDose: (medicationId: string, doseId: string) => void;
@@ -199,6 +206,9 @@ export const useAppStore = create<AppState>()(
       scoreAnswers: {},
       medsTaken: {},
       choiceAnswers: {},
+      asaClass: null,
+      asaEmergency: false,
+      fastingStatus: null,
       emergencyOpen: false,
       emergencyKind: 'last',
       settingsOpen: false,
@@ -242,6 +252,9 @@ export const useAppStore = create<AppState>()(
           scoreAnswers: {},
           medsTaken: {},
           choiceAnswers: {},
+          asaClass: null,
+          asaEmergency: false,
+          fastingStatus: null,
           checks: {},
         }),
 
@@ -265,6 +278,9 @@ export const useAppStore = create<AppState>()(
       toggleScoreItem: (id) => set((s) => ({ scoreAnswers: { ...s.scoreAnswers, [id]: !s.scoreAnswers[id] } })),
       toggleMedTaken: (id) => set((s) => ({ medsTaken: { ...s.medsTaken, [id]: !s.medsTaken[id] } })),
       setChoiceAnswer: (itemId, optionIndex) => set((s) => ({ choiceAnswers: { ...s.choiceAnswers, [itemId]: optionIndex } })),
+      setAsaClass: (asaClass) => set({ asaClass }),
+      setAsaEmergency: (asaEmergency) => set({ asaEmergency }),
+      setFastingStatus: (fastingStatus) => set({ fastingStatus }),
       touchRecent: (id) =>
         set((s) => ({ recents: [id, ...s.recents.filter((r) => r !== id)].slice(0, 6) })),
 

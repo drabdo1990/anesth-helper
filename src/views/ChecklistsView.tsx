@@ -7,6 +7,7 @@ import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
 import { useAppStore } from '../store/useAppStore';
 import { EMPTY_HANDOFF, buildHandoffSummary, type HandoffInput } from '../lib/handoff';
+import { copyText } from '../lib/copyText';
 import { ChecklistItem } from '../components/ui/ChecklistItem';
 import { SourceBadge } from '../components/ui/SourceBadge';
 import { WarningBanner } from '../components/ui/WarningBanner';
@@ -112,28 +113,6 @@ const NumberField: React.FC<{ label: string; unit: string; value: string; onChan
     />
   </label>
 );
-
-const copyText = async (text: string): Promise<boolean> => {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    try {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    } catch {
-      return false;
-    }
-  }
-};
 
 const HandoffForm: React.FC = () => {
   const [form, setForm] = useState<HandoffInput>(EMPTY_HANDOFF);
