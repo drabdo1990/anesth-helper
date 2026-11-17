@@ -23,7 +23,7 @@
 
 ## 2. Information architecture
 
-The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · Intra-op · Post-op · Plans`**, with the red **SOS** button unchanged.
+The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · Intra-op · Post-op`** (a **Plans** tab joins in rollout step 4, once it has content), with the red **SOS** button unchanged.
 
 | Place | Contents | Origin |
 |---|---|---|
@@ -34,17 +34,17 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 | **Library** (header book icon, which already opens References) | Comorbidity reference · Drug reference · Sources and verification · Guideline comparisons | Existing ReferencesView and ReferenceDrugsPanel, plus comorbidity browsing |
 | **SOS** | LAST, MH, CICO, plus the QRH crises (anaphylaxis, massive bleeding, bronchospasm, laryngospasm) | Crisis lists move out of the Lists view |
 
-**Where each checklist group goes.** `ChecklistsView` gets a `groups` prop, and each phase renders only its own groups:
-- `Pre-op` → Pre-op tab (Fasting step)
-- `Machine`, `Airway`, `Ventilation`, `Regional` → Intra-op › Lists
-- `Intra/post-op` → shown on both Intra-op › Lists and Post-op
-- `Crises` → SOS
+**Where each checklist group goes.** `ChecklistsView` gets a `phaseLists` prop (from `listsFor(tab)` in `lib/phases.ts`), and each phase renders only its own lists:
+- Fasting / NPO → Pre-op tab
+- Emergence and extubation → Post-op tab
+- Everything else → Intra-op › Lists. Pre-induction is run in the OR, so it stays here rather than moving to the clinic-style Pre-op tab. The crisis lists stay here too.
 - Handoff → Post-op
+- Moving the crisis lists into SOS is its own task. SOS has three weight-based panels behind a three-way switch, and adding four more would need that switch redesigned.
 
 The biometric header (age, sex, weight, height) stays on every phase tab and is the single input for every score and dose.
 
 **Settings additions:**
-- **Units** (`SI` | `conventional`) for creatinine, glucose and Hb. This is persisted as a preference and is not patient data.
+- **Units** setting: added in rollout step 2, together with the first score that reads a creatinine, so it is never a setting nobody uses.
 
 ## 3. Data model (`src/data/`)
 
@@ -85,7 +85,7 @@ There is no global guideline switch. Wherever AHA/ACC, ESC or other guidelines c
   - Each line ends with its source tag.
   - It has **no free-text fields**.
   - The note is never stored. It reaches the clipboard only on a user tap.
-- **`copyText.ts`:** the existing `copyText` moves out of `ChecklistsView.tsx` so the handoff and the pre-op note can share it. It awaits the clipboard and falls back if that fails.
+- **`copyText.ts`:** the existing `copyText` moves out of `ChecklistsView.tsx` in rollout step 6, when the pre-op note becomes its second user. It awaits the clipboard and falls back if that fails.
 - The intra-op **handoff keeps its current no-biometrics rule**, unchanged.
 
 ## 5. Rapid plan cards (`planCards.ts`)
@@ -145,7 +145,7 @@ interface PlanCard {
   - Band thresholds are ascending.
   - Every plan card has all five phases.
 - **Pre-op note:** `buildPreopNote` is tested on a fixed input against the expected lines, and the input type has no free-text string field.
-- **Migration:** the persisted `activeTab` maps old values to new ones in `migratePersisted` (`dosing`/`airway`/`ventilation` → `intraop` plus that sub-view, `checklists` → `intraop` › Lists), with a test case added to `migrate.test.ts`.
+- **No migration needed:** `activeTab` is not persisted (see `partialize` in `useAppStore.ts`), so renaming the tabs cannot break an installed app. The existing `migrate.test.ts` still guards the persisted shape.
 - **Every PR:** `npm run verify` must pass.
 
 ## 9. Dropped from the blueprint
@@ -173,7 +173,7 @@ Each step is one PR and ships on its own.
 - They are on `SOURCES_WITHOUT_DERIVED_VALUES` until records cite them. Each PR that encodes a record removes its id from that list.
 - Not yet registered: the SGLT2 FDA labels, OAA/DAS obstetric, and the CFS 2.0 and STOP-Bang cut-off papers. Each content PR adds these before its records.
 
-1. **Navigation redesign:** the new tabs, existing views moved, Library in the header, crises in SOS, `copyText` moved to `lib/`, the tab migration and the units setting. No new clinical content.
+1. **Navigation redesign** (plan: `docs/superpowers/plans/2026-11-17-phase-navigation.md`): the Pre-op, Intra-op and Post-op tabs, existing views moved, an intra-op sub-navigation. No new clinical content. Deferred from this step: Plans tab (step 4), units setting (step 2), `copyText` move (step 6), crisis lists into SOS (own task).
 2. **Assess:** scores and CrCl.
 3. **Peri-op meds.**
 4. **Plan cards**, first batch.
