@@ -174,7 +174,7 @@ Each step is one PR and ships on its own.
 - Not yet registered: the SGLT2 FDA labels, OAA/DAS obstetric, and the CFS 2.0 and STOP-Bang cut-off papers. Each content PR adds these before its records.
 
 1. **Navigation redesign** (plan: `docs/superpowers/plans/2026-11-17-phase-navigation.md`): the Pre-op, Intra-op and Post-op tabs, existing views moved, an intra-op sub-navigation. No new clinical content. Deferred from this step: Plans tab (step 4), units setting (step 2), `copyText` move (step 6), crisis lists into SOS (own task).
-2. **Assess:** scores and CrCl.
+2. **Assess** (plan: `docs/superpowers/plans/2026-11-17-assess-scores-crcl.md`): serum creatinine with a mg/dL / µmol/L toggle, Cockcroft-Gault CrCl (actual body weight, adults only), RCRI and STOP-Bang, and the biometric header on Pre-op. RCRI was verified against the paper's full text. Deferred to step 2b: DASI, ARISCAT and the Clinical Frailty Scale (their weight tables and scale text have not been read), the ASA picker and surgical-risk grade (no ASA source registered, and nothing reads them before the pre-op note), glucose and Hb units, and CrCl bands (step 3 defines them from ASRA and the drug labels).
 3. **Peri-op meds.**
 4. **Plan cards**, first batch.
 5. **Post-op tools.**
