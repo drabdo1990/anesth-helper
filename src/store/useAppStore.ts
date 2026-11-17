@@ -78,6 +78,7 @@ interface AppState extends PersistedPrefs {
   intraopView: IntraopView;
   scoreAnswers: Record<string, boolean>;
   medsTaken: Record<string, boolean>;
+  choiceAnswers: Record<string, number>;
   emergencyOpen: boolean;
   emergencyKind: EmergencyKind;
   settingsOpen: boolean;
@@ -122,6 +123,7 @@ interface AppState extends PersistedPrefs {
   setCreatinineUnit: (unit: CreatinineUnit) => void;
   toggleScoreItem: (id: string) => void;
   toggleMedTaken: (id: string) => void;
+  setChoiceAnswer: (itemId: string, optionIndex: number) => void;
   touchRecent: (id: string) => void;
 
   setSelectedDose: (medicationId: string, doseId: string) => void;
@@ -196,6 +198,7 @@ export const useAppStore = create<AppState>()(
       intraopView: 'dosing',
       scoreAnswers: {},
       medsTaken: {},
+      choiceAnswers: {},
       emergencyOpen: false,
       emergencyKind: 'last',
       settingsOpen: false,
@@ -238,6 +241,7 @@ export const useAppStore = create<AppState>()(
           vent: { ...DEFAULT_VENT, scenarioId: get().ventScenarioId },
           scoreAnswers: {},
           medsTaken: {},
+          choiceAnswers: {},
           checks: {},
         }),
 
@@ -260,6 +264,7 @@ export const useAppStore = create<AppState>()(
       setCreatinineUnit: (creatinineUnit) => set({ creatinineUnit }),
       toggleScoreItem: (id) => set((s) => ({ scoreAnswers: { ...s.scoreAnswers, [id]: !s.scoreAnswers[id] } })),
       toggleMedTaken: (id) => set((s) => ({ medsTaken: { ...s.medsTaken, [id]: !s.medsTaken[id] } })),
+      setChoiceAnswer: (itemId, optionIndex) => set((s) => ({ choiceAnswers: { ...s.choiceAnswers, [itemId]: optionIndex } })),
       touchRecent: (id) =>
         set((s) => ({ recents: [id, ...s.recents.filter((r) => r !== id)].slice(0, 6) })),
 
