@@ -18,6 +18,10 @@ describe('listsFor', () => {
     expect(intraop.some((c) => c.id === 'pre-induction')).toBe(true);
     expect(intraop.some((c) => c.group === 'Crises')).toBe(true);
   });
+
+  it('gives the Plans tab no checklists of its own', () => {
+    expect(listsFor('plans')).toEqual([]);
+  });
 });
 
 describe('needsBiometrics', () => {
@@ -27,6 +31,7 @@ describe('needsBiometrics', () => {
     ['intraop', 'vent', true],
     ['intraop', 'lists', false],
     ['preop', 'dosing', true],
+    ['plans', 'dosing', false],
     ['postop', 'vent', false],
   ] as const)('%s / %s -> %s', (tab, view, want) => {
     expect(needsBiometrics(tab, view)).toBe(want);
