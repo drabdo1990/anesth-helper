@@ -7,6 +7,7 @@ import { LOCAL_ANESTHETICS, MEDICATIONS } from './medications';
 import { VENTILATION_SCENARIOS, VENT_ADVANCED_REFERENCE, VENT_ALARMS, VENT_MODES, VENT_TROUBLESHOOTING } from './ventilation';
 import { CHECKLISTS } from './checklists';
 import { CHOICE_SCORES } from './choiceScores';
+import { CONDITIONS } from './conditions';
 import { GLP1_PROTOCOLS } from './glp1Protocols';
 import { NEURAXIAL_REGIMENS } from './neuraxial';
 import { PERIOP_RULES } from './periopMeds';
@@ -104,6 +105,10 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
     add(s.sourceIds, `Choice score ${s.name}: ${s.items.length} items (${pts}); bands ${s.bands.map((b) => `${b.min}+ ${b.label}`).join(', ')}`);
   }
   add(PONV_PLAN.sourceIds, `PONV plan: ${PONV_PLAN.adults.headline}`);
+
+  for (const c of CONDITIONS) {
+    add(c.sourceIds, c.plan ? `Condition plan: ${c.name} (ch. ${c.chapter})` : `Condition list entry, no plan yet: ${c.name} (ch. ${c.chapter})`);
+  }
 
   for (const r of PERIOP_RULES) {
     for (const d of r.drugs) add([d.sourceId], `Perioperative ${r.drugClass}: ${d.name}: ${d.timings.map((t) => t.text).join(' | ')}`);
