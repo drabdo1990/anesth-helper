@@ -12,6 +12,7 @@ import { listsFor, needsBiometrics, type IntraopView } from './lib/phases';
 import { AirwayView } from './views/AirwayView';
 import { AssessView } from './views/AssessView';
 import { MedsPanel } from './components/MedsPanel';
+import { PlansView } from './views/PlansView';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
@@ -103,6 +104,7 @@ export const App: React.FC = () => {
         {activeTab === 'intraop' && intraopView === 'dosing' && <DosingView />}
         {activeTab === 'intraop' && intraopView === 'airway' && <AirwayView />}
         {activeTab === 'intraop' && intraopView === 'vent' && <VentilationView />}
+        {activeTab === 'plans' && <PlansView />}
         {/* Checklist views stay mounted and are only hidden, so the handoff form keeps what was typed. */}
         <div className={activeTab === 'preop' ? '' : 'hidden'} aria-hidden={activeTab !== 'preop'}>
           <AssessView />
