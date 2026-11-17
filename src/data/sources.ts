@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft21';
+export const DATA_VERSION = '2026.11.17-draft22';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -331,10 +331,10 @@ export const SOURCES: ClinicalSource[] = [
     publisher: 'Elsevier Churchill Livingstone (Miller RD, ed.)',
     year: '2005',
     tier: 3,
-    scope: ['neuraxial regimens (Tables 14-7, 14-8)', 'high-frequency ventilation, apneic threshold, laparoscopy CO2', 'facemask, OPA and portable airway kit', 'ASA monitoring and NORA summaries'],
+    scope: ['neuraxial regimens (Tables 14-7, 14-8)', 'high-frequency ventilation, apneic threshold, laparoscopy CO2', 'facemask, OPA and portable airway kit', 'ASA monitoring and NORA summaries', 'PACU discharge criteria: modified Aldrete and PADSS (Tables 68-18, 71-4)'],
     verification: 'secondary',
     accessNote:
-      'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit. Audit 2026-11: a 10th edition was published in 2024; it was not read, so these values remain from the 2005 edition.',
+      'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit. Audit 2026-11: a 10th edition was published in 2024; it was not read, so these values remain from the 2005 edition. Tables 68-18 and 71-4 (PACU discharge) were read from the notebook text on 2026-11-17.',
   },
   {
     id: 'stoelting-8e',
@@ -427,9 +427,9 @@ export const SOURCES: ClinicalSource[] = [
     publisher: 'Clinical Cases in Anesthesia',
     year: '2005',
     tier: 3,
-    scope: ['antiemetic and sympathomimetic doses'],
+    scope: ['antiemetic and sympathomimetic doses', 'modified Aldrete and PADSS tables (Tables 78.1, 78.2)'],
     verification: 'secondary',
-    accessNote: 'Citation taken from the project notebook. Edition and page were not verified in this build.',
+    accessNote: 'Citation taken from the project notebook. Edition and page were not verified in this build. Tables 78.1 and 78.2 (Aldrete, PADSS) were read from the notebook text on 2026-11-17; the copy has OCR damage in the Aldrete blood-pressure row.',
   },
   {
     id: 'aln-2025',
@@ -1193,7 +1193,8 @@ export const SOURCES: ClinicalSource[] = [
     tier: 3,
     scope: ['modified Aldrete PACU recovery score (SpO2 replaces colour)', 'discharge at >= 9 (working threshold)'],
     verification: 'secondary',
-    accessNote: 'Letter; PubMed record read, text not opened. The >= 9 discharge threshold must be confirmed in the text before encoding.',
+    accessNote:
+      'Letter; PubMed record read, text not opened. Item wording and the 9-of-10 discharge mark were read on 2026-11-17 from Miller 6e (Table 71-4, "at least 9 out of 10") and Clinical Cases in Anesthesia (Table 78.1); the two differ on the circulation bands (percent or mm) and on the 0-point oxygen level.',
   },
   {
     id: 'padss-chung-1995',
@@ -1208,6 +1209,20 @@ export const SOURCES: ClinicalSource[] = [
     verification: 'secondary',
     accessNote:
       'Abstract read; full text paywalled. A separate Chung paper, "Discharge criteria - a new trend" (Can J Anaesth 1995;42:1056-8), covers the modified PADSS and is not registered here.',
+  },
+  {
+    id: 'padss-marshall-chung-1999',
+    tag: 'PADSS 1999',
+    name: 'Discharge criteria and complications after ambulatory surgery (revised PADSS)',
+    publisher: 'Marshall SI, Chung F',
+    year: '1999',
+    version: 'Anesth Analg 1999;88:508-17, doi 10.1097/00000539-199903000-00008',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/10071996/',
+    tier: 3,
+    scope: ['revised PADSS home-readiness score (pain scored as acceptable or not)', 'discharge at 9 or more of 10 with an adult escort'],
+    verification: 'secondary',
+    accessNote:
+      'Review; full text not readable. Item wording and the 9-of-10 mark were read on 2026-11-17 from Miller 6e (Tables 68-18 and 71-4) and Clinical Cases in Anesthesia (Table 78.2), which attributes the table to Marshall and Chung 1999. The two books differ on the pain item: "not acceptable" scores 1 in Miller 6e and 0 in Clinical Cases.',
   },
   {
     id: '4at-bellelli-2014',
