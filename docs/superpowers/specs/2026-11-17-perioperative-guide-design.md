@@ -27,7 +27,8 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 
 | Place | Contents | Origin |
 |---|---|---|
-| **Pre-op** tab | Assess · Meds · Comorbidities · Fasting · Pre-op note | New. Fasting is the existing NPO checklist. |
+| **Pre-op** tab | Assess · Meds · Fasting · Pre-op note | New. Fasting is the existing NPO checklist. |
+| **Conditions** tab | Comorbidity search and plans, rare diseases first | New, rollout step 7 (user request 2026-11-17: its own tab) |
 | **Intra-op** tab | Sub-views: Dosing · Airway · Vent · Lists | Existing views moved in unchanged |
 | **Post-op** tab | PONV (Apfel) · Analgesia plan · PACU discharge (Aldrete, PADSS) · Delirium (4AT) · Emergence list · Handoff | New, plus the existing emergence checklist and handoff |
 | **Plans** tab | Rapid plan cards (§5) | New, rollout step 4 |
@@ -117,9 +118,9 @@ interface PlanCard {
 - **Pre-op tab:** a vertical flow of collapsible steps. Each step header shows its current result (for example "RCRI 2 · elevated"), so the user can jump straight to any step.
   - **Assess:** ASA picker with an E toggle, surgical risk grade, RCRI, functional capacity, STOP-Bang, CFS (shown when age ≥ 65), ARISCAT.
   - **Meds:** class toggles. Each shows its action, timing, resumption and conditions, with `variants` side by side where guidelines conflict.
-  - **Comorbidities:** a simple filter over name and aliases, with no search library. Picking one adds its plan and highlights its `medRuleIds`.
   - **Fasting:** the existing NPO checklist.
   - **Note:** a preview plus a Copy button.
+- **Conditions tab:** a search box (a simple filter over name and aliases, with no search library) above the condition list. Picking a condition shows its plan and highlights its `medRuleIds` in Pre-op › Meds. A search with no match says the condition is not in the app yet; it never falls back to an online or AI lookup (§9).
 - **Post-op tab:** Apfel with its prophylaxis plan, the analgesia plan, Aldrete or PADSS with the discharge threshold, 4AT, the emergence checklist and the handoff.
 - **Reuse:** the HUD `Panel`, `ChecklistItem`, `SegmentedControl`, `SourceBadge`, `NoSourceValue` and `useDialogFocus` components, plus the existing touch-target and contrast conventions (48 px minimum, `aria-pressed` on toggles).
 
@@ -180,4 +181,4 @@ Each step is one PR and ships on its own.
 4. **Plan cards**, first batch (plan: `docs/superpowers/plans/2026-11-17-plan-cards.md`): a Plans tab with four cards (Pediatric, Obstetric cesarean under neuraxial, Obesity, RSI / full stomach). Deviation from §5: a phase lists the ids of existing checklist items instead of new `ChecklistItemRecord`s, so no new clinical statement is written and every line keeps its own source; `links` is reduced to `ventScenarioId`, `airway`, `dosing`, `lists`, `references`. The Pediatric card never links to Dosing. Obesity names no BMI cut-off (no registered source states one). **Deferred:** Obstetric general anesthesia / failed intubation and Elderly / frail (no sourced content readable yet), a filtered Dosing deep-link (the filter is local state), and the later batches.
 5. **Post-op tools** (plan: `docs/superpowers/plans/2026-11-17-postop-tools.md`): first slice, primary-verified only. The Apfel PONV score (adults only; items, incidence and low/medium/high classification from the open ASER 2025 consensus appendix) with the consensus's statements (2 interventions at any risk in adults; five baseline-risk strategies; no doses), and the 4AT delirium screen (item wording, points and bands read from the 4AT form, version 1, in the supplementary appendix of Bellelli 2014, now a `primary` source; validated in hospitalised patients aged 70 or over, not specifically after surgery) using a new multi-option `ChoiceScore` model. The biometric header now also shows on Post-op (Apfel needs sex and age); the handoff stays biometrics-free. **Deferred to step 5b:** the modified Aldrete score and PADSS (item tables not readable; two open papers disagree on the PADSS threshold, "below 10" vs "9 or more"), the analgesia plan (ERAS guideline not read for this slice), PONV antiemetic doses (main-text table paywalled), and pediatric PONV risk (POVOC/VPOP).
 6. **Pre-op note**, plus the README privacy section updated for the note's biometrics.
-7. **Comorbidities**, in batches of about ten through the §7 pipeline.
+7. **Conditions**, in batches of about ten through the §7 pipeline, in its own bottom tab (the bar then holds five tabs plus SOS, so the step checks it still fits at 320 px). **Rare diseases come first** (user request 2026-11-17). The first batch is drawn from what the "Anesthesia nootbooks" notebook covers, for example malignant hyperthermia susceptibility, porphyria, myasthenia gravis, muscular dystrophies, pheochromocytoma and Ehlers-Danlos; the final list is confirmed with the user when step 7 is planned. Needs `notebooklm login` first. Common comorbidities follow in later batches.
