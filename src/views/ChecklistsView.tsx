@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Check, ClipboardCopy, RotateCcw } from 'lucide-react';
 import { CHECKLISTS, CHECKLIST_GROUPS, HANDOFF_OPTIONS } from '../data/checklists';
-import type { ChecklistGroup } from '../data/types';
+import type { ChecklistGroup, ChecklistRecord } from '../data/types';
 import { CICO_PLANS, LAST_STEPS, MH_STEPS } from '../data/emergencies';
 import { MEDICATIONS } from '../data/medications';
 import { VENT_MODES } from '../data/ventilation';
@@ -62,12 +62,14 @@ const Overview: React.FC = () => {
   );
 };
 
-// Groups with no lists yet are hidden.
-const GROUP_TABS: { id: GroupTab; label: string }[] = [
-  ...CHECKLIST_GROUPS.filter((g) => CHECKLISTS.some((c) => c.group === g)).map((g) => ({ id: g as GroupTab, label: g })),
-  { id: 'handoff', label: 'Handoff summary' },
-  { id: 'overview', label: 'Overview' },
-];
+type Extra = 'handoff' | 'overview';
+const EXTRA_LABEL: Record<Extra, string> = { handoff: 'Handoff summary', overview: 'Overview' };
+
+interface ChecklistsViewProps {
+  /** The lists this phase shows (see `listsFor` in lib/phases.ts). */
+  phaseLists: ChecklistRecord[];
+  extras?: Extra[];
+}
 
 const chipClass = (on: boolean): string =>
   `min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`;
@@ -199,26 +201,33 @@ const HandoffForm: React.FC = () => {
   );
 };
 
-export const ChecklistsView: React.FC = () => {
-  const [group, setGroup] = useState<GroupTab>(GROUP_TABS[0].id);
-  const [sub, setSub] = useState<string>(CHECKLISTS[0].id);
+export const ChecklistsView: React.FC<ChecklistsViewProps> = ({ phaseLists, extras = [] }) => {
+  // Groups with no lists in this phase are hidden.
+  const tabs: { id: GroupTab; label: string }[] = [
+    ...CHECKLIST_GROUPS.filter((g) => phaseLists.some((c) => c.group === g)).map((g) => ({ id: g as GroupTab, label: g })),
+    ...extras.map((e) => ({ id: e as GroupTab, label: EXTRA_LABEL[e] })),
+  ];
+  const [group, setGroup] = useState<GroupTab>(tabs[0].id);
+  const [sub, setSub] = useState<string>(phaseLists[0].id);
   const checks = useAppStore((s) => s.checks);
   const toggle = useAppStore((s) => s.toggleCheck);
   const resetChecks = useAppStore((s) => s.resetChecks);
 
-  const lists = CHECKLISTS.filter((c) => c.group === group);
+  const lists = phaseLists.filter((c) => c.group === group);
   const list = lists.find((c) => c.id === sub) ?? lists[0];
   const done = list ? list.items.filter((i) => checks[i.id]).length : 0;
 
   return (
     <div className="flex flex-col gap-3 pb-8">
-      <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklist groups">
-        {GROUP_TABS.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={group === t.id} onClick={() => setGroup(t.id)} className={chipClass(group === t.id)}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {tabs.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklist groups">
+          {tabs.map((t) => (
+            <button key={t.id} type="button" role="tab" aria-selected={group === t.id} onClick={() => setGroup(t.id)} className={chipClass(group === t.id)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
       {lists.length > 1 && (
         <div className="flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Checklists">
           {lists.map((c) => (
