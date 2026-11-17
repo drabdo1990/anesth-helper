@@ -129,7 +129,6 @@ export const SOURCES_WITHOUT_DERIVED_VALUES = [
   'dasi-hlatky-1989',
   'ariscat-canet-2010',
   'cfs-rockwood-2005',
-  'aldrete-1995',
   'padss-chung-1995',
   'aha-acc-periop-2024',
   'esc-ncs-2022',
