@@ -11,6 +11,7 @@ import { SegmentedControl } from './components/ui/SegmentedControl';
 import { listsFor, needsBiometrics, type IntraopView } from './lib/phases';
 import { AirwayView } from './views/AirwayView';
 import { AssessView } from './views/AssessView';
+import { MedsPanel } from './components/MedsPanel';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
@@ -105,6 +106,7 @@ export const App: React.FC = () => {
         {/* Checklist views stay mounted and are only hidden, so the handoff form keeps what was typed. */}
         <div className={activeTab === 'preop' ? '' : 'hidden'} aria-hidden={activeTab !== 'preop'}>
           <AssessView />
+          <MedsPanel />
           <ChecklistsView phaseLists={listsFor('preop')} />
         </div>
         <div className={activeTab === 'intraop' && intraopView === 'lists' ? '' : 'hidden'} aria-hidden={!(activeTab === 'intraop' && intraopView === 'lists')}>
