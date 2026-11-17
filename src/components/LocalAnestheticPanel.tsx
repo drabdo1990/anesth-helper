@@ -105,7 +105,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ weightKg }) => {
       <div className="rounded-2xl border border-slate-700 bg-slate-950 p-3">
         <div className="flex items-end justify-between gap-2">
           <UnitValue label="Combined fraction (sum of dose / max)" value={total.total.toFixed(2)} unit={`= ${Math.round(total.total * 100)}%`} size="xl" tone={STATUS_TONE[total.status]} />
-          <span className={`rounded-lg px-2 py-1 text-xs font-black uppercase ${total.status === 'toxic' ? 'bg-red-500 text-white' : total.status === 'caution' ? 'bg-amber-500 text-slate-950' : 'bg-emerald-500/20 text-emerald-300'}`}>
+          <span className={`rounded-lg px-2 py-1 text-xs font-black uppercase ${total.status === 'toxic' ? 'bg-red-500 text-white' : total.status === 'caution' ? 'bg-amber-500 text-black' : 'bg-emerald-500/20 text-emerald-300'}`}>
             {total.status === 'toxic' ? 'At or over 1.0' : total.status === 'caution' ? 'Caution' : 'Below limit'}
           </span>
         </div>
@@ -129,7 +129,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ weightKg }) => {
       )}
 
       {rows.map(({ admin, agent, doseMg, record, maxMg, maxNote, absoluteMaxMg, localProtocol, conflict }) => (
-        <div key={admin.id} className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
+        <div key={admin.id} className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-clinical-card p-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Agent">
               {LOCAL_ANESTHETICS.map((a) => (
@@ -217,7 +217,7 @@ export const LocalAnestheticPanel: React.FC<Props> = ({ weightKg }) => {
         <button
           type="button"
           onClick={() => add(LOCAL_ANESTHETICS[0].id, LOCAL_ANESTHETICS[0].concentrationsPercent[0])}
-          className="min-h-[48px] rounded-xl bg-cyan-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5"
+          className="min-h-[48px] rounded-xl bg-cyan-500 font-black uppercase text-black flex items-center justify-center gap-1.5"
         >
           <Plus className="h-5 w-5" /> Add entry
         </button>

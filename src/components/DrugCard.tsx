@@ -300,7 +300,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
               <button
                 type="button"
                 onClick={() => logDose(medication.id, computed.bolus!.massMg)}
-                className="min-h-[48px] rounded-lg bg-amber-500 px-2 text-xs font-black text-slate-950"
+                className="min-h-[48px] rounded-lg bg-amber-500 px-2 text-xs font-black text-black"
               >
                 Log this dose
               </button>

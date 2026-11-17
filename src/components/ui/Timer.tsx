@@ -93,7 +93,7 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
               type="button"
               onClick={() => onAlertChange(opt)}
               className={`min-h-[48px] rounded-xl border px-3 text-xs font-bold ${
-                alertEverySeconds === opt ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-800 text-slate-300'
+                alertEverySeconds === opt ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-slate-700 bg-slate-800 text-slate-300'
               }`}
             >
               {opt === 0 ? 'Off' : opt < 60 ? `${opt}s` : `${opt / 60} min`}
@@ -103,7 +103,7 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
       )}
       <div className="grid grid-cols-2 gap-2">
         {running ? (
-          <button type="button" onClick={() => pause(id)} className="min-h-[48px] rounded-xl bg-amber-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5">
+          <button type="button" onClick={() => pause(id)} className="min-h-[48px] rounded-xl bg-amber-500 font-black uppercase text-black flex items-center justify-center gap-1.5">
             <Pause className="h-5 w-5" /> Pause
           </button>
         ) : (
@@ -113,7 +113,7 @@ export const Timer: React.FC<TimerProps> = ({ id, label, alertEverySeconds = 0, 
               unlockAudio();
               start(id);
             }}
-            className="min-h-[48px] rounded-xl bg-emerald-500 font-black uppercase text-slate-950 flex items-center justify-center gap-1.5"
+            className="min-h-[48px] rounded-xl bg-emerald-500 font-black uppercase text-black flex items-center justify-center gap-1.5"
           >
             <Play className="h-5 w-5" /> {seconds > 0 ? 'Resume' : 'Start'}
           </button>

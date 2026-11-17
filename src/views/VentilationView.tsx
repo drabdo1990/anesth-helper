@@ -146,7 +146,7 @@ export const VentilationView: React.FC = () => {
             role="tab"
             aria-selected={s.id === scenario.id}
             onClick={() => setVent({ scenarioId: s.id, mlPerKgPbw: s.tidalVolumeMlPerKgPbw?.target ?? null })}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${s.id === scenario.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
+            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${s.id === scenario.id ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
           >
             {s.name}
           </button>
@@ -190,7 +190,7 @@ export const VentilationView: React.FC = () => {
       {!range && <NoSourceValue topic={`${scenario.name}: tidal volume range`} />}
 
       {/* Tidal volume */}
-      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
+      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-clinical-card p-3">
         <NumericStepper
           label="Tidal volume target"
           value={mlPerKg}
@@ -225,7 +225,7 @@ export const VentilationView: React.FC = () => {
       </section>
 
       {/* Rate, minute ventilation, timing */}
-      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
+      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-clinical-card p-3">
         <NumericStepper label="Respiratory rate" value={vent.respiratoryRate} unit="breaths/min" step={1} min={4} max={60} emptyText="Enter rate" onChange={(v) => setVent({ respiratoryRate: v })} />
         <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-950 p-2">
           <UnitValue label="Minute ventilation" value={mv !== null ? mv.toFixed(1) : '--'} unit="L/min" size="xl" tone="cyan" />
@@ -256,7 +256,7 @@ export const VentilationView: React.FC = () => {
       </section>
 
       {/* Pressures */}
-      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-[#131b2e] p-3">
+      <section className="flex flex-col gap-2 rounded-2xl border border-slate-800 bg-clinical-card p-3">
         <NumericStepper label="PEEP" value={vent.peepCmH2O} unit="cmH2O" step={1} min={0} max={30} emptyText="Enter PEEP" onChange={(v) => setVent({ peepCmH2O: v })} />
         <NumericStepper label="Plateau pressure" value={vent.plateauCmH2O} unit="cmH2O" step={1} min={0} max={60} emptyText="Enter plateau" onChange={(v) => setVent({ plateauCmH2O: v })} />
         <NumericStepper label="FiO2" value={vent.fio2Percent} unit="%" step={5} min={21} max={100} emptyText="Enter FiO2" onChange={(v) => setVent({ fio2Percent: v })} />

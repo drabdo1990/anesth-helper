@@ -7,7 +7,7 @@ const TONE: Record<ValueTone, string> = {
   neutral: 'text-slate-100',
   cyan: 'text-cyan-300',
   amber: 'text-amber-300',
-  red: 'text-red-400',
+  red: 'text-red-300',
   emerald: 'text-emerald-300',
 };
 

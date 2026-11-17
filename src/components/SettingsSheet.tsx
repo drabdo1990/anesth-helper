@@ -9,6 +9,13 @@ import { DisclaimerBanner } from './DisclaimerBanner';
 import { useDialogFocus } from '../lib/useDialogFocus';
 import { SegmentedControl } from './ui/SegmentedControl';
 import { WarningBanner } from './ui/WarningBanner';
+import { setThemePreference, useThemePreference, type ThemePreference } from '../lib/theme';
+
+const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+];
 
 const SCALAR_OPTIONS: { value: ScalarPreference; label: string }[] = [
   { value: 'auto', label: 'Source default' },
@@ -29,6 +36,7 @@ export const SettingsSheet: React.FC = () => {
   const setMhContact = useAppStore((s) => s.setMhContact);
   const audioEnabled = useAppStore((s) => s.audioEnabled);
   const setAudioEnabled = useAppStore((s) => s.setAudioEnabled);
+  const theme = useThemePreference();
   const dialogRef = useDialogFocus<HTMLDivElement>(open, () => setOpen(false));
 
   if (!open) return null;
@@ -61,6 +69,12 @@ export const SettingsSheet: React.FC = () => {
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        <section className="flex flex-col gap-1.5">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Appearance</h3>
+          <SegmentedControl<ThemePreference> ariaLabel="Color theme" value={theme} options={THEME_OPTIONS} onChange={setThemePreference} />
+          <p className="text-xs text-slate-400">System follows your device. The SOS screen stays dark in both themes.</p>
+        </section>
 
         <section className="flex flex-col gap-2">
           <h3 className="text-sm font-bold text-slate-200">Active reference set</h3>
@@ -99,7 +113,7 @@ export const SettingsSheet: React.FC = () => {
                 role="radio"
                 aria-checked={preferredScalar === o.value}
                 onClick={() => setPreferredScalar(o.value)}
-                className={`min-h-[48px] rounded-xl border px-3 text-xs font-bold ${preferredScalar === o.value ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-700 bg-slate-800 text-slate-300'}`}
+                className={`min-h-[48px] rounded-xl border px-3 text-xs font-bold ${preferredScalar === o.value ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-slate-700 bg-slate-800 text-slate-300'}`}
               >
                 {o.label}
               </button>
