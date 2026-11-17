@@ -7,14 +7,25 @@ import { EmergencyOverlay } from './components/EmergencyOverlay';
 import { Navigation } from './components/Navigation';
 import { SettingsSheet } from './components/SettingsSheet';
 import { CicoPanel } from './components/emergency/CicoPanel';
+import { SegmentedControl } from './components/ui/SegmentedControl';
+import { listsFor, needsBiometrics, type IntraopView } from './lib/phases';
 import { AirwayView } from './views/AirwayView';
 import { ChecklistsView } from './views/ChecklistsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
 import { VentilationView } from './views/VentilationView';
 
+const INTRAOP_VIEWS: { value: IntraopView; label: string }[] = [
+  { value: 'dosing', label: 'Dosing' },
+  { value: 'airway', label: 'Airway' },
+  { value: 'vent', label: 'Vent' },
+  { value: 'lists', label: 'Lists' },
+];
+
 export const App: React.FC = () => {
   const activeTab = useAppStore((s) => s.activeTab);
+  const intraopView = useAppStore((s) => s.intraopView);
+  const setIntraopView = useAppStore((s) => s.setIntraopView);
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const setReferencesOpen = useAppStore((s) => s.setReferencesOpen);
   const emergencyOpen = useAppStore((s) => s.emergencyOpen);
@@ -79,18 +90,26 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {activeTab !== 'checklists' && <BiometricHeader />}
+      {needsBiometrics(activeTab, intraopView) && <BiometricHeader />}
 
       <main className="mx-auto w-full max-w-4xl flex-1 p-3 sm:p-4">
-        {activeTab !== 'checklists' && (
-          <>
-            {activeTab === 'dosing' && <DosingView />}
-            {activeTab === 'airway' && <AirwayView />}
-            {activeTab === 'ventilation' && <VentilationView />}
-          </>
+        {activeTab === 'intraop' && (
+          <div className="mb-3">
+            <SegmentedControl<IntraopView> ariaLabel="Intra-op tools" value={intraopView} options={INTRAOP_VIEWS} onChange={setIntraopView} />
+          </div>
         )}
-        <div className={activeTab === 'checklists' ? '' : 'hidden'} aria-hidden={activeTab !== 'checklists'}>
-          <ChecklistsView />
+        {activeTab === 'intraop' && intraopView === 'dosing' && <DosingView />}
+        {activeTab === 'intraop' && intraopView === 'airway' && <AirwayView />}
+        {activeTab === 'intraop' && intraopView === 'vent' && <VentilationView />}
+        {/* Checklist views stay mounted and are only hidden, so the handoff form keeps what was typed. */}
+        <div className={activeTab === 'preop' ? '' : 'hidden'} aria-hidden={activeTab !== 'preop'}>
+          <ChecklistsView phaseLists={listsFor('preop')} />
+        </div>
+        <div className={activeTab === 'intraop' && intraopView === 'lists' ? '' : 'hidden'} aria-hidden={!(activeTab === 'intraop' && intraopView === 'lists')}>
+          <ChecklistsView phaseLists={listsFor('intraop')} extras={['overview']} />
+        </div>
+        <div className={activeTab === 'postop' ? '' : 'hidden'} aria-hidden={activeTab !== 'postop'}>
+          <ChecklistsView phaseLists={listsFor('postop')} extras={['handoff']} />
         </div>
       </main>
 

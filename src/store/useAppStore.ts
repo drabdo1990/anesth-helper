@@ -7,8 +7,9 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Sex } from '../lib/calc/biometrics';
 import type { WeightScalar } from '../data/types';
 import type { GuidelineSet } from '../data/resolve';
+import type { AppTab, IntraopView } from '../lib/phases';
 
-export type AppTab = 'dosing' | 'airway' | 'ventilation' | 'checklists';
+export type { AppTab, IntraopView };
 export type EmergencyKind = 'last' | 'mh' | 'cico';
 export type ScalarPreference = 'auto' | WeightScalar;
 
@@ -70,6 +71,7 @@ interface AppState extends PersistedPrefs {
   // ---- in-memory only ----
   patient: PatientInput;
   activeTab: AppTab;
+  intraopView: IntraopView;
   emergencyOpen: boolean;
   emergencyKind: EmergencyKind;
   settingsOpen: boolean;
@@ -98,6 +100,7 @@ interface AppState extends PersistedPrefs {
   newCase: () => void;
 
   setActiveTab: (tab: AppTab) => void;
+  setIntraopView: (view: IntraopView) => void;
   openEmergency: (kind?: EmergencyKind) => void;
   closeEmergency: () => void;
   setEmergencyKind: (kind: EmergencyKind) => void;
@@ -178,7 +181,8 @@ export const useAppStore = create<AppState>()(
 
       // session
       patient: EMPTY_PATIENT,
-      activeTab: 'dosing',
+      activeTab: 'intraop',
+      intraopView: 'dosing',
       emergencyOpen: false,
       emergencyKind: 'last',
       settingsOpen: false,
@@ -223,6 +227,7 @@ export const useAppStore = create<AppState>()(
         }),
 
       setActiveTab: (activeTab) => set({ activeTab }),
+      setIntraopView: (intraopView) => set({ intraopView }),
       openEmergency: (kind) =>
         set((s) => ({ emergencyOpen: true, emergencyKind: kind ?? s.emergencyKind })),
       closeEmergency: () => set({ emergencyOpen: false }),
