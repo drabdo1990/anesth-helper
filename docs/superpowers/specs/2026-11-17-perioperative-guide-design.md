@@ -44,7 +44,7 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 The biometric header (age, sex, weight, height) is the single input for every score and dose. In the navigation step it shows on Intra-op › Dosing, Airway and Vent only (`needsBiometrics` in `lib/phases.ts`), because the checklists and handoff do not use it. Pre-op shows it from rollout step 2, when the first score needs age, sex and BMI.
 
 **Settings additions:**
-- **Units** setting: added in rollout step 2, together with the first score that reads a creatinine, so it is never a setting nobody uses.
+- **Units:** added in rollout step 2 as an inline mg/dL / µmol/L toggle beside the creatinine field in Assess (not in the Settings sheet), with the first score that reads a creatinine. Only the choice is persisted. Glucose and Hb units wait until something reads them.
 
 ## 3. Data model (`src/data/`)
 
