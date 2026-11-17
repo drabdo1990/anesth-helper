@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CHOICE_SCORES, FOUR_AT } from '../choiceScores';
+import { CHOICE_SCORES, FOUR_AT, MODIFIED_ALDRETE, PADSS } from '../choiceScores';
 import { SOURCE_BY_ID } from '../sources';
 
 describe('choice score records', () => {
@@ -34,5 +34,22 @@ describe('choice score records', () => {
     expect(FOUR_AT.note).toContain('aged 70 or over');
     expect(FOUR_AT.note).toContain('not specifically after surgery');
     expect(SOURCE_BY_ID['4at-bellelli-2014'].accessNote).toContain('not specifically after surgery');
+  });
+
+  it('Aldrete and PADSS: five items scored out of 10, with the discharge mark at 9', () => {
+    expect(MODIFIED_ALDRETE.items.map((i) => i.options.map((o) => o.points))).toEqual([[2, 1, 0], [2, 1, 0], [2, 1, 0], [2, 1, 0], [2, 1, 0]]);
+    expect(PADSS.items.map((i) => i.options.map((o) => o.points))).toEqual([[2, 1, 0], [2, 1, 0], [2, 1, 0], [2, 0], [2, 1, 0]]);
+    for (const s of [MODIFIED_ALDRETE, PADSS]) expect(s.bands.map((b) => b.min), s.id).toEqual([0, 9]);
+  });
+
+  it('Aldrete and PADSS: flag the three items the two textbooks word differently', () => {
+    const prompt = (s: typeof PADSS, id: string) => s.items.find((i) => i.id === id)?.prompt ?? '';
+    expect(prompt(MODIFIED_ALDRETE, 'aldrete-circulation')).toContain('Miller 6e');
+    expect(prompt(MODIFIED_ALDRETE, 'aldrete-spo2')).toContain('Miller 6e');
+    expect(prompt(PADSS, 'padss-pain')).toContain('Miller 6e');
+  });
+
+  it('lists the scores in the order the Post-op tab shows them', () => {
+    expect(CHOICE_SCORES.map((s) => s.id)).toEqual(['modified-aldrete', 'padss', '4at']);
   });
 });
