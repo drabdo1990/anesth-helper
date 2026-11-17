@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft20';
+export const DATA_VERSION = '2026.11.17-draft21';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -335,6 +335,18 @@ export const SOURCES: ClinicalSource[] = [
     verification: 'secondary',
     accessNote:
       'Transcribed from the project notebook. The printed text was not re-read in this build, and the 2005 edition predates current practice. Treat as a reference, not a limit. Audit 2026-11: a 10th edition was published in 2024; it was not read, so these values remain from the 2005 edition.',
+  },
+  {
+    id: 'stoelting-8e',
+    tag: 'Stoelting 8e',
+    name: "Stoelting's Anesthesia and Co-Existing Disease, 8th Edition",
+    publisher: 'Elsevier (Hines RL, Jones SB, eds.)',
+    year: '2022',
+    tier: 3,
+    scope: ['Diseases tab: condition list with chapter pointers', 'perioperative plans for MH susceptibility, acute porphyrias, myasthenia gravis, myotonic dystrophy, pheochromocytoma and carcinoid syndrome'],
+    verification: 'primary',
+    accessNote:
+      "Read from the book's full text in the project NotebookLM notebook on 2026-11-17. A textbook, not a guideline: the plans are short paraphrases of its management sections and need clinician review against current society guidance and local protocol.",
   },
   {
     id: 'oxford-handbook',

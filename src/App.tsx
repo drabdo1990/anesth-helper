@@ -16,6 +16,7 @@ import { PreopNotePanel } from './components/PreopNotePanel';
 import { PlansView } from './views/PlansView';
 import { PostopView } from './views/PostopView';
 import { ChecklistsView } from './views/ChecklistsView';
+import { ConditionsView } from './views/ConditionsView';
 import { DosingView } from './views/DosingView';
 import { ReferencesView } from './views/ReferencesView';
 import { VentilationView } from './views/VentilationView';
@@ -107,6 +108,7 @@ export const App: React.FC = () => {
         {activeTab === 'intraop' && intraopView === 'airway' && <AirwayView />}
         {activeTab === 'intraop' && intraopView === 'vent' && <VentilationView />}
         {activeTab === 'plans' && <PlansView />}
+        {activeTab === 'conditions' && <ConditionsView />}
         {/* Checklist views stay mounted and are only hidden, so the handoff form keeps what was typed. */}
         <div className={activeTab === 'preop' ? '' : 'hidden'} aria-hidden={activeTab !== 'preop'}>
           <AssessView />

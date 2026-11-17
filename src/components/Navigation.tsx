@@ -1,5 +1,5 @@
 import React from 'react';
-import { BedDouble, ClipboardList, LayoutGrid, ShieldAlert, Syringe } from 'lucide-react';
+import { BedDouble, ClipboardList, LayoutGrid, ShieldAlert, Stethoscope, Syringe } from 'lucide-react';
 import { useAppStore, type AppTab } from '../store/useAppStore';
 import { DisclaimerBanner } from './DisclaimerBanner';
 
@@ -8,9 +8,10 @@ const TABS: { id: AppTab; label: string; icon: React.ComponentType<{ className?:
   { id: 'plans', label: 'Plans', icon: LayoutGrid },
   { id: 'intraop', label: 'Intra-op', icon: Syringe },
   { id: 'postop', label: 'Post-op', icon: BedDouble },
+  { id: 'conditions', label: 'Diseases', icon: Stethoscope },
 ];
 
-/** Sticky bottom bar: three case phases plus the always-reachable red Emergency button. */
+/** Sticky bottom bar: the case phases, Plans and Diseases, plus the always-reachable red Emergency button. Tabs share the width (min-w-0) so five tabs and SOS fit a 320 px screen. */
 export const Navigation: React.FC = () => {
   const activeTab = useAppStore((s) => s.activeTab);
   const setActiveTab = useAppStore((s) => s.setActiveTab);
@@ -30,7 +31,7 @@ export const Navigation: React.FC = () => {
               type="button"
               onClick={() => setActiveTab(id)}
               aria-current={active ? 'page' : undefined}
-              className={`flex min-h-[56px] min-w-[56px] flex-1 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold touch-manipulation ${
+              className={`flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold touch-manipulation ${
                 active ? 'bg-cyan-500/15 text-cyan-300' : 'text-slate-400'
               }`}
             >
@@ -44,7 +45,7 @@ export const Navigation: React.FC = () => {
           onClick={() => openEmergency()}
           aria-haspopup="dialog"
           aria-expanded={emergencyOpen}
-          className="flex min-h-[56px] min-w-[72px] flex-col items-center justify-center gap-0.5 rounded-xl bg-red-500 text-[11px] font-black uppercase text-white shadow-glow-red touch-manipulation active:bg-red-600"
+          className="flex min-h-[56px] min-w-[64px] flex-col items-center justify-center gap-0.5 rounded-xl bg-red-500 text-[11px] font-black uppercase text-white shadow-glow-red touch-manipulation active:bg-red-600"
         >
           <ShieldAlert className="h-6 w-6" />
           SOS

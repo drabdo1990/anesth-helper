@@ -22,6 +22,10 @@ describe('listsFor', () => {
   it('gives the Plans tab no checklists of its own', () => {
     expect(listsFor('plans')).toEqual([]);
   });
+
+  it('gives the Diseases tab no checklists of its own', () => {
+    expect(listsFor('conditions')).toEqual([]);
+  });
 });
 
 describe('needsBiometrics', () => {
@@ -33,6 +37,7 @@ describe('needsBiometrics', () => {
     ['preop', 'dosing', true],
     ['plans', 'dosing', false],
     ['postop', 'vent', true],
+    ['conditions', 'dosing', false],
   ] as const)('%s / %s -> %s', (tab, view, want) => {
     expect(needsBiometrics(tab, view)).toBe(want);
   });

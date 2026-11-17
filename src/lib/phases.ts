@@ -1,7 +1,7 @@
 import { CHECKLISTS } from '../data/checklists';
 import type { ChecklistRecord } from '../data/types';
 
-export type AppTab = 'preop' | 'plans' | 'intraop' | 'postop';
+export type AppTab = 'preop' | 'plans' | 'intraop' | 'postop' | 'conditions';
 export type IntraopView = 'dosing' | 'airway' | 'vent' | 'lists';
 
 const PREOP_IDS = ['fasting-npo'];
