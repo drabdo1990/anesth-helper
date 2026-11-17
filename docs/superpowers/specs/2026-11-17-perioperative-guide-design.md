@@ -30,9 +30,9 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 | **Pre-op** tab | Assess · Meds · Comorbidities · Fasting · Pre-op note | New. Fasting is the existing NPO checklist. |
 | **Intra-op** tab | Sub-views: Dosing · Airway · Vent · Lists | Existing views moved in unchanged |
 | **Post-op** tab | PONV (Apfel) · Analgesia plan · PACU discharge (Aldrete, PADSS) · Delirium (4AT) · Emergence list · Handoff | New, plus the existing emergence checklist and handoff |
-| **Plans** tab | Rapid plan cards (§5) | New |
+| **Plans** tab | Rapid plan cards (§5) | New, rollout step 4 |
 | **Library** (header book icon, which already opens References) | Comorbidity reference · Drug reference · Sources and verification · Guideline comparisons | Existing ReferencesView and ReferenceDrugsPanel, plus comorbidity browsing |
-| **SOS** | LAST, MH, CICO, plus the QRH crises (anaphylaxis, massive bleeding, bronchospasm, laryngospasm) | Crisis lists move out of the Lists view |
+| **SOS** | LAST, MH, CICO, plus the QRH crises (anaphylaxis, massive bleeding, bronchospasm, laryngospasm) | Target state. For now the crisis lists stay under Intra-op › Lists (see below) |
 
 **Where each checklist group goes.** `ChecklistsView` gets a `phaseLists` prop (from `listsFor(tab)` in `lib/phases.ts`), and each phase renders only its own lists:
 - Fasting / NPO → Pre-op tab
@@ -41,7 +41,7 @@ The bottom bar changes from `Dosing · Airway · Vent · Lists` to **`Pre-op · 
 - Handoff → Post-op
 - Moving the crisis lists into SOS is its own task. SOS has three weight-based panels behind a three-way switch, and adding four more would need that switch redesigned.
 
-The biometric header (age, sex, weight, height) stays on every phase tab and is the single input for every score and dose.
+The biometric header (age, sex, weight, height) is the single input for every score and dose. In the navigation step it shows on Intra-op › Dosing, Airway and Vent only (`needsBiometrics` in `lib/phases.ts`), because the checklists and handoff do not use it. Pre-op shows it from rollout step 2, when the first score needs age, sex and BMI.
 
 **Settings additions:**
 - **Units** setting: added in rollout step 2, together with the first score that reads a creatinine, so it is never a setting nobody uses.
