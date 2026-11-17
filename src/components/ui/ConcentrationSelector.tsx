@@ -25,7 +25,7 @@ export const ConcentrationSelector: React.FC<ConcentrationSelectorProps> = ({ op
             }`}
           >
             {c.label}
-            {c.requiresDilution && <span className="ml-1 text-amber-400" title="Dilute before IV use">!</span>}
+            {c.requiresDilution && <span className="ml-1 text-amber-300" title="Dilute before IV use">!</span>}
           </button>
         );
       })}

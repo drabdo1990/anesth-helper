@@ -85,7 +85,7 @@ export const DosingView: React.FC = () => {
                 setFilter('all');
               }
             }}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${situation === s.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
+            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${situation === s.id ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
           >
             {s.label}
           </button>
@@ -105,7 +105,7 @@ export const DosingView: React.FC = () => {
             role="tab"
             aria-selected={filter === c.id}
             onClick={() => setFilter(c.id)}
-            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${filter === c.id ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
+            className={`min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${filter === c.id ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-slate-800 bg-slate-900 text-slate-300'}`}
           >
             {c.label}
           </button>

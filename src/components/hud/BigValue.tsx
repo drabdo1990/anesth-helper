@@ -13,10 +13,10 @@ interface BigValueProps {
 }
 
 const TONE: Record<BigValueTone, string> = {
-  info: 'text-clinical-cyan [text-shadow:0_0_14px_rgba(6,182,212,0.55)]',
-  ok: 'text-clinical-emerald [text-shadow:0_0_14px_rgba(16,185,129,0.55)]',
-  amber: 'text-clinical-amber [text-shadow:0_0_14px_rgba(245,158,11,0.55)]',
-  red: 'text-clinical-red [text-shadow:0_0_14px_rgba(239,68,68,0.6)]',
+  info: 'text-clinical-cyan [text-shadow:0_0_14px_rgba(6,182,212,var(--glow-a))]',
+  ok: 'text-clinical-emerald [text-shadow:0_0_14px_rgba(16,185,129,var(--glow-a))]',
+  amber: 'text-clinical-amber [text-shadow:0_0_14px_rgba(245,158,11,var(--glow-a))]',
+  red: 'text-clinical-red [text-shadow:0_0_14px_rgba(239,68,68,var(--glow-a))]',
 };
 
 export const BigValue: React.FC<BigValueProps> = ({ label, value, unit, tone = 'info', sourceIds }) => (

@@ -125,7 +125,7 @@ export const ReferencesView: React.FC = () => {
       aria-modal="true"
       aria-label="References"
       tabIndex={-1}
-      className="fixed inset-x-0 top-0 z-[70] flex h-screen h-[100dvh] flex-col bg-[#090d16]"
+      className="fixed inset-x-0 top-0 z-[70] flex h-screen h-[100dvh] flex-col bg-clinical-bg"
     >
       <div className="flex items-center gap-2 border-b border-slate-800 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <h2 className="flex-1 text-lg font-black uppercase text-slate-100">References & Guidelines</h2>

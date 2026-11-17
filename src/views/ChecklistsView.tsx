@@ -72,7 +72,7 @@ interface ChecklistsViewProps {
 }
 
 const chipClass = (on: boolean): string =>
-  `min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500 text-slate-950' : 'border-clinical-border bg-clinical-card text-slate-300'}`;
+  `min-h-[48px] shrink-0 rounded-xl border px-3 text-xs font-bold ${on ? 'border-cyan-400 bg-cyan-500 text-black' : 'border-clinical-border bg-clinical-card text-slate-300'}`;
 
 const baseName = (name: string): string => name.split(' (')[0];
 const namesFor = (category: string): string[] => [...new Set(MEDICATIONS.filter((m) => m.category === category).map((m) => baseName(m.name)))];
@@ -180,7 +180,7 @@ const HandoffForm: React.FC = () => {
         <button
           type="button"
           onClick={async () => setCopied((await copyText(text)) ? 'ok' : 'fail')}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-cyan-500 font-black uppercase text-slate-950"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-cyan-500 font-black uppercase text-black"
         >
           {copied === 'ok' ? <Check className="h-5 w-5" /> : <ClipboardCopy className="h-5 w-5" />}
           {copied === 'ok' ? 'Copied' : 'Copy summary to clipboard'}

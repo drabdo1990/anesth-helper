@@ -26,9 +26,9 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({ checked, onToggle,
     }`}
   >
     {checked ? (
-      <CheckCircle2 className={`mt-0.5 shrink-0 text-emerald-400 ${large ? 'h-7 w-7' : 'h-5 w-5'}`} />
+      <CheckCircle2 className={`mt-0.5 shrink-0 text-emerald-300 ${large ? 'h-7 w-7' : 'h-5 w-5'}`} />
     ) : (
-      <Circle className={`mt-0.5 shrink-0 ${critical ? 'text-red-400' : 'text-slate-500'} ${large ? 'h-7 w-7' : 'h-5 w-5'}`} />
+      <Circle className={`mt-0.5 shrink-0 ${critical ? 'text-red-300' : 'text-slate-500'} ${large ? 'h-7 w-7' : 'h-5 w-5'}`} />
     )}
     <span className="min-w-0 flex-1">
       <span className={`block font-semibold leading-snug ${large ? 'text-lg' : 'text-sm'} ${checked ? 'line-through opacity-70' : ''}`}>{label}</span>

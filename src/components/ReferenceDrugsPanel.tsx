@@ -44,7 +44,7 @@ const InfusionRow: React.FC<{ i: ReferenceInfusionLine }> = ({ i }) => (
 );
 
 const DrugEntry: React.FC<{ drug: ReferenceDrug }> = ({ drug }) => (
-  <details className="rounded-xl border border-slate-800 bg-[#131b2e] p-2.5">
+  <details className="rounded-xl border border-slate-800 bg-clinical-card p-2.5">
     <summary className="min-h-[40px] cursor-pointer text-sm font-bold text-slate-100">
       {drug.name}
       {drug.scalar && !drug.supplementTo && <span className="ml-2 text-[10px] font-semibold text-slate-400">source scalar: {drug.scalar}</span>}

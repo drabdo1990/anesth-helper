@@ -45,6 +45,7 @@ The biometric header (age, sex, weight, height) is the single input for every sc
 
 **Settings additions:**
 - **Units:** added in rollout step 2 as an inline mg/dL / µmol/L toggle beside the creatinine field in Assess (not in the Settings sheet), with the first score that reads a creatinine. Only the choice is persisted. Glucose and Hb units wait until something reads them.
+- **Appearance:** System / Light / Dark in the Settings sheet (plan: `docs/superpowers/plans/2026-11-17-theme.md`). Stored under its own key `anesthassist-theme` (no key means System), not in the persisted store. The palette is CSS variables selected by `data-theme`; light is the mirrored shade of the dark palette. The SOS overlay stays dark in both themes.
 
 ## 3. Data model (`src/data/`)
 

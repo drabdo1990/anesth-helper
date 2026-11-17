@@ -87,7 +87,7 @@ Do not add a value you cannot tie to a named source. Leave it out so the UI show
 
 ## International guidelines vs local protocol
 
-Settings (gear icon) has an **Active reference set** switch.
+Settings (gear icon) has an **Active reference set** switch and an **Appearance** switch (System, Light or Dark; System is the default and follows the device). The SOS screen stays dark in both themes.
 
 - Local values go in `src/data/localOverrides.ts`, keyed as documented in that file. **No local notebook was supplied, so this build contains none.**
 - Rules applied by `src/data/resolve.ts`:
@@ -98,7 +98,7 @@ Settings (gear icon) has an **Active reference set** switch.
 
 ## What is and is not stored
 
-**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentration for each dose, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, the creatinine unit (mg/dL or µmol/L), and anonymous checklist tick marks.
+**Stored on the device (localStorage, key `anesthassist-storage`):** reference set choice, preferred weight scalar, chosen concentration for each dose, last ventilation scenario, recently used drugs, the MH hotline/contact you type in Settings, timer-sound setting, the creatinine unit (mg/dL or µmol/L), the color theme (key `anesthassist-theme`, absent when set to System), and anonymous checklist tick marks.
 
 **Never stored:** patient weight, height, sex, age, serum creatinine, risk-score answers, ticked medications, dose selections, cumulative dose logs, local anesthetic entries, emergency logs, timers and handoff text. They live in memory and disappear when the app closes. **New case** clears them (and checklist ticks) on demand. Older saved data (including the previous version's patient values) is discarded on upgrade.
 

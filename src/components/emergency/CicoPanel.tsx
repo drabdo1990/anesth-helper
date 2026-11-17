@@ -57,7 +57,7 @@ export const CicoPanel: React.FC = () => {
             aria-selected={p.id === plan.id}
             onClick={() => setPlan(p.id)}
             className={`min-h-[56px] rounded-xl border text-lg font-black ${
-              p.id === plan.id ? (p.id === 'D' ? 'border-red-400 bg-red-500 text-white' : 'border-amber-300 bg-amber-400 text-slate-950') : 'border-slate-700 bg-slate-900 text-slate-300'
+              p.id === plan.id ? (p.id === 'D' ? 'border-red-400 bg-red-500 text-white' : 'border-amber-300 bg-amber-400 text-black') : 'border-slate-700 bg-slate-900 text-slate-300'
             }`}
           >
             Plan {p.id}
@@ -88,7 +88,7 @@ export const CicoPanel: React.FC = () => {
             ))}
           </ul>
           {next && (
-            <button type="button" onClick={() => setPlan(next.id)} className="mt-3 min-h-[56px] w-full rounded-xl bg-amber-400 text-lg font-black uppercase text-slate-950">
+            <button type="button" onClick={() => setPlan(next.id)} className="mt-3 min-h-[56px] w-full rounded-xl bg-amber-400 text-lg font-black uppercase text-black">
               Plan {plan.id} failed → go to Plan {next.id}
             </button>
           )}

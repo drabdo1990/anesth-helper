@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
 import { setPwaUpdate } from './lib/pwaUpdate';
+import { initTheme } from './lib/theme';
 import { useAppStore } from './store/useAppStore';
 import './index.css';
 
@@ -26,6 +27,8 @@ setPwaUpdate(() => updateSW(true));
 window.addEventListener('storage', (event) => {
   if (event.key === 'anesthassist-storage') void useAppStore.persist.rehydrate();
 });
+
+initTheme();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
