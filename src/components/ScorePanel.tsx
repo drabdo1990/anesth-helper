@@ -57,6 +57,8 @@ export const ScorePanel: React.FC<ScorePanelProps> = ({ score, answers, ctx, onT
       <div aria-live="polite">
         {result.kind === 'incomplete' ? (
           <WarningBanner level="info">Incomplete: needs {result.missing.join(', ')}.</WarningBanner>
+        ) : result.kind === 'not-applicable' ? (
+          <WarningBanner level="info">{result.reason}</WarningBanner>
         ) : (
           <>
             <p className="font-mono text-lg font-bold text-cyan-300">

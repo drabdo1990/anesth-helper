@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { RCRI, STOP_BANG } from '../../../data/riskScores';
+import { APFEL, RCRI, STOP_BANG } from '../../../data/riskScores';
 import { scoreResult, type ScoreContext } from '../scores';
 import { creatinineToUmol } from '../units';
 
 const ctx: ScoreContext = { ageYears: 40, sex: 'female', bmi: 25, creatinineUmolL: creatinineToUmol(1, 'mgdl') };
 
 const ok = (r: ReturnType<typeof scoreResult>) => {
-  if (r.kind !== 'ok') throw new Error(`expected ok, got incomplete: ${r.missing.join(', ')}`);
+  if (r.kind !== 'ok') throw new Error(`expected ok, got ${r.kind}`);
   return r;
 };
 
@@ -72,5 +72,47 @@ describe('STOP-Bang', () => {
       kind: 'incomplete',
       missing: ['weight and height (BMI)', 'age', 'biological sex'],
     });
+  });
+});
+
+describe('Apfel', () => {
+  const manual = APFEL.items.filter((i) => !i.derive);
+  const tick = (n: number) => Object.fromEntries(manual.slice(0, n).map((i) => [i.id, true]));
+  const female = { ...ctx, ageYears: 40, sex: 'female' as const };
+
+  it.each([
+    [0, 1, 'Medium risk'],
+    [1, 2, 'Medium risk'],
+    [2, 3, 'High risk'],
+    [3, 4, 'High risk'],
+  ])('a woman with %s ticked items scores %s -> %s', (n, points, band) => {
+    const r = ok(scoreResult(APFEL, tick(n), female));
+    expect(r.points).toBe(points);
+    expect(r.band.label).toBe(band);
+    expect(r.max).toBe(4);
+  });
+
+  it('a man with 0 ticked items is low risk, with 1 or 2 medium, with 3 high', () => {
+    const male = { ...ctx, ageYears: 40, sex: 'male' as const };
+    expect(ok(scoreResult(APFEL, tick(0), male)).band.label).toBe('Low risk');
+    expect(ok(scoreResult(APFEL, tick(1), male)).band.label).toBe('Medium risk');
+    expect(ok(scoreResult(APFEL, tick(2), male)).band.label).toBe('Medium risk');
+    expect(ok(scoreResult(APFEL, tick(3), male)).band.label).toBe('High risk');
+  });
+
+  it('is incomplete without sex, and without age', () => {
+    expect(scoreResult(APFEL, {}, { ...ctx, sex: null }).kind).toBe('incomplete');
+    const r = scoreResult(APFEL, {}, { ...ctx, ageYears: null });
+    expect(r.kind).toBe('incomplete');
+    if (r.kind === 'incomplete') expect(r.missing).toContain('age');
+  });
+
+  it('is for adults only: 17 is not applicable, 18 is', () => {
+    expect(scoreResult(APFEL, {}, { ...ctx, ageYears: 17 }).kind).toBe('not-applicable');
+    expect(scoreResult(APFEL, {}, { ...ctx, ageYears: 18 }).kind).toBe('ok');
+  });
+
+  it('does not change how the other scores treat children', () => {
+    expect(scoreResult(RCRI, {}, { ...ctx, ageYears: 10 }).kind).toBe('ok');
   });
 });
