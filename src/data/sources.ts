@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft15';
+export const DATA_VERSION = '2026.11.17-draft16';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1252,6 +1252,20 @@ export const SOURCES: ClinicalSource[] = [
     verification: 'secondary',
     accessNote:
       'ASRA announcement (2025-01-31) and ESRA newsletter summaries read; full text not opened. Moves from "prophylactic/therapeutic" to "low/high dose" terms. A search summary gave doi 10.1136/rapm-2024-105766, not confirmed. No interval is encoded until the full text is read.',
+  },
+  {
+    id: 'cockcroft-gault-1976',
+    tag: 'Cockcroft-Gault',
+    name: 'Prediction of creatinine clearance from serum creatinine',
+    publisher: 'Cockcroft DW, Gault MH',
+    year: '1976',
+    version: 'Nephron 1976;16:31-41, doi 10.1159/000180580',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/1244564/',
+    tier: 3,
+    scope: ['creatinine clearance estimate for adults', 'weight convention for anticoagulant dosing'],
+    verification: 'secondary',
+    accessNote:
+      'Citation confirmed by web search (2026-11-17); the paper was not opened and PubMed blocked automated fetches. The formula and its SI constants (1.23 men, 1.04 women, creatinine in micromol/L) come from NKF and UK NHS summaries. This build uses ACTUAL body weight, as the DOAC trials and the US rivaroxaban label do according to secondary summaries (label not opened). The weight choice in obesity is contested: confirm against local protocol. Adults only: the paper studied patients aged 18 to 92.',
   },
 ];
 
