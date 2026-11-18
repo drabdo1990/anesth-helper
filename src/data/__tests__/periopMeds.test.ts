@@ -202,6 +202,7 @@ describe('perioperative medication rules', () => {
     expect(t).toContain('withhold ticagrelor for 3–5 days, clopidogrel for 5 days, and prasugrel for 7 days prior to NCS');
     expect(t).toContain('continue aspirin peri-operatively if the bleeding risk allows');
     expect(t).toContain('continue aspirin∗ (75-100 mg)');
+    expect(cardiac('antiplatelet-pci').cautions?.some((c) => c.includes('ASRA'))).toBe(true);
   });
 
   it('bridging: not recommended routinely, and the card points to ASRA for spinal and epidural timing', () => {

@@ -105,6 +105,9 @@ export const PCI_ANTIPLATELET_RULE: PeriopMedRule = {
   action: 'individualise',
   summary:
     'Keep aspirin if the bleeding risk allows; the timing of surgery and any P2Y12 interruption depend on the stent and are decided by the surgeon, anaesthesiologist and cardiologist together.',
+  cautions: [
+    'These statements are about cardiac and thrombotic risk. For the timing of a spinal, epidural or deep block, use the ASRA cards.',
+  ],
   why:
     'AHA/ACC: the risk of perioperative stent thrombosis is greatest in the first 4 to 6 weeks after PCI, with excess risks that decline over time but persist to 6 months.',
   drugs: [
