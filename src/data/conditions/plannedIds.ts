@@ -61,4 +61,14 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'cushing',
   'conn',
   'acromegaly',
+  // Batch 5: Hematologic
+  'thalassemia',
+  'hereditary-spherocytosis',
+  'g6pd',
+  'sickle-cell',
+  'methemoglobinemia',
+  'polycythemia-vera',
+  'hemophilia',
+  'von-willebrand',
+  'antiphospholipid',
 ];
