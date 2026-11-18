@@ -34,3 +34,6 @@ dist-ssr
 # Local agent metadata
 .claude/
 .omc/
+.agents/
+agent/
+skills-lock.json
