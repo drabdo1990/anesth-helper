@@ -53,4 +53,12 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'centronuclear',
   'mitochondrial-myopathy',
   'lambert-eaton',
+  // Batch 4: Endocrine & Metabolic
+  'lesch-nyhan',
+  'hemochromatosis',
+  'wilson-disease',
+  'insulinoma',
+  'cushing',
+  'conn',
+  'acromegaly',
 ];
