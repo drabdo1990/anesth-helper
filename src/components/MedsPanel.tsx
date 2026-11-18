@@ -30,7 +30,7 @@ const DrugBlock: React.FC<{ drug: PeriopDrug; crcl: number | null }> = ({ drug, 
     ))}
     {drug.catheter && (
       <div className="flex flex-col gap-1">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Epidural / intrathecal catheters (label)</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Catheters, monitoring and post-block dosing</p>
         {drug.catheter.map((c) => (
           <p key={c} className="text-xs text-slate-300">
             {c}
@@ -38,7 +38,7 @@ const DrugBlock: React.FC<{ drug: PeriopDrug; crcl: number | null }> = ({ drug, 
         ))}
       </div>
     )}
-    <p className="text-xs text-slate-300">Restart: {drug.restart}</p>
+    {drug.restart && <p className="text-xs text-slate-300">Restart: {drug.restart}</p>}
     <SourceBadge sourceIds={[drug.sourceId]} />
   </div>
 );
@@ -77,11 +77,16 @@ export const MedsPanel: React.FC = () => {
     <div className="mb-3 flex flex-col gap-3">
       <Panel title="Perioperative medications">
         <p className="text-xs text-slate-400">
-          Tick what the patient takes. Instructions are the manufacturers' label wording, not ASRA neuraxial intervals.
+          Tick what the patient takes. Each card names its source: the manufacturers' labels, ASRA (for spinal, epidural and deep blocks) or the AHA/ACC and ESC cardiac guidelines.
         </p>
         <div className="flex flex-col gap-1.5">
-          {PERIOP_RULES.map((r) => (
-            <ScoreItem key={r.id} label={r.drugClass} checked={taken[r.id] === true} locked={false} onToggle={() => toggle(r.id)} />
+          {PERIOP_RULES.map((r, i) => (
+            <React.Fragment key={r.id}>
+              {r.section !== PERIOP_RULES[i - 1]?.section && (
+                <h4 className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{r.section}</h4>
+              )}
+              <ScoreItem label={r.drugClass} checked={taken[r.id] === true} locked={false} onToggle={() => toggle(r.id)} />
+            </React.Fragment>
           ))}
         </div>
       </Panel>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DOAC_RULE, SGLT2_RULE } from '../../data/periopMeds';
+import { DOAC_RULE, PERIOP_RULES, SGLT2_RULE } from '../../data/periopMeds';
 import { DATA_VERSION, SOURCE_BY_ID } from '../../data/sources';
+import { creatinineClearance } from '../calc/crcl';
 import { buildPreopNote, type PreopNoteInput } from '../preopNote';
 
 const EMPTY: PreopNoteInput = {
@@ -72,9 +73,9 @@ describe('buildPreopNote: scores', () => {
 });
 
 describe('buildPreopNote: medications', () => {
-  it('with nothing ticked, says the app covers only three classes (an empty list is not "no medications")', () => {
+  it('with nothing ticked, says so without implying the patient takes no medications', () => {
     const note = buildPreopNote(MAN);
-    expect(note).toContain('Medications ticked in the app: none (the app covers only SGLT2 inhibitors, DOACs and GLP-1 receptor agonists)');
+    expect(note).toContain('Medications ticked in the app: none (this is not a medication history; the app covers only the classes in its Medications section)');
   });
 
   it('SGLT2: each drug carries its own label timing, ertugliflozin 4 days, and the restart line', () => {
@@ -99,7 +100,7 @@ describe('buildPreopNote: medications', () => {
     const at68 = lines(buildPreopNote({ ...MAN, medsTaken: { doac: true } })).find((x) => x.includes('Dabigatran'))!;
     expect(at68).toContain('1 to 2 days');
     expect(at68).not.toContain('3 to 5 days');
-    expect(at68).toContain('this patient: CrCl 68 mL/min');
+    expect(at68).toContain('this patient: CrCl 68.1 mL/min');
     const at34 = lines(buildPreopNote({ ...MAN, creatinineUmolL: 176.8, medsTaken: { doac: true } })).find((x) => x.includes('Dabigatran'))!;
     expect(at34).toContain('3 to 5 days');
     expect(at34).not.toContain('1 to 2 days');
@@ -110,6 +111,35 @@ describe('buildPreopNote: medications', () => {
     expect(line).toContain('1 to 2 days');
     expect(line).toContain('3 to 5 days');
     expect(line).toContain('(CrCl not available)');
+  });
+
+  it('ASRA warfarin: the 5-day line is in the note, and a drug with no restart statement prints no "Restart"', () => {
+    const note = buildPreopNote({ ...MAN, medsTaken: { 'asra-warfarin': true } });
+    const warfarin = lines(note).find((x) => x.startsWith('  Warfarin:'))!;
+    expect(warfarin).toContain('stopped 5 days prior to the planned procedure');
+    expect(warfarin).not.toContain('Restart');
+    expect(note).not.toContain('undefined');
+  });
+
+  it('prints the catheter statements under each drug', () => {
+    const note = buildPreopNote({ ...MAN, medsTaken: { 'asra-lmwh': true } });
+    expect(note).toContain('    Catheter / post-block: ');
+    expect(note).toContain('The catheter should be removed 12 hours after the last dose of LMWH');
+  });
+
+  it('tags the CrCl to one decimal, so 49.6 is not shown as 50 beside the 30 to 49 line', () => {
+    const input = { ...MAN, creatinineUmolL: 121.3, medsTaken: { 'asra-doac': true } };
+    const crcl = creatinineClearance({ ageYears: 70, tbwKg: 70, sex: 'male', creatinineUmolL: 121.3 });
+    expect(crcl.kind === 'ok' && crcl.mlPerMin > 49.5 && crcl.mlPerMin < 50).toBe(true);
+    const note = buildPreopNote(input);
+    const line = lines(note).find((x) => x.includes('Dabigatran') && x.includes('120 hours'))!;
+    expect(line).toContain('(this patient: CrCl 49.');
+    expect(note).not.toContain('CrCl 50 mL/min)');
+  });
+
+  it('ticking every card at once builds a note without errors', () => {
+    const all = Object.fromEntries(PERIOP_RULES.map((r) => [r.id, true]));
+    expect(() => buildPreopNote({ ...MAN, medsTaken: all })).not.toThrow();
   });
 
   it('GLP-1: states no timing of its own', () => {
