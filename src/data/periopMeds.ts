@@ -3,6 +3,7 @@
 // merged or inferred.
 
 import { ASRA_RULES } from './periopAsra';
+import { CARDIAC_RULES } from './periopCardiac';
 
 export type PeriopAction = 'continue' | 'hold' | 'modify' | 'individualise';
 
@@ -160,4 +161,4 @@ export const GLP1_RULE: PeriopMedRule = {
   sourceIds: ['asa-glp1-2023', 'glp1-multisociety-2024', 'glp1-spaqi-2025', 'glp1-uk-2025', 'glp1-anzca-2025'],
 };
 
-export const PERIOP_RULES: PeriopMedRule[] = [SGLT2_RULE, DOAC_RULE, GLP1_RULE, ...ASRA_RULES];
+export const PERIOP_RULES: PeriopMedRule[] = [SGLT2_RULE, DOAC_RULE, GLP1_RULE, ...ASRA_RULES, ...CARDIAC_RULES];

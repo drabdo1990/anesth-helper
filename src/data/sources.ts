@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft23';
+export const DATA_VERSION = '2026.11.17-draft24';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1247,10 +1247,10 @@ export const SOURCES: ClinicalSource[] = [
     version: 'Circulation 2024;150:e351-e442, doi 10.1161/CIR.0000000000001285; JACC doi 10.1016/j.jacc.2024.06.013',
     url: 'https://pubmed.ncbi.nlm.nih.gov/39316661/',
     tier: 1,
-    scope: ['perioperative cardiovascular risk assessment', 'perioperative cardiac medications', 'SGLT2 inhibitor hold before surgery'],
-    verification: 'secondary',
+    scope: ['perioperative cardiovascular risk assessment', 'perioperative cardiac medications', 'SGLT2 inhibitor hold before surgery', 'beta-blocker, statin, RAAS inhibitor, antiplatelet and bridging statements'],
+    verification: 'primary',
     accessNote:
-      'Citation and AHA "Top things to know" summary read; full text not opened. Summary states SGLT2 inhibitors are stopped 3-4 days before surgery. Supersedes the 2014 ACC/AHA guideline. An AHA web page with a 2026 date was seen in search; check whether a newer edition exists.',
+      'Recommendation statements read on 2026-11-17 from the full-text copy in the project notebook and copied as printed. The class and level of each recommendation were not carried over because the copy separates them from the statements. Supersedes the 2014 ACC/AHA guideline. An AHA web page with a 2026 date was seen in search; check whether a newer edition exists.',
   },
   {
     id: 'esc-ncs-2022',
@@ -1261,10 +1261,10 @@ export const SOURCES: ClinicalSource[] = [
     version: 'Eur Heart J 2022;43:3826-3924, doi 10.1093/eurheartj/ehac270',
     url: 'https://doi.org/10.1093/eurheartj/ehac270',
     tier: 1,
-    scope: ['pre-operative cardiac assessment by surgical risk', 'functional capacity assessment', 'perioperative cardiac medications'],
-    verification: 'secondary',
+    scope: ['pre-operative cardiac assessment by surgical risk', 'functional capacity assessment', 'perioperative cardiac medications', 'beta-blocker, statin, RAAS inhibitor, antiplatelet and anticoagulant statements'],
+    verification: 'primary',
     accessNote:
-      'Citation, ESC press release and ACC key-points summary read; full text not opened. Summaries state no cardiac testing before low-risk surgery and functional capacity assessment for intermediate- and high-risk surgery (Class IIa).',
+      'Recommendation tables read on 2026-11-17 from the full-text copy in the project notebook; each statement is copied as printed with the class and level of its table, except the two RAAS inhibitor rows (transient discontinuation in hypertension; withholding on the day of surgery without HF), whose level was not captured: they show the class (IIa) only. Some summary lines elsewhere in the guideline give different wording for the same drug; the table wording is used.',
   },
   {
     id: 'asra-anticoag-2025',

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DOAC_RULE, GLP1_RULE, PERIOP_RULES, SGLT2_RULE, type PeriopDrug } from '../periopMeds';
 import { ASRA_RULES } from '../periopAsra';
+import { CARDIAC_RULES } from '../periopCardiac';
 import { SOURCE_BY_ID } from '../sources';
 
 const drug = (rule: typeof DOAC_RULE, id: string) => {
@@ -130,5 +131,83 @@ describe('perioperative medication rules', () => {
     expect(ASRA_RULES.find((r) => r.id === 'asra-doac')?.cautions?.some((c) => c.includes('cannot tell which dose'))).toBe(true);
     expect(asraDrug('asra-warfarin', 'warfarin').restart).toBeUndefined();
     expect(asraDrug('asra-antiplatelet', 'aspirin-nsaids').restart).toBeUndefined();
+  });
+
+  const cardiac = (id: string) => {
+    const r = CARDIAC_RULES.find((x) => x.id === id);
+    if (!r) throw new Error(`missing ${id}`);
+    return r;
+  };
+  const cardiacText = (id: string) =>
+    cardiac(id)
+      .drugs.flatMap((d) => [...d.timings.map((t) => t.text), d.restart ?? ''])
+      .join(' | ');
+
+  it('cardiac: has the five cards, in the cardiac section, each showing both guidelines side by side', () => {
+    expect(CARDIAC_RULES.map((r) => r.id)).toEqual(['beta-blocker', 'statin', 'raas-inhibitor', 'antiplatelet-pci', 'oac-bridging']);
+    for (const r of CARDIAC_RULES) {
+      expect(r.section, r.id).toBe('Cardiac drugs: AHA/ACC and ESC');
+      expect(r.sourceIds, r.id).toEqual(['aha-acc-periop-2024', 'esc-ncs-2022']);
+      expect(r.drugs.map((d) => d.sourceId), r.id).toEqual(['aha-acc-periop-2024', 'esc-ncs-2022']);
+    }
+  });
+
+  // The two ESC RAAS rows were captured with their class but not their level (see the esc-ncs-2022 accessNote). Only these may omit it.
+  const ESC_LEVEL_NOT_CAPTURED = [
+    'Transient discontinuation of ACEIs or ARBs before NCS in hypertensive patients should be considered. (Class IIa)',
+    'In patients without HF, withholding RAAS inhibitors on the day of NCS should be considered to prevent peri-operative hypotension. (Class IIa)',
+  ];
+
+  it('cardiac: ESC lines carry the class and level printed in the guideline, AHA/ACC lines do not invent one', () => {
+    for (const r of CARDIAC_RULES) {
+      const esc = r.drugs.find((d) => d.sourceId === 'esc-ncs-2022')!;
+      for (const t of [...esc.timings.map((x) => x.text), ...(esc.restart ? [esc.restart] : [])]) {
+        if (ESC_LEVEL_NOT_CAPTURED.includes(t)) expect(t, r.id).toMatch(/\(Class (I|II|III)[ab]?\)$/);
+        else expect(t, r.id).toMatch(/\(Class (I|II|III)[ab]?, level [ABC]\)$/);
+      }
+      const aha = r.drugs.find((d) => d.sourceId === 'aha-acc-periop-2024')!;
+      for (const t of aha.timings) expect(t.text, r.id).not.toMatch(/\(Class /);
+    }
+  });
+
+  it('cardiac: every statement ends the way its guideline ends it, so none was cut short', () => {
+    for (const r of CARDIAC_RULES) {
+      const texts = [...(r.cautions ?? []), ...r.drugs.flatMap((d) => [...d.timings.map((t) => t.text), ...(d.restart ? [d.restart] : [])])];
+      for (const t of texts) expect(t, `${r.id}: ...${t.slice(-60)}`).toMatch(/[.)]$/);
+    }
+  });
+
+  it('beta-blockers: continue chronic therapy, and do not start routinely or on the day of surgery', () => {
+    expect(cardiac('beta-blocker').action).toBe('continue');
+    const t = cardiacText('beta-blocker');
+    expect(t).toContain('beta blockers should be continued through the perioperative period');
+    expect(t).toContain('beta blockers should not be initiated on the day of surgery');
+    expect(t).toContain('Routine initiation of beta-blocker peri-operatively is not recommended. (Class III, level A)');
+  });
+
+  it('statins: continue', () => {
+    expect(cardiac('statin').action).toBe('continue');
+    expect(cardiacText('statin')).toContain('it is recommended to continue statins during the peri-operative period. (Class I, level B)');
+  });
+
+  it('RAAS inhibitors: the two guidelines differ, both are shown, and the card does not pick one', () => {
+    expect(cardiac('raas-inhibitor').action).toBe('individualise');
+    const t = cardiacText('raas-inhibitor');
+    expect(t).toContain('perioperative continuation is reasonable');
+    expect(t).toContain('withholding RAAS inhibitors on the day of NCS should be considered');
+  });
+
+  it('antiplatelet drugs after a stent: ESC withholding days and the aspirin statement are present', () => {
+    const t = cardiacText('antiplatelet-pci');
+    expect(t).toContain('withhold ticagrelor for 3–5 days, clopidogrel for 5 days, and prasugrel for 7 days prior to NCS');
+    expect(t).toContain('continue aspirin peri-operatively if the bleeding risk allows');
+    expect(t).toContain('continue aspirin∗ (75-100 mg)');
+  });
+
+  it('bridging: not recommended routinely, and the card points to ASRA for spinal and epidural timing', () => {
+    const t = cardiacText('oac-bridging');
+    expect(t).toContain('routine periprocedural bridging is not recommended');
+    expect(t).toContain('Bridging of OAC therapy is not recommended in patients with low/moderate thrombotic risk undergoing NCS. (Class III, level B)');
+    expect(cardiac('oac-bridging').cautions?.some((c) => c.includes('ASRA'))).toBe(true);
   });
 });
