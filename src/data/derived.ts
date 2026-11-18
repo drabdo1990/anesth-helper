@@ -132,5 +132,4 @@ export const SOURCES_WITHOUT_DERIVED_VALUES = [
   'padss-chung-1995',
   'aha-acc-periop-2024',
   'esc-ncs-2022',
-  'asra-anticoag-2025',
 ];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DOAC_RULE, SGLT2_RULE } from '../../data/periopMeds';
+import { DOAC_RULE, PERIOP_RULES, SGLT2_RULE } from '../../data/periopMeds';
 import { DATA_VERSION, SOURCE_BY_ID } from '../../data/sources';
 import { buildPreopNote, type PreopNoteInput } from '../preopNote';
 
@@ -72,9 +72,9 @@ describe('buildPreopNote: scores', () => {
 });
 
 describe('buildPreopNote: medications', () => {
-  it('with nothing ticked, says the app covers only three classes (an empty list is not "no medications")', () => {
+  it('with nothing ticked, says so without implying the patient takes no medications', () => {
     const note = buildPreopNote(MAN);
-    expect(note).toContain('Medications ticked in the app: none (the app covers only SGLT2 inhibitors, DOACs and GLP-1 receptor agonists)');
+    expect(note).toContain('Medications ticked in the app: none (this is not a medication history; the app covers only the classes in its Medications section)');
   });
 
   it('SGLT2: each drug carries its own label timing, ertugliflozin 4 days, and the restart line', () => {
@@ -110,6 +110,19 @@ describe('buildPreopNote: medications', () => {
     expect(line).toContain('1 to 2 days');
     expect(line).toContain('3 to 5 days');
     expect(line).toContain('(CrCl not available)');
+  });
+
+  it('ASRA warfarin: the 5-day line is in the note, and a drug with no restart statement prints no "Restart"', () => {
+    const note = buildPreopNote({ ...MAN, medsTaken: { 'asra-warfarin': true } });
+    const warfarin = lines(note).find((x) => x.startsWith('  Warfarin:'))!;
+    expect(warfarin).toContain('stopped 5 days prior to the planned procedure');
+    expect(warfarin).not.toContain('Restart');
+    expect(note).not.toContain('undefined');
+  });
+
+  it('ticking every card at once builds a note without errors', () => {
+    const all = Object.fromEntries(PERIOP_RULES.map((r) => [r.id, true]));
+    expect(() => buildPreopNote({ ...MAN, medsTaken: all })).not.toThrow();
   });
 
   it('GLP-1: states no timing of its own', () => {

@@ -84,7 +84,7 @@ export const buildPreopNote = (input: PreopNoteInput): string => {
 
   const taken = PERIOP_RULES.filter((r) => input.medsTaken[r.id]);
   if (taken.length === 0) {
-    lines.push('Medications ticked in the app: none (the app covers only SGLT2 inhibitors, DOACs and GLP-1 receptor agonists)');
+    lines.push('Medications ticked in the app: none (this is not a medication history; the app covers only the classes in its Medications section)');
   } else {
     lines.push('Medications ticked in the app:');
     for (const rule of taken) {
@@ -98,7 +98,7 @@ export const buildPreopNote = (input: PreopNoteInput): string => {
             return `${t.when ? `${t.when}: ` : ''}${t.text}${note}`;
           })
           .join(' ');
-        lines.push(`  ${d.name}: ${timing} Restart: ${d.restart} ${tags([d.sourceId])}`);
+        lines.push(`  ${d.name}: ${timing}${d.restart ? ` Restart: ${d.restart}` : ''} ${tags([d.sourceId])}`);
       }
     }
   }

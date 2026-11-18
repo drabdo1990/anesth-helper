@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft22';
+export const DATA_VERSION = '2026.11.17-draft23';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1272,13 +1272,16 @@ export const SOURCES: ClinicalSource[] = [
     name: 'Regional anesthesia in the patient receiving antithrombotic or thrombolytic therapy: ASRA Pain Medicine evidence-based guidelines (fifth edition)',
     publisher: 'American Society of Regional Anesthesia and Pain Medicine',
     year: '2025',
-    version: 'Reg Anesth Pain Med 2025 (fifth edition)',
+    version: 'Reg Anesth Pain Med 2025 (fifth edition), doi 10.1136/rapm-2024-105766',
     url: 'https://asra.com/guidelines-articles/guidelines/guideline-item/guidelines/2025/01/31/regional-anesthesia-in-the-patient-receiving-antithrombotic-or-thrombolytic-therapy-american-society-of-regional-anesthesia-and-pain-medicine-evidence-based-guidelines-(fifth-edition)',
     tier: 1,
-    scope: ['neuraxial and deep block timing with anticoagulants and antiplatelets', 'DOAC interruption intervals'],
-    verification: 'secondary',
+    scope: [
+      'neuraxial and deep block timing with warfarin, heparins, fondaparinux, antiplatelet drugs and thrombolytics',
+      'DOAC interruption intervals at low and high dose',
+    ],
+    verification: 'primary',
     accessNote:
-      'ASRA announcement (2025-01-31) and ESRA newsletter summaries read; full text not opened. Moves from "prophylactic/therapeutic" to "low/high dose" terms. A search summary gave doi 10.1136/rapm-2024-105766, not confirmed. No interval is encoded until the full text is read.',
+      'Full text (the journal page copy in the project notebook) read on 2026-11-17: every recommendation statement is copied as printed, with its grade. The page tables (1 to 6, including the DOAC table) were not in the extracted text, so the app does not restate the doses behind "high" and "low" dose. Updates the 2018 fourth edition and uses "low/high dose" terms. ASRA says its intervals are deliberately more conservative than guidelines written to prevent thrombosis.',
   },
   {
     id: 'cockcroft-gault-1976',
