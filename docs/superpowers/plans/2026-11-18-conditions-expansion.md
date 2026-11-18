@@ -1,6 +1,6 @@
 # Perioperative Disease Management Plans Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Expand AnesthAssist's Diseases comorbidity database from 6 core planned conditions to full, structured perioperative management plans (`preop`, `intraop`, `avoid`, `postop`) across all 71 conditions stubbed from *Stoelting's Anesthesia and Co-Existing Disease* (8th Edition, 2022).
 
@@ -53,7 +53,7 @@
 - Consumes: `STOELTING_CHAPTERS`, `ConditionRecord`, `ConditionPlan` from existing `src/data/conditions.ts`.
 - Produces: `src/data/conditions/types.ts` exporting interfaces & helpers; `src/data/conditions/index.ts` exporting `CONDITIONS`, `PLANNED_CONDITION_IDS`, `STOELTING_CHAPTERS`, `PROJECT_NOTEBOOK_URL`.
 
-- [ ] **Step 1: Create `src/data/conditions/types.ts`**
+- [x] **Step 1: Create `src/data/conditions/types.ts`**
 Extract `ConditionPlan`, `ConditionRecord`, `STOELTING_CHAPTERS`, `PROJECT_NOTEBOOK_URL`, and helper `entry()`:
 ```typescript
 export interface ConditionPlan {
@@ -81,7 +81,7 @@ export function entry(id: string, name: string, chapter: number, aliases: string
 }
 ```
 
-- [ ] **Step 2: Create `src/data/conditions/plannedIds.ts`**
+- [x] **Step 2: Create `src/data/conditions/plannedIds.ts`**
 Initialize with the current 6 planned condition IDs:
 ```typescript
 export const PLANNED_CONDITION_IDS: string[] = [
@@ -94,7 +94,7 @@ export const PLANNED_CONDITION_IDS: string[] = [
 ];
 ```
 
-- [ ] **Step 3: Create specialty files partitioning existing 110 condition records**
+- [x] **Step 3: Create specialty files partitioning existing 110 condition records**
 - `cardiovascular.ts`: Ch. 7, 8, 10, 12 conditions.
 - `respiratory.ts`: Ch. 2, 3 conditions.
 - `neurologic.ts`: Ch. 13, 14, 15 conditions (including existing plans for `myasthenia-gravis` and `myotonic-dystrophy`).
@@ -102,21 +102,21 @@ export const PLANNED_CONDITION_IDS: string[] = [
 - `hematologic.ts`: Ch. 23, 27 conditions.
 - `multisystem.ts`: Ch. 16, 17, 21, 24, 26, 29, 31 conditions (including existing plan for `mh-susceptibility`).
 
-- [ ] **Step 4: Create `src/data/conditions/index.ts`**
+- [x] **Step 4: Create `src/data/conditions/index.ts`**
 Aggregate records from all specialty modules into `CONDITIONS: ConditionRecord[]`.
 
-- [ ] **Step 5: Replace `src/data/conditions.ts` with re-export facade**
+- [x] **Step 5: Replace `src/data/conditions.ts` with re-export facade**
 ```typescript
 export * from './conditions/index';
 ```
 
-- [ ] **Step 6: Run test suite to verify 100% backward compatibility**
+- [x] **Step 6: Run test suite to verify 100% backward compatibility**
 Run: `npm.cmd test`
 Expected: 433 tests in 38 files pass.
 Run: `npx.cmd tsc -b`
 Expected: 0 errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 ```bash
 git add src/data/conditions/ src/data/conditions.ts
 git commit -m "refactor(conditions): modularize conditions database into organ-system modules"
@@ -134,7 +134,7 @@ git commit -m "refactor(conditions): modularize conditions database into organ-s
 - Consumes: `entry()` from `types.ts`, NotebookLM Stoelting 8e queries (Ch. 7, 8, 10, 12).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for cardiovascular conditions**
+- [x] **Step 1: Populate clinical plans for cardiovascular conditions**
 Query NotebookLM session `58a46bdf` for Stoelting 8e perioperative guidance and populate plans for:
 1. `tetralogy-of-fallot` (Ch. 7)
 2. `eisenmenger-syndrome` (Ch. 7)
@@ -151,15 +151,15 @@ Query NotebookLM session `58a46bdf` for Stoelting 8e perioperative guidance and 
 13. `mitral-stenosis` (Ch. 10)
 14. `mitral-regurgitation` (Ch. 10)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS` in `src/data/conditions/plannedIds.ts`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS` in `src/data/conditions/plannedIds.ts`**
 Add the 14 cardiovascular condition IDs.
 
-- [ ] **Step 3: Run tests to verify clinical invariants**
+- [x] **Step 3: Run tests to verify clinical invariants**
 Run: `npm.cmd test`
 Verify `conditions.test.ts` validates all sections (>10 chars, no `mg/kg`, unique IDs).
 Run: `npx.cmd tsc -b`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/cardiovascular.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for cardiovascular conditions"
@@ -177,7 +177,7 @@ git commit -m "feat(conditions): add perioperative plans for cardiovascular cond
 - Consumes: NotebookLM Stoelting 8e queries (Ch. 2, 3).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for respiratory conditions**
+- [x] **Step 1: Populate clinical plans for respiratory conditions**
 Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 1. `cystic-fibrosis` (Ch. 2)
 2. `bronchiectasis` (Ch. 2)
@@ -188,14 +188,14 @@ Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 7. `obstructive-sleep-apnea` (Ch. 2)
 8. `lung-transplantation` (Ch. 3)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS`**
 Add the respiratory condition IDs to `src/data/conditions/plannedIds.ts`.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/respiratory.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for respiratory conditions"
@@ -213,7 +213,7 @@ git commit -m "feat(conditions): add perioperative plans for respiratory conditi
 - Consumes: NotebookLM Stoelting 8e queries (Ch. 13, 14, 15).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for neurologic conditions**
+- [x] **Step 1: Populate clinical plans for neurologic conditions**
 Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 1. `amyotrophic-lateral-sclerosis` (Ch. 14)
 2. `guillain-barre-syndrome` (Ch. 15)
@@ -226,14 +226,14 @@ Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 9. `spinal-cord-injury-acute` (Ch. 14)
 10. `muscular-dystrophy-duchenne` (Ch. 15)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS`**
 Add the neurologic condition IDs to `src/data/conditions/plannedIds.ts`.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/neurologic.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for neurologic conditions"
@@ -251,7 +251,7 @@ git commit -m "feat(conditions): add perioperative plans for neurologic conditio
 - Consumes: NotebookLM Stoelting 8e queries (Ch. 18, 22).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for endocrine conditions**
+- [x] **Step 1: Populate clinical plans for endocrine conditions**
 Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 1. `cushing-syndrome` (Ch. 22)
 2. `acromegaly` (Ch. 22)
@@ -265,14 +265,14 @@ Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 10. `hypopituitarism` (Ch. 22)
 11. `addison-disease` (Ch. 22)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS`**
 Add the endocrine condition IDs to `src/data/conditions/plannedIds.ts`.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/endocrine.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for endocrine conditions"
@@ -290,7 +290,7 @@ git commit -m "feat(conditions): add perioperative plans for endocrine condition
 - Consumes: NotebookLM Stoelting 8e queries (Ch. 23, 27).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for hematologic & oncologic conditions**
+- [x] **Step 1: Populate clinical plans for hematologic & oncologic conditions**
 Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 1. `sickle-cell-disease` (Ch. 23)
 2. `g6pd-deficiency` (Ch. 23)
@@ -303,14 +303,14 @@ Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 9. `multiple-myeloma` (Ch. 23)
 10. `superior-vena-cava-syndrome` (Ch. 27)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS`**
 Add the hematologic condition IDs to `src/data/conditions/plannedIds.ts`.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/hematologic.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for hematologic conditions"
@@ -328,7 +328,7 @@ git commit -m "feat(conditions): add perioperative plans for hematologic conditi
 - Consumes: NotebookLM Stoelting 8e queries (Ch. 16, 17, 21, 24, 26, 29, 31).
 - Produces: Updated condition records with full `ConditionPlan` objects.
 
-- [ ] **Step 1: Populate clinical plans for multisystem conditions**
+- [x] **Step 1: Populate clinical plans for multisystem conditions**
 Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 1. `systemic-sclerosis` (Ch. 24)
 2. `marfan-syndrome` (Ch. 24)
@@ -342,14 +342,14 @@ Query NotebookLM for Stoelting 8e perioperative guidance and populate plans for:
 10. `anorexia-nervosa` (Ch. 29)
 11. `mastocytosis` (Ch. 24)
 
-- [ ] **Step 2: Update `PLANNED_CONDITION_IDS`**
+- [x] **Step 2: Update `PLANNED_CONDITION_IDS`**
 Add the multisystem condition IDs to `src/data/conditions/plannedIds.ts`.
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add src/data/conditions/multisystem.ts src/data/conditions/plannedIds.ts
 git commit -m "feat(conditions): add perioperative plans for multisystem conditions"
@@ -364,7 +364,7 @@ git commit -m "feat(conditions): add perioperative plans for multisystem conditi
 - Test: `src/data/__tests__/integrity.test.ts`
 - Modify: `README.md` (or docs if recording expansion milestones)
 
-- [ ] **Step 1: Run full test suite & production build**
+- [x] **Step 1: Run full test suite & production build**
 Run: `npm.cmd test`
 Verify: All 71 planned conditions are validated, derived values resolve to `stoelting-8e`, 0 failures.
 Run: `npx.cmd tsc -b`
@@ -372,7 +372,7 @@ Verify: Clean compile.
 Run: `npx.cmd vite build`
 Verify: Clean bundle.
 
-- [ ] **Step 2: Commit final verification**
+- [x] **Step 2: Commit final verification**
 ```bash
 git add README.md
 git commit -m "docs: record completion of 71 Stoelting 8e perioperative disease management plans"
