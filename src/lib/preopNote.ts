@@ -94,11 +94,12 @@ export const buildPreopNote = (input: PreopNoteInput): string => {
         const timing = matchTimings(d, crclMl)
           .filter((m) => m.match !== 'no')
           .map(({ timing: t, match }) => {
-            const note = match === 'unknown' ? ' (CrCl not available)' : match === 'yes' && crclMl !== null ? ` (this patient: CrCl ${Math.round(crclMl)} mL/min)` : '';
+            const note = match === 'unknown' ? ' (CrCl not available)' : match === 'yes' && crclMl !== null ? ` (this patient: CrCl ${crclMl.toFixed(1)} mL/min)` : '';
             return `${t.when ? `${t.when}: ` : ''}${t.text}${note}`;
           })
           .join(' ');
         lines.push(`  ${d.name}: ${timing}${d.restart ? ` Restart: ${d.restart}` : ''} ${tags([d.sourceId])}`);
+        for (const c of d.catheter ?? []) lines.push(`    Catheter / post-block: ${c}`);
       }
     }
   }

@@ -11,7 +11,7 @@ export const BETA_BLOCKER_RULE: PeriopMedRule = {
   section: 'Cardiac drugs: AHA/ACC and ESC',
   action: 'continue',
   summary:
-    'Continue chronic therapy through surgery; do not start routinely on the day of surgery.',
+    'Continue chronic therapy through surgery; do not start one routinely, or on the day of surgery.',
   why:
     'AHA/ACC: acutely discontinuing beta blockers for long-term indications is harmful, and initiating them on the day of surgery is harmful, particularly at higher doses.',
   drugs: [
