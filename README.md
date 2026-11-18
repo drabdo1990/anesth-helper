@@ -21,7 +21,7 @@ The reference layer in `src/data/` was transcribed from product labels (DailyMed
 ```bash
 npm ci
 npm run dev        # http://localhost:5173
-npm test           # unit tests (clinical calculations and data integrity; 212 tests)
+npm test           # unit tests (clinical calculations and data integrity; 433 tests)
 npm run verify     # tests + type-check + production build
 ```
 

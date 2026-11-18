@@ -93,7 +93,7 @@ export const ConditionsView: React.FC = () => {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-slate-400">
-        Uncommon conditions from Stoelting's Anesthesia and Co-Existing Disease (8th edition). Six have a perioperative plan; the rest point to their chapter. Searching works offline and nothing you type is stored.
+        Uncommon conditions from Stoelting's Anesthesia and Co-Existing Disease (8th edition). Each has a perioperative plan (Pre-op, Intra-op, Avoid, Post-op). Searching works offline and nothing you type is stored.
       </p>
       <label className="flex min-h-[48px] items-center gap-2 rounded-xl border border-clinical-border-light bg-clinical-card px-3 focus-within:border-cyan-500">
         <Search className="h-4 w-4 shrink-0 text-slate-400" />
