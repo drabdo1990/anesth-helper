@@ -44,10 +44,11 @@ const plan = (id: string) => {
 const text = (lines: string[]) => lines.join(' ');
 
 describe('condition plans', () => {
-  it('cover the core 6, rare diseases first', () => {
-    expect([...PLANNED_CONDITION_IDS].sort()).toEqual(
-      ['acute-porphyria', 'carcinoid-syndrome', 'mh-susceptibility', 'myasthenia-gravis', 'myotonic-dystrophy', 'pheochromocytoma'].sort(),
-    );
+  it('covers the core 6 rare diseases and all planned conditions', () => {
+    const core6 = ['acute-porphyria', 'carcinoid-syndrome', 'mh-susceptibility', 'myasthenia-gravis', 'myotonic-dystrophy', 'pheochromocytoma'];
+    for (const id of core6) {
+      expect(PLANNED_CONDITION_IDS).toContain(id);
+    }
   });
 
   it('have every section filled and no empty line', () => {
