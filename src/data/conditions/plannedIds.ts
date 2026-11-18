@@ -17,4 +17,9 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'takotsubo',
   'peripartum-cardiomyopathy',
   'polyarteritis-nodosa',
+  // Batch 2: Respiratory & Airway
+  'cystic-fibrosis',
+  'primary-ciliary-dyskinesia',
+  'sarcoidosis',
+  'lymphangioleiomyomatosis',
 ];
