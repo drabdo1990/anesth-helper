@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DOAC_RULE, GLP1_RULE, PERIOP_RULES, SGLT2_RULE, type PeriopDrug } from '../periopMeds';
 import { ASRA_RULES } from '../periopAsra';
 import { CARDIAC_RULES } from '../periopCardiac';
+import { MEDICATIONS } from '../medications';
 import { SOURCE_BY_ID } from '../sources';
 
 const drug = (rule: typeof DOAC_RULE, id: string) => {
@@ -212,3 +213,43 @@ describe('perioperative medication rules', () => {
     expect(cardiac('oac-bridging').cautions?.some((c) => c.includes('ASRA'))).toBe(true);
   });
 });
+
+describe('pediatric medication formulary', () => {
+  it('contains at least 18 pediatric doses with scalar locked to TBW', () => {
+    const pedsDoses = MEDICATIONS.flatMap((m) => m.doses).filter((d) => d.population === 'pediatric');
+    expect(pedsDoses.length).toBeGreaterThanOrEqual(18);
+    for (const d of pedsDoses) {
+      expect(d.scalar).toBe('TBW');
+    }
+  });
+
+  it('ensures all pediatric age brackets have minYears < maxYears', () => {
+    const pedsDoses = MEDICATIONS.flatMap((m) => m.doses).filter((d) => d.population === 'pediatric');
+    for (const d of pedsDoses) {
+      if (d.ageBracket) {
+        if (d.ageBracket.minYears !== undefined && d.ageBracket.maxYears !== undefined) {
+          expect(d.ageBracket.minYears).toBeLessThan(d.ageBracket.maxYears);
+        }
+      }
+    }
+  });
+
+  it('provides pediatric dilution presets for fentanyl, atropine, ketamine, and midazolam', () => {
+    const fentanyl = MEDICATIONS.find((m) => m.id === 'fentanyl' || m.id === 'fentanyl-bolus');
+    expect(fentanyl).toBeDefined();
+    expect(fentanyl?.concentrations?.some((c) => c.isPediatricDefault && c.pediatricInstructions)).toBe(true);
+
+    const atropine = MEDICATIONS.find((m) => m.id === 'atropine-premed' || m.id === 'atropine');
+    expect(atropine).toBeDefined();
+    expect(atropine?.concentrations?.some((c) => c.isPediatricDefault && c.pediatricInstructions)).toBe(true);
+
+    const ketamine = MEDICATIONS.find((m) => m.id === 'ketamine' || m.id === 'ketamine-induction');
+    expect(ketamine).toBeDefined();
+    expect(ketamine?.concentrations?.some((c) => c.isPediatricDefault && c.pediatricInstructions)).toBe(true);
+
+    const midazolam = MEDICATIONS.find((m) => m.id === 'midazolam-premed' || m.id === 'midazolam');
+    expect(midazolam).toBeDefined();
+    expect(midazolam?.concentrations?.some((c) => c.isPediatricDefault && c.pediatricInstructions)).toBe(true);
+  });
+});
+

@@ -136,6 +136,8 @@ export interface LocalAnesthetic {
   concentrationsPercent: number[];
   cautions?: string[];
   sourceIds: string[];
+  /** Pediatric safe plain maximum dose limit in mg/kg. */
+  pedsPlainMaxMgPerKg?: number;
 }
 
 export interface AirwayDeviceRule {
