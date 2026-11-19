@@ -1,6 +1,6 @@
 # Pediatric Medication Dosing Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Implement a comprehensive, evidence-based pediatric medication dosing and dilution system in AnesthAssist's Dosing tab with weight-scalar locking (TBW), age-bracket auto-matching, adult single-dose ceiling caps, and safe dilution volume calculations.
 
@@ -58,7 +58,7 @@
   }
   ```
 
-- [ ] **Step 1: Write the failing calculation tests for pediatric safety invariants**
+- [x] **Step 1: Write the failing calculation tests for pediatric safety invariants**
 
 In `src/lib/calc/__tests__/medication.test.ts`, add test suite `describe('pediatric dose calculations')`:
 ```typescript
@@ -135,12 +135,12 @@ it('enforces minimum dose floor for atropine', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx.cmd vitest run src/lib/calc/__tests__/medication.test.ts`
 Expected: FAIL due to missing types and properties on `DoseCalculationResult`.
 
-- [ ] **Step 3: Update `src/data/types.ts` and `src/lib/calc/medication.ts`**
+- [x] **Step 3: Update `src/data/types.ts` and `src/lib/calc/medication.ts`**
 
 In `src/data/types.ts`:
 Add `TargetPopulation`, `AgeBracket`, `minimumFloor`, `cappedAtAdultMax` to `MedicationDose`, and `isPediatricDefault`, `pediatricInstructions` to `MedicationConcentration`.
@@ -153,17 +153,17 @@ Update `calculateDose()`:
 4. Check `dose.minimumFloor`: if `rawMass < dose.minimumFloor.value`, elevate to `dose.minimumFloor.value` and set `isFloorEnforced = true`.
 5. Compute volume `volumeMl` from selected concentration.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx.cmd vitest run src/lib/calc/__tests__/medication.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Run full test suite and compile**
+- [x] **Step 5: Run full test suite and compile**
 
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: All 433+ tests pass, 0 type errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/data/types.ts src/lib/calc/medication.ts src/lib/calc/__tests__/medication.test.ts
@@ -183,7 +183,7 @@ git commit -m "feat(calc): add pediatric TBW locking, adult ceiling caps, and do
 - Consumes: `MedicationDose`, `MedicationConcentration` with pediatric fields from `types.ts`.
 - Produces: Populated pediatric doses and dilution presets in `MEDICATIONS`.
 
-- [ ] **Step 1: Write the failing tests for pediatric formulary entries**
+- [x] **Step 1: Write the failing tests for pediatric formulary entries**
 
 In `src/data/__tests__/periopMeds.test.ts`:
 ```typescript
@@ -208,12 +208,12 @@ it('provides pediatric dilution presets for fentanyl and atropine', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx.cmd vitest run src/data/__tests__/periopMeds.test.ts`
 Expected: FAIL (no pediatric doses populated yet).
 
-- [ ] **Step 3: Add pediatric doses and dilution presets to `src/data/medications.ts`**
+- [x] **Step 3: Add pediatric doses and dilution presets to `src/data/medications.ts`**
 
 Add verified pediatric doses matching the spec:
 1. `midazolam-premed`: IV (`0.05–0.1 mg/kg`, max `2 mg`), PO (`0.25–0.5 mg/kg`, max `15 mg`).
@@ -236,17 +236,17 @@ Add verified pediatric doses matching the spec:
 18. `dexamethasone-ponv`: (`0.15 mg/kg`, max `4.0–8.0 mg`).
 19. Local anesthetics in `LOCAL_ANESTHETICS`: Add pediatric ceiling specifications.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx.cmd vitest run src/data/__tests__/periopMeds.test.ts src/data/__tests__/integrity.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Run full test suite and compile**
+- [x] **Step 5: Run full test suite and compile**
 
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/data/medications.ts src/data/__tests__/periopMeds.test.ts
@@ -267,7 +267,7 @@ git commit -m "feat(meds): add pediatric dosing records and dilution presets acr
 - Consumes: `population` from `types.ts`, `MEDICATIONS` from `medications.ts`, `patient.ageYears` from store.
 - Produces: Interactive Adult/Pediatric mode switch, age-bracket matching UI, dilution preset preselection, and linked Pediatric plan card.
 
-- [ ] **Step 1: Write the failing test for plan cards**
+- [x] **Step 1: Write the failing test for plan cards**
 
 In `src/data/__tests__/planCards.test.ts`, update the test verifying pediatric plan card links:
 ```typescript
@@ -277,12 +277,12 @@ it('pediatric plan card links to Dosing in pediatric mode', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx.cmd vitest run src/data/__tests__/planCards.test.ts`
 Expected: FAIL (`expected undefined to be true`).
 
-- [ ] **Step 3: Implement UI updates in `DosingView.tsx` and `DrugCard.tsx`**
+- [x] **Step 3: Implement UI updates in `DosingView.tsx` and `DrugCard.tsx`**
 
 1. In `DosingView.tsx`:
    - Replace the blocking `if (pediatric) return <WarningBanner ...>` block with state:
@@ -311,17 +311,17 @@ Expected: FAIL (`expected undefined to be true`).
 3. In `src/data/planCards.ts`:
    - Update `peds` card: set `links.dosing: true`, update description to highlight pediatric dosing availability.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx.cmd vitest run src/data/__tests__/planCards.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Run full test suite and compile**
+- [x] **Step 5: Run full test suite and compile**
 
 Run: `npm.cmd test` && `npx.cmd tsc -b`
 Expected: All tests pass, clean TypeScript compilation.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/views/DosingView.tsx src/components/DrugCard.tsx src/data/planCards.ts src/data/__tests__/planCards.test.ts
@@ -338,11 +338,11 @@ git commit -m "feat(ui): add Adult/Pediatric segmented control, age-bracket matc
 - Compile: `npx.cmd tsc -b`
 - Build: `npx.cmd vite build`
 
-- [ ] **Step 1: Update README.md documentation**
+- [x] **Step 1: Update README.md documentation**
 
 Update `README.md` section on Dosing and Plans to document that the Dosing calculator provides both Adult and Pediatric modes with strict TBW scalars, age-bracket auto-matching, adult single-dose caps, and safe dilution presets.
 
-- [ ] **Step 2: Run full test suite, type-check, and build**
+- [x] **Step 2: Run full test suite, type-check, and build**
 
 Run:
 ```powershell
@@ -352,7 +352,7 @@ npx.cmd vite build
 ```
 Verify: 100% tests pass, 0 compile errors, clean PWA production bundle generated.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add README.md
