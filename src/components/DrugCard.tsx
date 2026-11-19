@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, FlaskConical, ShieldCheck } from 'lucide-react';
 import type { Medication, MedicationDose, WeightScalar } from '../data/types';
 import { resolveWithOverrides } from '../data/resolve';
@@ -6,6 +6,7 @@ import { useAppStore } from '../store/useAppStore';
 import type { Biometrics } from '../lib/calc/biometrics';
 import { formatMcg, formatMg, formatMl, maxDecimalPlaces } from '../lib/calc/format';
 import {
+  calculateDose,
   computeMedicationDose,
   cumulativeDoseStatus,
   doseAppliesToWeight,
@@ -47,10 +48,12 @@ const SCALARS: { value: WeightScalar; label: string }[] = [
 interface DrugCardProps {
   medication: Medication;
   biometrics: Biometrics | null;
+  population?: 'adult' | 'pediatric';
 }
 
-export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) => {
+export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics, population = 'adult' }) => {
   const actualWeightKg = useAppStore((s) => s.patient.tbwKg);
+  const ageYears = useAppStore((s) => s.patient.ageYears);
   const selectedDoseIds = useAppStore((s) => s.selectedDose);
   const setSelectedDose = useAppStore((s) => s.setSelectedDose);
   const doseValues = useAppStore((s) => s.doseValues);
@@ -68,9 +71,62 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
   const touchRecent = useAppStore((s) => s.touchRecent);
   const [showDetails, setShowDetails] = useState(false);
 
-  const applicable = actualWeightKg === null ? medication.doses : medication.doses.filter((d) => doseAppliesToWeight(d, actualWeightKg));
+  const popDoses =
+    population === 'pediatric'
+      ? medication.doses.filter((d) => d.population === 'pediatric' || d.population === 'both')
+      : medication.doses.filter((d) => (d.population ?? 'adult') === 'adult' || d.population === 'both');
+
+  const applicable =
+    actualWeightKg === null ? popDoses : popDoses.filter((d) => doseAppliesToWeight(d, actualWeightKg));
+
+  const isAgeMatch = (d: MedicationDose): boolean => {
+    if (ageYears === null || !d.ageBracket) return false;
+    const min = d.ageBracket.minYears ?? 0;
+    const max = d.ageBracket.maxYears ?? 18;
+    return ageYears >= min && ageYears < max;
+  };
+
+  const prevAgeRef = useRef<number | null>(null);
+  const prevPopRef = useRef<'adult' | 'pediatric' | null>(null);
+
+  // Auto-select age-matched dose on mount, age change, or population change
+  useEffect(() => {
+    if (population === 'pediatric' && ageYears !== null) {
+      if (prevAgeRef.current !== ageYears || prevPopRef.current !== population) {
+        const matched = applicable.find(isAgeMatch);
+        if (matched) {
+          setSelectedDose(medication.id, matched.id);
+        }
+      }
+    }
+    prevAgeRef.current = ageYears;
+    prevPopRef.current = population;
+  }, [population, ageYears, medication.id, applicable, setSelectedDose]);
+
+  const matchedDose = population === 'pediatric' && ageYears !== null ? applicable.find(isAgeMatch) : undefined;
+  const isAgeOrPopChanged = prevAgeRef.current !== ageYears || prevPopRef.current !== population;
+  const currentSelectedDose = applicable.find((d) => d.id === selectedDoseIds[medication.id]);
+
   const dose: MedicationDose | undefined =
-    applicable.find((d) => d.id === selectedDoseIds[medication.id]) ?? applicable[0];
+    population === 'pediatric' && ageYears !== null && isAgeOrPopChanged && matchedDose
+      ? matchedDose
+      : currentSelectedDose ?? matchedDose ?? applicable[0];
+
+  // Set pediatric default concentration on mount or entering pediatric mode
+  const prevConcPopRef = useRef<'adult' | 'pediatric' | null>(null);
+  useEffect(() => {
+    if (population === 'pediatric') {
+      const pedDefault = medication.concentrations.find((c) => c.isPediatricDefault);
+      if (pedDefault) {
+        if (prevConcPopRef.current !== 'pediatric' || (dose && concentrationChoice[dose.id] === undefined)) {
+          if (dose) {
+            setConcentrationChoice(dose.id, pedDefault.mgPerMl);
+          }
+        }
+      }
+    }
+    prevConcPopRef.current = population;
+  }, [population, dose?.id, medication.concentrations, concentrationChoice, setConcentrationChoice]);
 
   if (!dose) {
     return (
@@ -82,7 +138,10 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
 
   // The saved strength is per dose. An infusion can therefore remember 20 mcg/mL while the bolus
   // dose remembers the 100 mcg/mL syringe.
-  const defaultMgPerMl = dose.preferredConcentrationMgPerMl ?? medication.concentrations[0].mgPerMl;
+  const pedDefaultConc =
+    population === 'pediatric' ? medication.concentrations.find((c) => c.isPediatricDefault) : undefined;
+  const defaultMgPerMl =
+    pedDefaultConc?.mgPerMl ?? dose.preferredConcentrationMgPerMl ?? medication.concentrations[0].mgPerMl;
   const concIndex = resolveConcentrationIndex(
     medication.concentrations,
     concentrationChoice[dose.id],
@@ -90,7 +149,21 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
   );
   const conc = medication.concentrations[concIndex];
   const weightBased = isWeightBased(dose);
-  const needsWeight = dose.weightBandKg !== undefined ? actualWeightKg === null : weightBased && biometrics === null;
+  const isPediatric = population === 'pediatric' || dose.population === 'pediatric';
+
+  const effectiveBiometrics =
+    biometrics ??
+    (actualWeightKg !== null
+      ? { tbw: actualWeightKg, bmi: 0, pbw: 0, ibw: actualWeightKg, abw40: actualWeightKg, lbw: actualWeightKg }
+      : STUB_BIOMETRICS);
+
+  const needsWeight =
+    dose.weightBandKg !== undefined
+      ? actualWeightKg === null
+      : isPediatric
+        ? actualWeightKg === null
+        : weightBased && biometrics === null;
+
   const lo = dose.min ?? dose.default ?? 0;
   const hi = dose.max ?? dose.default ?? lo;
   const value = doseValues[dose.id] ?? dose.default ?? lo;
@@ -98,18 +171,43 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
 
   const prefApplies = weightBased && preferredScalar !== 'auto' && dose.scalarBasis !== 'label';
   const scalar: WeightScalar | undefined = weightBased
-    ? (scalarOverrides[dose.id] ?? (prefApplies ? (preferredScalar as WeightScalar) : dose.scalar) ?? 'TBW')
+    ? isPediatric
+      ? 'TBW'
+      : (scalarOverrides[dose.id] ?? (prefApplies ? (preferredScalar as WeightScalar) : dose.scalar) ?? 'TBW')
     : undefined;
 
   const resolvedMax = dose.absoluteMax
     ? resolveWithOverrides(`dose-max:${dose.id}`, dose.absoluteMax.value, guidelineSet)
     : null;
 
+  const effectiveAbsoluteMax =
+    dose.absoluteMax && resolvedMax
+      ? { ...dose.absoluteMax, value: resolvedMax.value }
+      : dose.absoluteMax;
+
+  const calcResult =
+    actualWeightKg !== null
+      ? calculateDose({
+          dose: {
+            ...dose,
+            absoluteMax: effectiveAbsoluteMax,
+          },
+          tbwKg: actualWeightKg,
+          ibwKg: effectiveBiometrics.ibw,
+          lbwKg: effectiveBiometrics.lbw,
+          abw40Kg: effectiveBiometrics.abw40,
+          selectedScalar: scalar,
+          doseValue: value,
+          concentrationMgPerMl: conc.mgPerMl,
+          patientAgeYears: ageYears,
+        })
+      : null;
+
   const computed: DoseComputation | null = needsWeight
     ? null
-    : computeMedicationDose(dose, value, conc.mgPerMl, biometrics ?? STUB_BIOMETRICS, {
+    : computeMedicationDose(dose, value, conc.mgPerMl, effectiveBiometrics, {
         scalarOverride: scalar,
-        absoluteMax: dose.absoluteMax && resolvedMax ? { ...dose.absoluteMax, value: resolvedMax.value } : undefined,
+        absoluteMax: effectiveAbsoluteMax,
         companion: medication.companion
           ? {
               name: medication.companion.name,
@@ -125,12 +223,21 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
     ? `${resolvedMax?.value ?? dose.absoluteMax.value} ${dose.absoluteMax.unit}${dose.absoluteMax.scope ? ` (${dose.absoluteMax.scope})` : ''}`
     : '';
 
+  const isMcg = dose.unit === 'mcg' || dose.unit === 'mcg/kg';
+  const bolusMass = calcResult ? calcResult.calculatedMass : computed?.bolus?.mass;
+  const bolusMassUnit: 'mg' | 'mcg' = isMcg ? 'mcg' : (computed?.bolus?.massUnit ?? 'mg');
+  const bolusVolume = calcResult && calcResult.volumeMl !== null ? calcResult.volumeMl : computed?.bolus?.volumeMl;
+
   const cumulativeDose = medication.doses.find((d) => d.absoluteMax?.scope === 'cumulative');
   const cumulativeMax = cumulativeDose?.absoluteMax
     ? resolveWithOverrides(`dose-max:${cumulativeDose.id}`, cumulativeDose.absoluteMax.value, guidelineSet).value
     : undefined;
   const loggedMg = (doseAdminLogs[medication.id] ?? []).reduce((sum, mg) => sum + mg, 0);
-  const plannedMg = computed?.bolus?.massMg;
+  const plannedMg = calcResult
+    ? isMcg
+      ? calcResult.calculatedMass / 1000
+      : calcResult.calculatedMass
+    : computed?.bolus?.massMg;
   const cumulativeStatus =
     cumulativeMax !== undefined && plannedMg !== undefined
       ? cumulativeDoseStatus(loggedMg, plannedMg, cumulativeMax)
@@ -143,11 +250,13 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
       : computed?.percentOfMax;
 
   const maxTone =
-    effectiveMax === 'exceeds' || effectiveMax === 'at-limit'
-      ? 'red'
-      : effectivePercent !== undefined && effectivePercent >= 90
-        ? 'amber'
-        : null;
+    calcResult?.isCapped
+      ? null
+      : effectiveMax === 'exceeds' || effectiveMax === 'at-limit'
+        ? 'red'
+        : effectivePercent !== undefined && effectivePercent >= 90
+          ? 'amber'
+          : null;
 
   const sourceIds = [
     ...new Set([
@@ -165,26 +274,59 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
 
       {applicable.length > 1 && (
         <div className="flex flex-col gap-1.5" role="radiogroup" aria-label="Dose / indication">
-          {applicable.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              role="radio"
-              aria-checked={d.id === dose.id}
-              onClick={() => {
-                setSelectedDose(medication.id, d.id);
-                touchRecent(medication.id);
-              }}
-              className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs font-semibold touch-manipulation ${
-                d.id === dose.id ? 'border-cyan-400 bg-cyan-500/15 text-cyan-100' : 'border-clinical-border-light bg-clinical-card text-slate-300'
-              }`}
-            >
-              {d.indication}
-            </button>
-          ))}
+          {applicable.map((d) => {
+            const isMatch = isAgeMatch(d);
+            return (
+              <button
+                key={d.id}
+                type="button"
+                role="radio"
+                aria-checked={d.id === dose.id}
+                onClick={() => {
+                  setSelectedDose(medication.id, d.id);
+                  touchRecent(medication.id);
+                }}
+                className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs font-semibold touch-manipulation ${
+                  d.id === dose.id ? 'border-cyan-400 bg-cyan-500/15 text-cyan-100' : 'border-clinical-border-light bg-clinical-card text-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span>
+                    {d.indication}
+                    {d.ageBracket?.label && (
+                      <span className="ml-1.5 text-[11px] font-normal text-slate-400">
+                        ({d.ageBracket.label})
+                      </span>
+                    )}
+                  </span>
+                  {population === 'pediatric' && isMatch && (
+                    <span className="shrink-0 rounded border border-cyan-500/40 bg-cyan-500/20 px-1.5 py-0.5 text-[10px] font-bold text-cyan-300">
+                      Age match
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
-      {applicable.length === 1 && <p className="text-sm font-semibold text-slate-200">{dose.indication}</p>}
+      {applicable.length === 1 && (
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-slate-200">
+            {dose.indication}
+            {dose.ageBracket?.label && (
+              <span className="ml-1.5 text-xs font-normal text-slate-400">
+                ({dose.ageBracket.label})
+              </span>
+            )}
+          </p>
+          {population === 'pediatric' && isAgeMatch(dose) && (
+            <span className="shrink-0 rounded border border-cyan-500/40 bg-cyan-500/20 px-1.5 py-0.5 text-[10px] font-bold text-cyan-300">
+              Age match
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Maximum warning goes ABOVE the result so it cannot be missed. */}
       {computed && maxTone && (
@@ -227,13 +369,24 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
           <span className="font-mono text-xs text-slate-400">
             Source range: {dose.min ?? dose.default}
             {dose.max !== undefined && dose.max !== dose.min ? `-${dose.max}` : ''} {dose.unit}
+            {dose.ageBracket?.label ? ` • ${dose.ageBracket.label}` : ''}
           </span>
-          {scalar && scalarWeightKgOrNull(biometrics, scalar) !== null && (
+          {scalar && scalarWeightKgOrNull(effectiveBiometrics, scalar) !== null && (
             <WeightScalarBadge
               scalar={scalar}
-              kg={scalarWeightKgOrNull(biometrics, scalar) ?? 0}
+              kg={scalarWeightKgOrNull(effectiveBiometrics, scalar) ?? 0}
               basis={scalar === dose.scalar ? dose.scalarBasis : undefined}
             />
+          )}
+          {calcResult?.isCapped && (
+            <span className="inline-flex items-center rounded-md border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-200">
+              {calcResult.cappedMessage ?? 'Capped at adult max'}
+            </span>
+          )}
+          {calcResult?.isFloorEnforced && (
+            <span className="inline-flex items-center rounded-md border border-sky-500/40 bg-sky-500/20 px-2 py-0.5 text-xs font-semibold text-sky-200">
+              {calcResult.floorMessage ?? 'Minimum floor applied'}
+            </span>
           )}
         </div>
 
@@ -260,12 +413,20 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
         {weightBased && (
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Weight scalar</span>
-            <SegmentedControl
-              ariaLabel="Weight scalar"
-              value={scalar ?? 'TBW'}
-              options={SCALARS}
-              onChange={(s) => setScalarOverride(dose.id, s)}
-            />
+            {population === 'pediatric' ? (
+              <div className="mt-1 flex items-center">
+                <span className="inline-flex items-center rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300">
+                  TBW (Actual weight)
+                </span>
+              </div>
+            ) : (
+              <SegmentedControl
+                ariaLabel="Weight scalar"
+                value={scalar ?? 'TBW'}
+                options={SCALARS}
+                onChange={(s) => setScalarOverride(dose.id, s)}
+              />
+            )}
           </div>
         )}
 
@@ -273,20 +434,38 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
           <WarningBanner level="info">
             {dose.weightBandKg
               ? 'Enter actual weight to confirm this weight-banded dose.'
-              : 'Enter actual weight, height and biological sex to calculate this weight-based dose.'}
+              : isPediatric
+                ? 'Enter actual weight to calculate this pediatric dose.'
+                : 'Enter actual weight, height and biological sex to calculate this weight-based dose.'}
           </WarningBanner>
         )}
 
         {computed?.kind === 'bolus' && computed.bolus && (
           <div className="grid grid-cols-2 gap-2 border-t border-clinical-border pt-2">
-            <BigValue label="Total" value={fmtMass(computed.bolus.mass, computed.bolus.massUnit)} unit={computed.bolus.massUnit} tone={effectiveMax === 'ok' ? undefined : 'red'} />
-            <BigValue label={`Volume at ${conc.label}`} value={fmtVolume(computed.bolus.volumeMl)} unit="mL" />
+            <BigValue
+              label="Total"
+              value={fmtMass(bolusMass ?? computed.bolus.mass, bolusMassUnit)}
+              unit={bolusMassUnit}
+              tone={calcResult?.isCapped ? 'amber' : effectiveMax === 'ok' ? undefined : 'red'}
+            />
+            <BigValue
+              label={`Volume at ${conc.label}`}
+              value={fmtVolume(bolusVolume ?? computed.bolus.volumeMl)}
+              unit="mL"
+            />
           </div>
         )}
         {computed?.kind === 'infusion' && computed.infusion && (
           <div className="grid grid-cols-2 gap-2 border-t border-clinical-border pt-2">
             <BigValue label="Rate" value={computed.infusion.mcgPerMin.toFixed(1)} unit="mcg/min" tone={effectiveMax === 'ok' ? undefined : 'red'} />
             <BigValue label={`Pump at ${conc.label}`} value={computed.infusion.mlPerHr.toFixed(1)} unit="mL/hr" />
+          </div>
+        )}
+
+        {conc.pediatricInstructions && (
+          <div className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-2.5 text-xs text-slate-300">
+            <span className="font-semibold text-cyan-300">Dilution preparation: </span>
+            {conc.pediatricInstructions}
           </div>
         )}
 
@@ -299,7 +478,7 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
             <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
-                onClick={() => logDose(medication.id, computed.bolus!.massMg)}
+                onClick={() => logDose(medication.id, plannedMg ?? computed.bolus!.massMg)}
                 className="min-h-[48px] rounded-lg bg-amber-500 px-2 text-xs font-black text-black"
               >
                 Log this dose
@@ -330,7 +509,21 @@ export const DrugCard: React.FC<DrugCardProps> = ({ medication, biometrics }) =>
               <ShieldCheck className="h-4 w-4" /> {computed.companion.name}
             </span>
             <span className="font-mono font-bold tabular-nums text-emerald-200">
-              {formatMg(computed.companion.massMg)} mg = {fmtVolume(computed.companion.volumeMl)} mL
+              {formatMg(
+                calcResult
+                  ? (isMcg ? calcResult.calculatedMass / 1000 : calcResult.calculatedMass) *
+                      (medication.companion?.ratioMgPerMg ?? 1)
+                  : computed.companion.massMg,
+              )}{' '}
+              mg ={' '}
+              {fmtVolume(
+                calcResult
+                  ? ((isMcg ? calcResult.calculatedMass / 1000 : calcResult.calculatedMass) *
+                      (medication.companion?.ratioMgPerMg ?? 1)) /
+                      (medication.companion?.concentrationMgPerMl ?? 1)
+                  : computed.companion.volumeMl,
+              )}{' '}
+              mL
             </span>
           </div>
         )}

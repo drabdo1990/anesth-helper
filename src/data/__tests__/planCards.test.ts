@@ -50,10 +50,10 @@ describe('plan cards', () => {
     }
   });
 
-  it('pediatric: has the child, infant and neonate fasting lines and never links to Dosing', () => {
+  it('pediatric: has the child, infant and neonate fasting lines and links to Dosing', () => {
     const ids = idsOf(card('peds'));
     for (const id of ['fasting-peds-clear', 'fasting-breast-milk', 'fasting-formula']) expect(ids).toContain(id);
-    expect(card('peds').links.dosing).toBeUndefined();
+    expect(card('peds').links.dosing).toBe(true);
     expect(card('peds').links.ventScenarioId).toBe('pediatric');
   });
 

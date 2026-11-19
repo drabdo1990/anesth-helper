@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { CATEGORY_LABELS, CATEGORY_ORDER, CATEGORY_PLACEHOLDERS, LOCAL_ANESTHETICS, MEDICATIONS } from '../data/medications';
 import { useAppStore } from '../store/useAppStore';
@@ -9,6 +9,7 @@ import { NeuraxialReference } from '../components/NeuraxialReference';
 import { ReferenceDrugsPanel } from '../components/ReferenceDrugsPanel';
 import { OTHER_REFERENCE_FILTER, OTHER_REFERENCE_LABEL, type DosingFilter } from '../data/referenceGroups';
 import { NoSourceValue } from '../components/ui/NoSourceValue';
+import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { WarningBanner } from '../components/ui/WarningBanner';
 import { SITUATIONS } from '../data/situations';
 
@@ -23,7 +24,25 @@ export const DosingView: React.FC = () => {
   const ageYears = useAppStore((s) => s.patient.ageYears);
   const result = useBiometricResult();
   const biometrics = result.ok ? result.value : null;
-  const pediatric = ageYears !== null && ageYears < 18;
+
+  const [population, setPopulation] = useState<'adult' | 'pediatric'>(
+    ageYears !== null && ageYears < 18 ? 'pediatric' : 'adult',
+  );
+
+  useEffect(() => {
+    if (ageYears !== null) {
+      setPopulation(ageYears < 18 ? 'pediatric' : 'adult');
+    }
+  }, [ageYears]);
+
+  const filteredMedications = useMemo(() => {
+    if (population === 'pediatric') {
+      return MEDICATIONS.filter((m) =>
+        m.doses.some((d) => d.population === 'pediatric' || d.population === 'both'),
+      );
+    }
+    return MEDICATIONS;
+  }, [population]);
 
   const q = query.trim().toLowerCase();
   const visibleCategories = useMemo(
@@ -32,30 +51,37 @@ export const DosingView: React.FC = () => {
   );
 
   const matches = (name: string, cls: string): boolean => q === '' || name.toLowerCase().includes(q) || cls.toLowerCase().includes(q);
-  const recentMeds = recents.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined);
+  const recentMeds = recents.map((id) => filteredMedications.find((m) => m.id === id)).filter((m) => m !== undefined);
   const activeSituation = SITUATIONS.find((s) => s.id === situation);
-  const situationMeds = activeSituation?.drugIds.map((id) => MEDICATIONS.find((m) => m.id === id)).filter((m) => m !== undefined) ?? [];
+  const situationMeds = activeSituation?.drugIds.map((id) => filteredMedications.find((m) => m.id === id)).filter((m) => m !== undefined) ?? [];
 
   if (ageYears === null) {
     return (
       <WarningBanner level="amber" title="Age required">
-        Enter age in the patient bar before using the adult dosing calculator. This prevents adult doses being shown for an
+        Enter age in the patient bar before using the dosing calculator. This prevents adult doses being shown for an
         unknown child.
-      </WarningBanner>
-    );
-  }
-
-  if (pediatric) {
-    return (
-      <WarningBanner level="red" title="Pediatric dosing not available">
-        This dosing calculator contains adult label doses only. It is withheld for a patient under 18. Use a current pediatric
-        dosing reference and your local protocol.
       </WarningBanner>
     );
   }
 
   return (
     <div className="flex flex-col gap-4 pb-8">
+      <SegmentedControl
+        ariaLabel="Dosing population"
+        value={population}
+        options={[
+          { value: 'adult', label: 'Adult' },
+          { value: 'pediatric', label: 'Pediatric' },
+        ]}
+        onChange={(v) => setPopulation(v)}
+      />
+
+      {ageYears !== null && ageYears < 18 && population === 'adult' && (
+        <WarningBanner level="amber" title="Adult reference mode">
+          Showing adult reference doses for a pediatric patient.
+        </WarningBanner>
+      )}
+
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
@@ -120,7 +146,7 @@ export const DosingView: React.FC = () => {
           </p>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {situationMeds.map((m) => (
-              <DrugCard key={m.id} medication={m} biometrics={biometrics} />
+              <DrugCard key={m.id} medication={m} biometrics={biometrics} population={population} />
             ))}
           </div>
         </>
@@ -133,7 +159,7 @@ export const DosingView: React.FC = () => {
       )}
 
       {situation === null && visibleCategories.map((cat) => {
-        const meds = MEDICATIONS.filter((m) => m.category === cat && matches(m.name, m.class));
+        const meds = filteredMedications.filter((m) => m.category === cat && matches(m.name, m.class));
         const placeholders = CATEGORY_PLACEHOLDERS.filter((p) => p.category === cat && (q === '' || p.topic.toLowerCase().includes(q)));
         if (
           cat === 'local' &&
@@ -155,7 +181,7 @@ export const DosingView: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {meds.map((m) => (
-                  <DrugCard key={m.id} medication={m} biometrics={biometrics} />
+                  <DrugCard key={m.id} medication={m} biometrics={biometrics} population={population} />
                 ))}
                 {placeholders.map((p) => (
                   <NoSourceValue key={p.topic} topic={p.topic} />

@@ -20,7 +20,7 @@ export interface PlanCardLinks {
   ventScenarioId?: string;
   /** Opens Intra-op > Airway. */
   airway?: boolean;
-  /** Opens Intra-op > Dosing, unfiltered. Never set on the pediatric card: calculated dosing is withheld under 18. */
+  /** Opens Intra-op > Dosing (adult or pediatric calculator). */
   dosing?: boolean;
   /** Opens Intra-op > Lists (checklists and the crisis lists). */
   lists?: boolean;
@@ -45,7 +45,7 @@ export const PLAN_CARDS: PlanCard[] = [
   {
     id: 'peds',
     title: 'Pediatric',
-    population: 'Children and infants. The app treats under 18 as pediatric.',
+    population: 'Children and infants. Calculated pediatric dosing, airway and ventilation available.',
     why: WHY,
     phases: {
       preop: ['fasting-peds-clear', 'fasting-breast-milk', 'fasting-formula', 'fasting-risk-conditions'],
@@ -54,7 +54,7 @@ export const PLAN_CARDS: PlanCard[] = [
       emergence: ['em-reversal', 'em-ventilation', 'em-oxygenation', 'em-reflexes', 'em-suction', 'em-risk'],
       redFlags: [],
     },
-    links: { ventScenarioId: 'pediatric', airway: true, references: true, lists: true },
+    links: { ventScenarioId: 'pediatric', airway: true, dosing: true, references: true, lists: true },
   },
   {
     id: 'ob-cs-neuraxial',
