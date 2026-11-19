@@ -3,7 +3,7 @@ import { LOCAL_ANESTHETICS, MEDICATIONS } from '../../../data/medications';
 import type { MedicationDose } from '../../../data/types';
 import { computeBiometrics, type Biometrics } from '../biometrics';
 import { calculateInfusion, checkRateMax } from '../dosing';
-import { computeMedicationDose, cumulativeDoseStatus, doseAppliesToWeight, resolveConcentrationIndex, scalarWeightKg } from '../medication';
+import { computeMedicationDose, calculateDose, cumulativeDoseStatus, doseAppliesToWeight, resolveConcentrationIndex, scalarWeightKg } from '../medication';
 import { localAnestheticDoseMg, maxAllowedMg } from '../localAnesthetic';
 
 const bio = (tbwKg: number, heightCm: number, sex: 'male' | 'female'): Biometrics => {
@@ -234,5 +234,140 @@ describe('local anesthetic limits from the data layer', () => {
     const mg = localAnestheticDoseMg(20, 0.5);
     expect(mg).toBe(100);
     expect(mg / (la('bupivacaine').plain?.absoluteMaxMg ?? 1)).toBeCloseTo(0.5714, 3);
+  });
+});
+
+describe('pediatric dose calculations', () => {
+  it('locks weight scalar to TBW for pediatric doses even if adult scalar is passed', () => {
+    const pedDose: MedicationDose = {
+      id: 'test-ped-propofol',
+      indication: 'Pediatric induction',
+      min: 2.5,
+      max: 3.5,
+      default: 3.0,
+      unit: 'mg/kg',
+      population: 'pediatric',
+      scalar: 'TBW',
+      sourceIds: ['oxford-handbook'],
+    };
+    const res = calculateDose({
+      dose: pedDose,
+      tbwKg: 10,
+      ibwKg: 8,
+      lbwKg: 7,
+      abw40Kg: 8.8,
+      selectedScalar: 'LBW',
+    });
+    expect(res.scalar).toBe('TBW');
+    expect(res.scalarWeightKg).toBe(10);
+    expect(res.calculatedMass).toBe(30); // 3.0 * 10
+  });
+
+  it('caps pediatric dose strictly at adult single-dose ceiling', () => {
+    const pedParacetamol: MedicationDose = {
+      id: 'test-ped-paracetamol',
+      indication: 'Pediatric analgesia',
+      min: 15,
+      max: 15,
+      default: 15,
+      unit: 'mg/kg',
+      population: 'pediatric',
+      absoluteMax: { value: 1000, unit: 'mg' },
+      cappedAtAdultMax: true,
+      sourceIds: ['oxford-handbook'],
+    };
+    const res = calculateDose({
+      dose: pedParacetamol,
+      tbwKg: 75,
+      ibwKg: null,
+      lbwKg: null,
+      abw40Kg: null,
+    });
+    expect(res.calculatedMass).toBe(1000); // 75 * 15 = 1125, capped at 1000
+    expect(res.isCapped).toBe(true);
+    expect(res.cappedMessage).toBe('Capped at adult max (1000 mg)');
+  });
+
+  it('enforces minimum dose floor for atropine', () => {
+    const pedAtropine: MedicationDose = {
+      id: 'test-ped-atropine',
+      indication: 'Vagolysis',
+      min: 10,
+      max: 20,
+      default: 15,
+      unit: 'mcg/kg',
+      population: 'pediatric',
+      minimumFloor: { value: 100, unit: 'mcg' }, // 0.1 mg floor
+      sourceIds: ['oxford-handbook'],
+    };
+    const res = calculateDose({
+      dose: pedAtropine,
+      tbwKg: 3, // 3 * 15 = 45 mcg
+      ibwKg: null,
+      lbwKg: null,
+      abw40Kg: null,
+    });
+    expect(res.calculatedMass).toBe(100);
+    expect(res.isFloorEnforced).toBe(true);
+    expect(res.floorMessage).toBe('Minimum floor applied (100 mcg)');
+  });
+
+  it('calculates volume correctly with pediatric dilution presets', () => {
+    const pedFentanyl: MedicationDose = {
+      id: 'test-ped-fentanyl',
+      indication: 'Pediatric analgesia',
+      min: 1,
+      max: 2,
+      default: 1.5,
+      unit: 'mcg/kg',
+      population: 'pediatric',
+      absoluteMax: { value: 100, unit: 'mcg' },
+      sourceIds: ['oxford-handbook'],
+    };
+    // 4 kg * 1.5 mcg/kg = 6 mcg.
+    // Neat: 50 mcg/mL (0.05 mg/mL) -> 6 / 50 = 0.12 mL
+    const neatRes = calculateDose({
+      dose: pedFentanyl,
+      tbwKg: 4,
+      concentrationMgPerMl: 0.05,
+    });
+    expect(neatRes.calculatedMass).toBe(6);
+    expect(neatRes.volumeMl).toBeCloseTo(0.12, 5);
+
+    // Pediatric dilution preset: 10 mcg/mL (0.01 mg/mL) -> 6 / 10 = 0.6 mL
+    const diluteRes = calculateDose({
+      dose: pedFentanyl,
+      tbwKg: 4,
+      concentrationMgPerMl: 0.01,
+    });
+    expect(diluteRes.calculatedMass).toBe(6);
+    expect(diluteRes.volumeMl).toBeCloseTo(0.6, 5);
+  });
+
+  it('matches age brackets when patient age is supplied', () => {
+    const infantPropofol: MedicationDose = {
+      id: 'test-propofol-infant',
+      indication: 'Infant induction',
+      min: 2.5,
+      max: 3.5,
+      default: 3.0,
+      unit: 'mg/kg',
+      population: 'pediatric',
+      ageBracket: { minYears: 0, maxYears: 2, label: 'Infant (< 2 yr)' },
+      sourceIds: ['oxford-handbook'],
+    };
+    const matched = calculateDose({
+      dose: infantPropofol,
+      tbwKg: 10,
+      patientAgeYears: 1.5,
+    });
+    expect(matched.ageBracketMatched).toBe(true);
+
+    const notMatched = calculateDose({
+      dose: infantPropofol,
+      tbwKg: 18,
+      patientAgeYears: 5,
+    });
+    expect(notMatched.ageBracketMatched).toBe(false);
   });
 });

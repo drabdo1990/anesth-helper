@@ -1,10 +1,10 @@
 // Turns a sourced MedicationDose + a chosen value + patient biometrics into mass, volume/rate and
 // maximum-dose status. Pure. All limit checks use unrounded numbers.
 
-import type { AbsoluteMax, MedicationDose, WeightScalar } from '../../data/types';
+import type { AbsoluteMax, DoseUnit, MedicationDose, WeightScalar } from '../../data/types';
 import type { Biometrics } from './biometrics';
 import {
-  calculateDose,
+  calculateDose as calculateRawDose,
   calculateInfusion,
   checkAbsoluteMax,
   checkRateMax,
@@ -92,9 +92,13 @@ export const computeMedicationDose = (
   biometrics: Biometrics,
   options: ComputeOptions = {},
 ): DoseComputation => {
-  const scalar = isWeightBased(dose) ? (options.scalarOverride ?? dose.scalar ?? 'TBW') : undefined;
+  const scalar = isWeightBased(dose)
+    ? dose.population === 'pediatric'
+      ? 'TBW'
+      : (options.scalarOverride ?? dose.scalar ?? 'TBW')
+    : undefined;
   const scalarKg = scalar ? scalarWeightKg(biometrics, scalar) : undefined;
-  const weight = scalarKg ?? biometrics.tbw;
+  const weight = dose.population === 'pediatric' ? biometrics.tbw : (scalarKg ?? biometrics.tbw);
   const absoluteMax = options.absoluteMax ?? dose.absoluteMax;
 
   if (dose.unit === 'mcg/kg/min' || dose.unit === 'mcg/min') {
@@ -115,7 +119,7 @@ export const computeMedicationDose = (
     };
   }
 
-  const bolus = calculateDose(value, dose.unit, weight, concentrationMgPerMl);
+  const bolus = calculateRawDose(value, dose.unit, weight, concentrationMgPerMl);
   let max: MaxDoseStatus = 'ok';
   let percentOfMax: number | undefined;
   if (absoluteMax && absoluteMax.unit !== 'mcg/min') {
@@ -137,4 +141,128 @@ export const computeMedicationDose = (
     : undefined;
 
   return { kind: 'bolus', value, unit: dose.unit, scalar, scalarKg, bolus, max, percentOfMax, absoluteMax, companion };
+};
+
+export interface DoseCalculationResult {
+  scalar: WeightScalar;
+  scalarWeightKg: number;
+  calculatedMass: number;
+  unit: DoseUnit;
+  volumeMl: number | null;
+  concentrationMgPerMl: number | null;
+  isCapped: boolean;
+  cappedMessage?: string;
+  isFloorEnforced: boolean;
+  floorMessage?: string;
+  ageBracketMatched?: boolean;
+}
+
+export interface CalculateDoseParams {
+  dose: MedicationDose;
+  tbwKg: number;
+  ibwKg?: number | null;
+  lbwKg?: number | null;
+  abw40Kg?: number | null;
+  selectedScalar?: WeightScalar;
+  doseValue?: number;
+  concentrationMgPerMl?: number | null;
+  patientAgeYears?: number | null;
+}
+
+export const calculateDose = (params: CalculateDoseParams): DoseCalculationResult => {
+  const { dose, tbwKg, ibwKg, lbwKg, abw40Kg, selectedScalar, doseValue, concentrationMgPerMl, patientAgeYears } =
+    params;
+
+  let scalar: WeightScalar;
+  let scalarWeightKg: number;
+
+  if (dose.population === 'pediatric') {
+    scalar = 'TBW';
+    scalarWeightKg = tbwKg;
+  } else {
+    scalar = selectedScalar ?? dose.scalar ?? 'TBW';
+    switch (scalar) {
+      case 'TBW':
+        scalarWeightKg = tbwKg;
+        break;
+      case 'IBW':
+        scalarWeightKg = ibwKg ?? tbwKg;
+        break;
+      case 'LBW':
+        scalarWeightKg = lbwKg ?? tbwKg;
+        break;
+      case 'ABW40':
+        scalarWeightKg = abw40Kg ?? tbwKg;
+        break;
+    }
+  }
+
+  const doseVal = doseValue ?? dose.default ?? dose.min ?? 0;
+  const isMcg = dose.unit === 'mcg' || dose.unit === 'mcg/kg';
+  const weightBased = isWeightBased(dose);
+  const rawMass = weightBased ? doseVal * scalarWeightKg : doseVal;
+
+  let calculatedMass = rawMass;
+  let isCapped = false;
+  let cappedMessage: string | undefined;
+
+  if (dose.absoluteMax) {
+    const maxValInDoseUnit =
+      dose.absoluteMax.unit === 'mg' && isMcg
+        ? dose.absoluteMax.value * 1000
+        : dose.absoluteMax.unit === 'mcg' && !isMcg
+          ? dose.absoluteMax.value / 1000
+          : dose.absoluteMax.value;
+
+    if (rawMass > maxValInDoseUnit) {
+      calculatedMass = maxValInDoseUnit;
+      isCapped = true;
+      cappedMessage = `Capped at adult max (${dose.absoluteMax.value} ${dose.absoluteMax.unit})`;
+    }
+  }
+
+  let isFloorEnforced = false;
+  let floorMessage: string | undefined;
+
+  if (dose.minimumFloor) {
+    const floorValInDoseUnit =
+      dose.minimumFloor.unit === 'mg' && isMcg
+        ? dose.minimumFloor.value * 1000
+        : dose.minimumFloor.unit === 'mcg' && !isMcg
+          ? dose.minimumFloor.value / 1000
+          : dose.minimumFloor.value;
+
+    if (calculatedMass < floorValInDoseUnit) {
+      calculatedMass = floorValInDoseUnit;
+      isFloorEnforced = true;
+      floorMessage = `Minimum floor applied (${dose.minimumFloor.value} ${dose.minimumFloor.unit})`;
+    }
+  }
+
+  let volumeMl: number | null = null;
+  if (concentrationMgPerMl !== undefined && concentrationMgPerMl !== null && concentrationMgPerMl > 0) {
+    const massMg = isMcg ? calculatedMass / 1000 : calculatedMass;
+    volumeMl = massMg / concentrationMgPerMl;
+  }
+
+  let ageBracketMatched: boolean | undefined = undefined;
+  if (patientAgeYears !== undefined && patientAgeYears !== null && dose.ageBracket) {
+    const minOk = dose.ageBracket.minYears === undefined || patientAgeYears >= dose.ageBracket.minYears;
+    const maxOk = dose.ageBracket.maxYears === undefined || patientAgeYears < dose.ageBracket.maxYears;
+    ageBracketMatched = minOk && maxOk;
+  }
+
+  return {
+    scalar,
+    scalarWeightKg,
+    calculatedMass,
+    unit: dose.unit,
+    volumeMl,
+    concentrationMgPerMl: concentrationMgPerMl ?? null,
+    isCapped,
+    cappedMessage,
+    isFloorEnforced,
+    floorMessage,
+    ageBracketMatched,
+  };
 };

@@ -34,6 +34,14 @@ export interface AbsoluteMax {
   scope?: string;
 }
 
+export type TargetPopulation = 'adult' | 'pediatric' | 'both';
+
+export interface AgeBracket {
+  minYears?: number;
+  maxYears?: number;
+  label: string;
+}
+
 export interface MedicationDose {
   id: string;
   indication: string;
@@ -51,6 +59,14 @@ export interface MedicationDose {
   weightBandKg?: { min?: number; max?: number; maxExclusive?: number };
   notes?: string[];
   sourceIds: string[];
+  /** Target population for this dose line. Defaults to 'adult' if omitted. */
+  population?: TargetPopulation;
+  /** Age bracket specification for auto-matching patient age. */
+  ageBracket?: AgeBracket;
+  /** Minimum dose floor to avoid subtherapeutic adverse effects (e.g. Atropine 0.1 mg). */
+  minimumFloor?: { value: number; unit: 'mg' | 'mcg' };
+  /** Explicitly flags that dose must never exceed adult single-dose ceiling. */
+  cappedAtAdultMax?: boolean;
 }
 
 export interface MedicationConcentration {
@@ -59,6 +75,10 @@ export interface MedicationConcentration {
   sourceId: string;
   /** Needs dilution before IV use (e.g. ketamine 100 mg/mL). */
   requiresDilution?: boolean;
+  /** When true, preselected as default concentration in pediatric mode. */
+  isPediatricDefault?: boolean;
+  /** Concise step-by-step preparation instruction for nursing/anesthesia staff. */
+  pediatricInstructions?: string;
 }
 
 export type MedicationCategory =
