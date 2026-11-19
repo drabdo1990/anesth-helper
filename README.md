@@ -109,8 +109,16 @@ Settings (gear icon) has an **Active reference set** switch and an **Appearance*
 
 `npm test` runs 200+ tests covering IBW/PBW, LBW, ABW40 and BMI; dose and volume math (including mcg/mg conversion); single and cumulative maximum-dose flags; infusion rates; ETT/LMA/DLT sizing; pediatric age guards; tidal volume and minute ventilation; the local anesthetic combined fraction; LAST lipid bolus, infusion and the 12 mL/kg ceiling; dantrolene dose, vial counts and the cumulative warning; guideline-vs-local resolution; the fasting/NPO checklist and its source coverage; anonymous handoff construction; and source traceability of every clinical record. CI and Vercel run `npm run verify`.
 
+## Repository Policies
+
+- **Security & Vulnerability Disclosure:** See [SECURITY.md](SECURITY.md) for details on zero-PHI verification and reporting security concerns.
+- **Privacy Policy:** See [PRIVACY.md](PRIVACY.md) for our zero-PHI architecture, local device storage policies, and HIPAA/GDPR alignment.
+- **Contribution Guidelines:** See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on proposing clinical data updates, evidence tier requirements, and engineering standards.
+- **Code of Conduct:** See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community participation and clinical discussion standards.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). The software is provided as is, and the clinical-use disclaimer above still applies.
 
 Exception: `src/data/checklistsQrh.ts` is adapted from the Association of Anaesthetists Quick Reference Handbook (www.anaesthetists.org/qrh) and is shared under CC BY-NC-SA 4.0 (attribution, non-commercial, share-alike), not MIT. Remove that file if you need a purely MIT or commercial build.
+
