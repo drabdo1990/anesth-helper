@@ -21,11 +21,11 @@ The reference layer in `src/data/` was transcribed from product labels (DailyMed
 ```bash
 npm ci
 npm run dev        # http://localhost:5173
-npm test           # unit tests (clinical calculations and data integrity; 433 tests)
+npm test           # unit tests (clinical calculations and data integrity; 455 tests)
 npm run verify     # tests + type-check + production build
 ```
 
-Requires Node 20+.
+Requires Node 22+.
 
 ## Build and deploy for offline use
 
@@ -39,6 +39,26 @@ npm run preview    # serve dist/ locally to test offline behaviour
 Deploy the `dist/` folder to any static host. `vercel.json` already sets cache headers (service worker and manifest are never cached; hashed assets are immutable).
 
 PWA icons are generated from the favicon artwork by `python scripts/generate-icons.py` (needs `pip install pillow`). Re-run only if you change the logo.
+
+## Android App & Google Play Release
+
+AnesthAssist is packaged as an offline-first native Android application using **Capacitor**:
+* **Application ID:** `online.anesthassist.app`
+* **Google Play Title:** `AnesthAssist: OR Decision Aid`
+* **Official Production Domain:** `https://anesthassist.online`
+
+### Cloud Compilation via GitHub Actions
+Before the first release, configure the four signing secrets described in [docs/google-play-keystore-setup.md](docs/google-play-keystore-setup.md). Tagged releases (`v*`) fail if the secrets are missing; manual runs without them produce an unsigned bundle.
+
+To generate a production-ready, signed **Android App Bundle (`.aab`)**:
+1. Go to the repository's **Actions** tab on GitHub: [drabdo1990/anesth-helper Actions](https://github.com/drabdo1990/anesth-helper/actions/workflows/android-release.yml).
+2. Select **Build & Sign Android App Bundle** and click **Run workflow**.
+3. Once completed, download the signed **`anesthassist-release-aab`** artifact and upload it directly to Google Play Console.
+
+### Setup & Play Store Documentation
+* **Upload Keystore & Secrets:** See [docs/google-play-keystore-setup.md](docs/google-play-keystore-setup.md).
+* **Store Listing Copy & Data Safety Form:** See [docs/google-play-listing.md](docs/google-play-listing.md).
+* **Feature Graphic (1024x500):** Generated at `public/feature-graphic.png` via `python scripts/generate-feature-graphic.py`.
 
 ## App structure
 
