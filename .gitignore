@@ -38,3 +38,7 @@ dist-ssr
 agent/
 skills-lock.json
 .superpowers/
+
+# Android keystores & signing secrets
+*.jks
+*.keystore
