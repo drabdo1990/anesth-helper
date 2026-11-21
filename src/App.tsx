@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, BookOpen, RefreshCw, Settings, WifiOff } from 'lucide-react';
 import { useAppStore } from './store/useAppStore';
-import { initNativeBridge } from './lib/nativeBridge';
 import { applyPwaUpdate } from './lib/pwaUpdate';
 import { BiometricHeader } from './components/BiometricHeader';
 import { EmergencyOverlay } from './components/EmergencyOverlay';
@@ -49,20 +48,6 @@ export const App: React.FC = () => {
       window.removeEventListener('online', on);
       window.removeEventListener('offline', off);
     };
-  }, []);
-
-  useEffect(() => {
-    const cleanup = initNativeBridge({
-      getState: () => ({
-        emergencyOpen: useAppStore.getState().emergencyOpen,
-        settingsOpen: useAppStore.getState().settingsOpen,
-        referencesOpen: useAppStore.getState().referencesOpen,
-      }),
-      closeEmergency: () => useAppStore.getState().closeEmergency(),
-      closeSettings: () => useAppStore.getState().setSettingsOpen(false),
-      closeReferences: () => useAppStore.getState().setReferencesOpen(false),
-    });
-    return cleanup;
   }, []);
 
   const iconBtn =
