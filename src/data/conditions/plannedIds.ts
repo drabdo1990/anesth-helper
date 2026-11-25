@@ -162,4 +162,15 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'thoracic-olv',
   'septic-shock',
   'brain-death-donor',
+  // Batch 10: Subspecialty Part 3 (Neuroanesthesia, Psychiatric & Toxicities)
+  'traumatic-brain-injury',
+  'intracranial-aneurysm-sah',
+  'awake-craniotomy-mass',
+  'acute-spinal-cord-injury',
+  'maoi-ssri-serotonin-syndrome',
+  'lithium-ect',
+  'substance-use-withdrawal',
+  'central-anticholinergic-syndrome',
+  'co-cyanide-toxicity',
+  'organophosphate-pseudocholinesterase',
 ];

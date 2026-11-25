@@ -8,8 +8,8 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('registers all 110 Stoelting entries + 24 acute emergencies + 19 subspecialty cards (153 total)', () => {
-    expect(CONDITIONS).toHaveLength(153);
+  it('registers all 110 Stoelting entries + 24 acute emergencies + 29 subspecialty cards (163 total)', () => {
+    expect(CONDITIONS).toHaveLength(163);
   });
 
   it('uses updated data version 2026.11.25-draft27 and registers anesthesia-considerations', () => {
@@ -159,5 +159,14 @@ describe('condition plans', () => {
     expect(text(plan('copd-bullous-emphysema').avoid)).toMatch(/nitrous oxide|N2O/i);
     expect(text(plan('thoracic-olv').intraop)).toMatch(/CPAP|PEEP/i);
     expect(text(plan('brain-death-donor').intraop)).toMatch(/Rule of 100s|vasopressin/i);
+  });
+
+  it('keeps neuroanesthesia, psychiatric, and toxicity safety lines', () => {
+    expect(text(plan('traumatic-brain-injury').avoid)).toMatch(/hypotonic|nitrous/i);
+    expect(text(plan('acute-spinal-cord-injury').avoid)).toMatch(/Succinylcholine/i);
+    expect(text(plan('maoi-ssri-serotonin-syndrome').avoid)).toMatch(/meperidine/i);
+    expect(text(plan('central-anticholinergic-syndrome').intraop)).toMatch(/physostigmine/i);
+    expect(text(plan('co-cyanide-toxicity').intraop)).toMatch(/hydroxocobalamin/i);
+    expect(text(plan('organophosphate-pseudocholinesterase').avoid)).toMatch(/succinylcholine|mivacurium/i);
   });
 });
