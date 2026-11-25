@@ -8,8 +8,8 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('is the full first list, so an entry cannot be dropped by accident', () => {
-    expect(CONDITIONS.length).toBe(110);
+  it('holds all 110 Stoelting conditions plus 24 acute emergencies (134 total)', () => {
+    expect(CONDITIONS.length).toBe(134);
   });
 
   it('uses updated data version 2026.11.25-draft26 and registers anesthesia-considerations', () => {
@@ -109,5 +109,21 @@ describe('condition plans', () => {
   it('send MH to the SOS panel instead of retyping dantrolene doses', () => {
     expect(CONDITIONS.find((c) => c.id === 'mh-susceptibility')?.crisis).toBe('mh');
     for (const id of PLANNED_CONDITION_IDS) expect(JSON.stringify(plan(id)), id).not.toMatch(/mg\/kg/);
+  });
+
+  it('keeps emergency safety-critical statements and cross-links', () => {
+    expect(text(plan('airway-fire').intraop)).toMatch(/halt fresh gas flow/i);
+    expect(text(plan('airway-fire').intraop)).toMatch(/extubate|remove.*tube/i);
+    expect(text(plan('tension-pneumothorax').avoid)).toMatch(/nitrous oxide/i);
+    expect(text(plan('tension-pneumothorax').intraop)).toMatch(/needle/i);
+    expect(text(plan('venous-air-embolism').avoid)).toMatch(/nitrous oxide/i);
+    expect(text(plan('venous-air-embolism').postop)).toMatch(/Durant/i);
+    expect(text(plan('total-spinal').avoid)).toMatch(/reverse Trendelenburg/i);
+    expect(text(plan('transfusion-reaction').intraop)).toMatch(/halt.*transfusion|stop.*transfusion/i);
+    expect(text(plan('transfusion-reaction').avoid)).toMatch(/discarding/i);
+    expect(CONDITIONS.find((c) => c.id === 'last-toxicity')?.crisis).toBe('last');
+    expect(CONDITIONS.find((c) => c.id === 'anaphylaxis')?.checklistId).toBe('crisis-anaphylaxis');
+    expect(CONDITIONS.find((c) => c.id === 'bronchospasm')?.checklistId).toBe('crisis-bronchospasm');
+    expect(CONDITIONS.find((c) => c.id === 'laryngospasm')?.checklistId).toBe('crisis-laryngospasm');
   });
 });

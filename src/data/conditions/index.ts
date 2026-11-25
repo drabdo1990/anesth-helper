@@ -4,6 +4,7 @@ import { NEUROLOGIC_CONDITIONS } from './neurologic';
 import { ENDOCRINE_CONDITIONS } from './endocrine';
 import { HEMATOLOGIC_CONDITIONS } from './hematologic';
 import { MULTISYSTEM_CONDITIONS } from './multisystem';
+import { EMERGENCY_CONDITIONS } from './emergencies';
 import type { ConditionRecord } from './types';
 
 export const CONDITIONS: ConditionRecord[] = [
@@ -13,6 +14,7 @@ export const CONDITIONS: ConditionRecord[] = [
   ...ENDOCRINE_CONDITIONS,
   ...HEMATOLOGIC_CONDITIONS,
   ...MULTISYSTEM_CONDITIONS,
+  ...EMERGENCY_CONDITIONS,
 ];
 
 export { CARDIOVASCULAR_CONDITIONS } from './cardiovascular';
@@ -21,6 +23,7 @@ export { NEUROLOGIC_CONDITIONS } from './neurologic';
 export { ENDOCRINE_CONDITIONS } from './endocrine';
 export { HEMATOLOGIC_CONDITIONS } from './hematologic';
 export { MULTISYSTEM_CONDITIONS } from './multisystem';
+export { EMERGENCY_CONDITIONS } from './emergencies';
 
 export { PLANNED_CONDITION_IDS } from './plannedIds';
 export * from './types';
