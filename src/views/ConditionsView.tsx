@@ -102,7 +102,7 @@ const Detail: React.FC<{ c: ConditionRecord; onBack: () => void }> = ({ c, onBac
   );
 };
 
-/** Diseases tab: offline search over the condition list; plans for the first six, chapter pointers for the rest. */
+/** Diseases tab: offline search over every condition (Stoelting, acute emergencies, board subspecialty cards); each opens a four-section plan. */
 export const ConditionsView: React.FC = () => {
   const [query, setQuery] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
