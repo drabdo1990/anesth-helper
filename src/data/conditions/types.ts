@@ -5,16 +5,22 @@ export interface ConditionPlan {
   postop: string[];
 }
 
+export type CrisisChecklistId = 'crisis-anaphylaxis' | 'crisis-bronchospasm' | 'crisis-laryngospasm';
+
 export interface ConditionRecord {
   id: string;
   name: string;
   /** Lower-case other names and abbreviations the search also matches. */
   aliases: string[];
   /** Chapter number in Stoelting 8e; the title is in STOELTING_CHAPTERS. */
-  chapter: number;
+  chapter?: number;
+  /** Topic category for non-Stoelting sources such as Anesthesia Considerations. */
+  category?: string;
   plan?: ConditionPlan;
   /** The SOS panel this plan links to. */
-  crisis?: 'mh';
+  crisis?: 'mh' | 'last';
+  /** The QRH crisis checklist under Intra-op > Lists this plan links to. */
+  checklistId?: CrisisChecklistId;
   sourceIds: string[];
 }
 
@@ -64,6 +70,30 @@ export function entry(
   }
   if (crisis !== undefined) {
     rec.crisis = crisis;
+  }
+  return rec;
+}
+
+export function emergencyEntry(
+  id: string,
+  name: string,
+  aliases: string[],
+  plan: ConditionPlan,
+  options?: { crisis?: 'mh' | 'last'; checklistId?: CrisisChecklistId },
+): ConditionRecord {
+  const rec: ConditionRecord = {
+    id,
+    name,
+    aliases,
+    category: 'Acute Intraoperative Emergencies',
+    plan,
+    sourceIds: ['anesthesia-considerations'],
+  };
+  if (options?.crisis !== undefined) {
+    rec.crisis = options.crisis;
+  }
+  if (options?.checklistId !== undefined) {
+    rec.checklistId = options.checklistId;
   }
   return rec;
 }

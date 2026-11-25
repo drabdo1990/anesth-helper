@@ -7,7 +7,9 @@ import { Panel } from '../components/hud/Panel';
 import { WarningBanner } from '../components/ui/WarningBanner';
 
 const chapterLine = (c: ConditionRecord): string =>
-  `Stoelting's Anesthesia and Co-Existing Disease, 8th edition (2022), chapter ${c.chapter}: ${STOELTING_CHAPTERS[c.chapter]}.`;
+  c.chapter !== undefined
+    ? `Stoelting's Anesthesia and Co-Existing Disease, 8th edition (2022), chapter ${c.chapter}: ${STOELTING_CHAPTERS[c.chapter]}.`
+    : `Anesthesia Considerations for Oral Board Exam: ${c.category}.`;
 
 const SECTIONS: { key: 'preop' | 'intraop' | 'avoid' | 'postop'; label: string }[] = [
   { key: 'preop', label: 'Pre-op' },

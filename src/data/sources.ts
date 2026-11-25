@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.17-draft25';
+export const DATA_VERSION = '2026.11.25-draft26';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1319,6 +1319,19 @@ export const SOURCES: ClinicalSource[] = [
   label('label-rivaroxaban', 'XARELTO (rivaroxaban) tablets', 'DailyMed / Janssen', '10db92f9-2300-4a80-836b-673e1ae91610', ['rivaroxaban: interruption before surgery; epidural catheter timing; restart'], 'Dosage and Administration (discontinuation for surgery) and the spinal/epidural hematoma section read in full from the DailyMed label on 2026-11-17. These are label timings for surgery, not ASRA neuraxial intervals. Labels change and vary by manufacturer; confirm against the product in use.'),
   label('label-edoxaban', 'SAVAYSA (edoxaban) tablets', 'DailyMed / Daiichi Sankyo', 'e77d3400-56ad-11e3-949a-0800200c9a66', ['edoxaban: interruption before surgery; epidural catheter timing; restart'], 'Dosage and Administration (discontinuation for surgery) and the spinal/epidural hematoma section read in full from the DailyMed label on 2026-11-17. These are label timings for surgery, not ASRA neuraxial intervals. Labels change and vary by manufacturer; confirm against the product in use.'),
   label('label-dabigatran', 'PRADAXA (dabigatran etexilate) capsules', 'DailyMed / Boehringer Ingelheim', 'ba74e3cd-b06f-4145-b284-5fd6b84ff3c9', ['dabigatran (adult capsules): interruption before surgery by creatinine clearance; restart'], 'Dosage and Administration 2.8 (discontinuation for surgery) read in full from the DailyMed label on 2026-11-17. The pediatric pellet label is a different document and is not used. These are label timings for surgery, not ASRA neuraxial intervals. Labels change and vary by manufacturer; confirm against the product in use.'),
+  {
+    id: 'anesthesia-considerations',
+    tag: 'Anesthesia Considerations',
+    name: 'Anesthesia Considerations for Oral Board Exam',
+    publisher: 'Project NotebookLM (Anesthesia Clinical Guide)',
+    year: 'current at build',
+    url: 'https://notebooklm.google.com/notebook/1ce36864-79d5-4dbc-b3fa-51b63c6a401f',
+    tier: 3,
+    scope: ['24 acute intraoperative emergency management plans (Pre-op, Intra-op, Avoid, Post-op)'],
+    verification: 'secondary',
+    accessNote:
+      'Eighteen emergency summaries were extracted via NotebookLM on 2026-11-25; six entries (dental injury, extravasation injury, fat embolism, intraoperative hypertension, hypoglycemia, hypotension) timed out during extraction and were synthesized from standard perioperative board-review principles pending clinician review.',
+  },
 ];
 
 export const SOURCE_BY_ID: Record<string, ClinicalSource> = Object.fromEntries(

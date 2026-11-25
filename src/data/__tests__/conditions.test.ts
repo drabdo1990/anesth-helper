@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { CONDITIONS, PLANNED_CONDITION_IDS, STOELTING_CHAPTERS } from '../conditions';
-import { SOURCE_BY_ID } from '../sources';
+import { CONDITIONS, PLANNED_CONDITION_IDS, STOELTING_CHAPTERS, emergencyEntry } from '../conditions';
+import { DATA_VERSION, SOURCE_BY_ID } from '../sources';
 
 describe('conditions', () => {
   it('have unique ids and unique names', () => {
@@ -12,15 +12,48 @@ describe('conditions', () => {
     expect(CONDITIONS.length).toBe(110);
   });
 
-  it('each point to a Stoelting 8e chapter that exists', () => {
-    for (const c of CONDITIONS) expect(STOELTING_CHAPTERS[c.chapter], c.id).toBeTruthy();
+  it('uses updated data version 2026.11.25-draft26 and registers anesthesia-considerations', () => {
+    expect(DATA_VERSION).toBe('2026.11.25-draft26');
+    expect(SOURCE_BY_ID['anesthesia-considerations']).toBeDefined();
   });
 
-  it('each cite Stoelting 8e, and every cited source is registered', () => {
+  it('each point to an existing Stoelting 8e chapter or declare a category', () => {
     for (const c of CONDITIONS) {
-      expect(c.sourceIds, c.id).toContain('stoelting-8e');
+      if (c.chapter !== undefined) {
+        expect(STOELTING_CHAPTERS[c.chapter], c.id).toBeTruthy();
+      } else {
+        expect(c.category?.trim().length, c.id).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('each cite Stoelting 8e or Anesthesia Considerations, and every cited source is registered', () => {
+    for (const c of CONDITIONS) {
+      const hasStoelting = c.sourceIds.includes('stoelting-8e');
+      const hasConsiderations = c.sourceIds.includes('anesthesia-considerations');
+      expect(hasStoelting || hasConsiderations, c.id).toBe(true);
       for (const id of c.sourceIds) expect(SOURCE_BY_ID[id], `${c.id} -> ${id}`).toBeDefined();
     }
+  });
+
+  it('emergencyEntry creates Acute Intraoperative Emergencies records cleanly', () => {
+    const sample = emergencyEntry(
+      'sample-emg',
+      'Sample emergency',
+      ['sample alias'],
+      {
+        preop: ['Preop line > 10 chars'],
+        intraop: ['Intraop line > 10 chars'],
+        avoid: ['Avoid line > 10 chars'],
+        postop: ['Postop line > 10 chars'],
+      },
+      { crisis: 'last', checklistId: 'crisis-anaphylaxis' },
+    );
+    expect(sample.category).toBe('Acute Intraoperative Emergencies');
+    expect(sample.chapter).toBeUndefined();
+    expect(sample.sourceIds).toEqual(['anesthesia-considerations']);
+    expect(sample.crisis).toBe('last');
+    expect(sample.checklistId).toBe('crisis-anaphylaxis');
   });
 
   it('carry a plan only for the planned ids, so an index entry never shows invented text', () => {

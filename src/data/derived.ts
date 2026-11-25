@@ -107,7 +107,8 @@ export const derivedValuesBySource = (): Record<string, string[]> => {
   add(PONV_PLAN.sourceIds, `PONV plan: ${PONV_PLAN.adults.headline}`);
 
   for (const c of CONDITIONS) {
-    add(c.sourceIds, c.plan ? `Condition plan: ${c.name} (ch. ${c.chapter})` : `Condition list entry, no plan yet: ${c.name} (ch. ${c.chapter})`);
+    const loc = c.chapter !== undefined ? `ch. ${c.chapter}` : c.category ?? 'reference';
+    add(c.sourceIds, c.plan ? `Condition plan: ${c.name} (${loc})` : `Condition list entry, no plan yet: ${c.name} (${loc})`);
   }
 
   for (const r of PERIOP_RULES) {
