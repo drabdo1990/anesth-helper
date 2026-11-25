@@ -49,7 +49,16 @@ const Detail: React.FC<{ c: ConditionRecord; onBack: () => void }> = ({ c, onBac
         {c.aliases.length > 0 && <p className="text-xs text-slate-400">Also: {c.aliases.join(', ')}</p>}
         {plan ? (
           <>
-            <WarningBanner level="info" title={c.chapter !== undefined ? 'Textbook summary' : 'Board emergency summary'}>
+            <WarningBanner
+              level="info"
+              title={
+                c.chapter !== undefined
+                  ? 'Textbook summary'
+                  : c.category === 'Acute Intraoperative Emergencies'
+                    ? 'Board emergency summary'
+                    : 'Board subspecialty summary'
+              }
+            >
               A short summary of {chapterLine(c)} Check current society guidance and your local protocol.
             </WarningBanner>
             {SECTIONS.map(({ key, label }) => (
@@ -105,7 +114,7 @@ export const ConditionsView: React.FC = () => {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-slate-400">
-        Conditions from Stoelting&apos;s Anesthesia and Co-Existing Disease (8th edition) and Acute Intraoperative Emergencies from Anesthesia Considerations. Each has a perioperative plan (Pre-op, Intra-op, Avoid, Post-op). Searching works offline and nothing you type is stored.
+        Rare diseases from Stoelting&apos;s Anesthesia and Co-Existing Disease (8th edition) plus Acute Intraoperative Emergencies and Subspecialty Conditions from Anesthesia Considerations. Each has a perioperative plan (Pre-op, Intra-op, Avoid, Post-op). Searching works offline and nothing you type is stored.
       </p>
       <label className="flex min-h-[48px] items-center gap-2 rounded-xl border border-clinical-border-light bg-clinical-card px-3 focus-within:border-cyan-500">
         <Search className="h-4 w-4 shrink-0 text-slate-400" />

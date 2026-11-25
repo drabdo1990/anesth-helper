@@ -184,4 +184,17 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'turp-syndrome',
   'dic',
   'hit-thrombocytopenia',
+  // Batch 12: Subspecialty Part 5 (Obstetrics, Pediatrics, Skin & MSK, Miscellaneous)
+  'preeclampsia-hellp',
+  'placenta-accreta-pph',
+  'amniotic-fluid-embolism',
+  'pyloric-stenosis',
+  'omphalocele-gastroschisis',
+  'nec-prematurity',
+  'foreign-body-aspiration',
+  'rheumatoid-arthritis',
+  'major-burn-injury',
+  'morbid-obesity-bariatric',
+  'geriatric-pocd',
+  'perioperative-hypothermia',
 ];

@@ -8,8 +8,8 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('registers all 110 Stoelting entries + 24 acute emergencies + 39 subspecialty cards (173 total)', () => {
-    expect(CONDITIONS).toHaveLength(173);
+  it('registers all 110 Stoelting entries + 24 acute emergencies + 51 subspecialty cards (185 total)', () => {
+    expect(CONDITIONS).toHaveLength(185);
   });
 
   it('uses updated data version 2026.11.25-draft27 and registers anesthesia-considerations', () => {
@@ -177,5 +177,14 @@ describe('condition plans', () => {
     expect(text(plan('esrd-renal-transplant').avoid)).toMatch(/succinylcholine|NSAIDs/i);
     expect(text(plan('turp-syndrome').intraop)).toMatch(/hyponatrem|serum sodium/i);
     expect(text(plan('hit-thrombocytopenia').avoid)).toMatch(/heparin|platelet/i);
+  });
+
+  it('keeps obstetrics, pediatrics, burn, and obesity subspecialty safety lines', () => {
+    expect(text(plan('preeclampsia-hellp').intraop)).toMatch(/magnesium/i);
+    expect(text(plan('placenta-accreta-pph').avoid)).toMatch(/carboprost|asthma|methylergonovine/i);
+    expect(text(plan('amniotic-fluid-embolism').intraop)).toMatch(/perimortem|DIC/i);
+    expect(text(plan('pyloric-stenosis').preop)).toMatch(/medical.*not.*surgical|alkalosis/i);
+    expect(text(plan('major-burn-injury').avoid)).toMatch(/Succinylcholine/i);
+    expect(text(plan('morbid-obesity-bariatric').intraop)).toMatch(/ramped|PBW/i);
   });
 });
