@@ -173,4 +173,15 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'central-anticholinergic-syndrome',
   'co-cyanide-toxicity',
   'organophosphate-pseudocholinesterase',
+  // Batch 11: Subspecialty Part 4 (Endocrinology, Hepatic, Renal & Hematology)
+  'diabetes-dka-hhs',
+  'hyperthyroidism-thyroid-storm',
+  'hypothyroidism-myxedema',
+  'adrenal-insufficiency',
+  'cirrhosis-esld',
+  'acute-liver-failure',
+  'esrd-renal-transplant',
+  'turp-syndrome',
+  'dic',
+  'hit-thrombocytopenia',
 ];

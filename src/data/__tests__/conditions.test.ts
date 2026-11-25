@@ -8,8 +8,8 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('registers all 110 Stoelting entries + 24 acute emergencies + 29 subspecialty cards (163 total)', () => {
-    expect(CONDITIONS).toHaveLength(163);
+  it('registers all 110 Stoelting entries + 24 acute emergencies + 39 subspecialty cards (173 total)', () => {
+    expect(CONDITIONS).toHaveLength(173);
   });
 
   it('uses updated data version 2026.11.25-draft27 and registers anesthesia-considerations', () => {
@@ -168,5 +168,14 @@ describe('condition plans', () => {
     expect(text(plan('central-anticholinergic-syndrome').intraop)).toMatch(/physostigmine/i);
     expect(text(plan('co-cyanide-toxicity').intraop)).toMatch(/hydroxocobalamin/i);
     expect(text(plan('organophosphate-pseudocholinesterase').avoid)).toMatch(/succinylcholine|mivacurium/i);
+  });
+
+  it('keeps endocrine, hepatic, renal, and hematologic safety lines', () => {
+    expect(text(plan('hyperthyroidism-thyroid-storm').intraop)).toMatch(/iodine|propranolol|esmolol/i);
+    expect(text(plan('adrenal-insufficiency').avoid)).toMatch(/etomidate/i);
+    expect(text(plan('cirrhosis-esld').intraop)).toMatch(/cisatracurium/i);
+    expect(text(plan('esrd-renal-transplant').avoid)).toMatch(/succinylcholine|NSAIDs/i);
+    expect(text(plan('turp-syndrome').intraop)).toMatch(/hyponatrem|serum sodium/i);
+    expect(text(plan('hit-thrombocytopenia').avoid)).toMatch(/heparin|platelet/i);
   });
 });

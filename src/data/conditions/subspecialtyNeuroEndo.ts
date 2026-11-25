@@ -247,4 +247,239 @@ export const SUBSPECIALTY_NEURO_ENDO_CONDITIONS: ConditionRecord[] = [
       ],
     },
   ),
+  subspecialtyEntry(
+    'diabetes-dka-hhs',
+    'Diabetes mellitus, DKA & HHS',
+    'Endocrinology',
+    ['diabetes', 'dka', 'hhs', 'diabetic ketoacidosis', 'gastroparesis'],
+    {
+      preop: [
+        'Assess end-organ disease: silent coronary ischemia, autonomic neuropathy (resting tachycardia, orthostasis, severe gastroparesis -> consider RSI), nephropathy, and stiff-joint syndrome ("prayer sign" limiting atlanto-occipital extension).',
+        'Check baseline POC glucose, electrolytes, and anion gap; defer purely elective surgery in active DKA/HHS until volume, acidosis, and hypokalemia are corrected.',
+      ],
+      intraop: [
+        'Maintain moderate glycemic targets (140–180 mg/dL) with hourly POC glucose checks and titrated short-acting IV insulin when needed.',
+        'In emergency surgery with DKA/HHS: continue isotonic saline resuscitation, careful potassium repletion, and insulin infusion while avoiding rapid osmotic shifts.',
+      ],
+      avoid: [
+        'Tight aggressive insulin targets (< 110 mg/dL) that trigger severe unnoticed intraoperative hypoglycemia under general anesthesia.',
+        'Starting insulin before correcting critical hypokalemia (< 3.3 mEq/L) or using SGLT2 inhibitors prior to major fasting (euglycemic DKA risk).',
+      ],
+      postop: [
+        'Check blood glucose in PACU and transition smoothly back to basal-bolus subcutaneous insulin once oral intake is established.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'hyperthyroidism-thyroid-storm',
+    'Hyperthyroidism & thyroid storm',
+    'Endocrinology',
+    ['thyroid storm', 'hyperthyroidism', 'graves disease', 'thyrotoxicosis'],
+    {
+      preop: [
+        'Defer elective surgery until clinically euthyroid using antithyroid thionamides (methimazole/PTU) and beta-blockers.',
+        'Evaluate neck imaging for retrosternal goiter, tracheal deviation/compression, and airway compromise.',
+      ],
+      intraop: [
+        'Recognize thyroid storm (high fever, severe tachycardia/AF, heart failure, agitation — closely mimics malignant hyperthermia, though CK/acidosis are milder).',
+        'Treat storm systematically: 1) beta-blocker (esmolol/propranolol), 2) thionamide (PTU/methimazole) FIRST, 3) potassium iodide (Lugol solution) 1 hour AFTER thionamide, 4) stress-dose hydrocortisone, and 5) active cooling.',
+      ],
+      avoid: [
+        'Sympathetic stimulants (ketamine, ephedrine, pancuronium, atropine, epinephrine-containing local anesthetics) in poorly controlled thyrotoxicosis.',
+        'Aspirin for fever control (displaces thyroid hormone from binding proteins and worsens free T3/T4 toxicity) or giving iodine before thionamide blockade.',
+      ],
+      postop: [
+        'Transfer to ICU after storm crisis and inspect vocal cord mobility and neck patency after thyroidectomy.',
+        'Monitor serially for acute hypocalcemia (Chvostek/Trousseau signs, QT prolongation) from parathyroid stunning.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'hypothyroidism-myxedema',
+    'Hypothyroidism & myxedema coma',
+    'Endocrinology',
+    ['hypothyroidism', 'myxedema coma'],
+    {
+      preop: [
+        'Mild/subclinical hypothyroidism can proceed safely; overt severe hypothyroidism or myxedema coma (hypothermia, hyponatremia, bradycardia, hypoventilation, pericardial effusion) requires delaying elective surgery until thyroid replacement.',
+        'Assess airway for macroglossia/goiter and check baseline sodium and cortisol axis.',
+      ],
+      intraop: [
+        'Anticipate exquisite sensitivity to all sedatives, opioids, and volatile agents (minimal MAC reduction is modest clinically, but myocardial/respiratory depression and delayed drug clearance are marked).',
+        'Maintain active warming, gentle fluid titration, and invasive monitoring in severe cases; treat myxedema coma emergently with IV levothyroxine PLUS stress hydrocortisone.',
+      ],
+      avoid: [
+        'Heavy preoperative sedatives, excessive vasodilators, and rapid aggressive warming prior to intravascular volume support (vasodilation unmasks hypotension).',
+        'Administering IV thyroxine without concurrent stress steroids when coexisting adrenal insufficiency is possible.',
+      ],
+      postop: [
+        'Keep patients with severe hypothyroidism closely monitored (ICU/step-down) for prolonged emergence, hyponatremia, and blunted hypoxic/hypercapnic ventilatory drive.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'adrenal-insufficiency',
+    'Adrenal insufficiency & adrenal crisis',
+    'Endocrinology',
+    ['addison disease', 'adrenal crisis', 'adrenal insufficiency', 'steroid suppression'],
+    {
+      preop: [
+        'Identify primary adrenal failure (Addison disease) or secondary HPA-axis suppression from chronic systemic/high-dose inhaled corticosteroids.',
+        'Plan perioperative stress-dose hydrocortisone scaled to surgical stress (morning home dose for minor cases; supplemental IV hydrocortisone for moderate/major surgery).',
+      ],
+      intraop: [
+        'Suspect acute adrenal crisis upon unexplained catecholamine-refractory hypotension, hypoglycemia, hyponatremia, and hyperkalemia.',
+        'Treat immediately with IV hydrocortisone bolus, isotonic saline with dextrose resuscitation, and vasopressors while correcting electrolyte shifts.',
+      ],
+      avoid: [
+        'Etomidate for induction or infusions in patients at risk for adrenal crisis or septic shock (potently inhibits 11-beta-hydroxylase cortisol synthesis for 24–48 h).',
+        'Omitting maintenance morning steroids prior to anesthesia.',
+      ],
+      postop: [
+        'Taper stress-dose hydrocortisone back to baseline maintenance over 2 to 3 days while monitoring electrolytes and blood glucose.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'cirrhosis-esld',
+    'Cirrhosis, portal hypertension & ESLD',
+    'Hepatic',
+    ['cirrhosis', 'portal hypertension', 'esld', 'child pugh', 'meld'],
+    {
+      preop: [
+        'Stratify severity via MELD and Child-Pugh scores (Child C carries prohibitive elective surgical mortality); evaluate ascites (full-stomach/RSI, impaired FRC), encephalopathy, hepatopulmonary syndrome (platypnea-orthodeoxia), and portopulmonary hypertension.',
+        'Assess baseline INR, platelets, fibrinogen (rebalanced hemostasis), and renal function (hepatorenal risk).',
+      ],
+      intraop: [
+        'Preserve hepatic arterial and portal venous oxygen delivery by maintaining normal MAP/preload and avoiding severe hyperventilation.',
+        'Prefer organ-independent elimination agents (cisatracurium, remifentanil, sevoflurane/desflurane) and expect elevated volume of distribution for hydrophilic drugs.',
+        'Administer albumin replacement carefully during large-volume paracentesis to prevent paracentesis-induced circulatory dysfunction.',
+      ],
+      avoid: [
+        'Halothane, hypotension, severe hypocapnia, and high PEEP (sharply reduce hepatic blood flow).',
+        'Preoperative sedatives precipitating hepatic encephalopathy, or large acetaminophen/NSAID loads.',
+      ],
+      postop: [
+        'Monitor closely for delayed clearance of sedatives, worsening encephalopathy, hypoglycemia, GI variceal bleeding, and acute kidney injury.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'acute-liver-failure',
+    'Acute (fulminant) liver failure',
+    'Hepatic',
+    ['fulminant hepatic failure', 'acute liver failure', 'alf'],
+    {
+      preop: [
+        'Differentiate from chronic cirrhosis: acute liver failure presents rapidly with severe coagulopathy, cerebral edema/intracranial hypertension, refractory hypoglycemia, and distributive vasodilatory shock.',
+        'Coordinate neurology/ICU neuro-protection plan and viscoelastic coagulation testing (TEG/ROTEM).',
+      ],
+      intraop: [
+        'Maintain cerebral perfusion pressure, 30-degree head elevation, mild hypocapnia, and active normothermia.',
+        'Infuse continuous dextrose with frequent POC glucose monitoring and treat vasodilatory shock with norepinephrine/vasopressin.',
+      ],
+      avoid: [
+        'Hepatotoxic medications, hypotonic IV fluids (worsen brain swelling), and unnecessary blind prophylactic FFP that obscures neurologic exams or worsens cerebral hyperemia.',
+        'Neuraxial anesthesia in acute hepatic coagulopathy.',
+      ],
+      postop: [
+        'Transfer intubated directly to liver ICU for continuous ICP, glucose, ammonia, and transplant candidacy monitoring.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'esrd-renal-transplant',
+    'End-stage renal disease (ESRD) & renal transplant',
+    'Renal',
+    ['esrd', 'ckd', 'dialysis', 'renal transplant'],
+    {
+      preop: [
+        'Verify timing of last hemodialysis, pre/post-dialysis weight, serum potassium (defer elective cases with acute hyperkalemia or ECG changes), metabolic acidosis, anemia, and uremic bleeding.',
+        'Inspect and label all arteriovenous (AV) fistulas/grafts: strictly zero blood pressure cuffs, venipuncture, or tourniquets on that extremity.',
+      ],
+      intraop: [
+        'Choose drugs independent of renal clearance (cisatracurium, atracurium, propofol, fentanyl/remifentanil) and confirm full TOF reversal (avoid sugammadex in severe ESRD per local label if alternative exists).',
+        'For renal transplantation: maintain adequate intravascular volume and normotension/mild hypertension prior to clamp release to ensure prompt graft perfusion.',
+        'Pad AV fistula limbs meticulously and confirm palpable thrill throughout surgery.',
+      ],
+      avoid: [
+        'Succinylcholine when serum potassium is elevated (> 5.5 mEq/L) or rising, and avoid NSAIDs, meperidine (normeperidine accumulation -> seizures), and morphine metabolite accumulation (M6G).',
+        'Blood pressure cuffs or peripheral IVs placed on an AV fistula arm.',
+      ],
+      postop: [
+        'Re-check potassium and AV fistula thrill in PACU; treat post-op hyperkalemia emergently with calcium, insulin-dextrose, beta-agonist, and dialysis.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'turp-syndrome',
+    'TURP syndrome & acute hyponatremia',
+    'Renal',
+    ['turp syndrome', 'hyponatremia', 'glycine toxicity', 'hysteroscopy fluid overload'],
+    {
+      preop: [
+        'Assess baseline cardiac and renal reserve in patients scheduled for prolonged transurethral resection or hysteroscopic procedures using hypotonic non-conductive irrigation (glycine 1.5%, sorbitol, mannitol).',
+        'Limit surgical irrigation bag height (< 60 cm above bladder) and operative resection time (< 60 min).',
+      ],
+      intraop: [
+        'Spinal anesthesia (to T10 level) enables early clinical detection of CNS symptoms (restlessness, confusion, nausea, visual disturbances/transient blindness from glycine) plus bladder perforation signs.',
+        'Recognize volume overload (hypertension, bradycardia, pulmonary edema) shifting to hyponatremic hypotension and seizures.',
+        'Stop surgery immediately upon suspicion, secure airway if obtunded, give IV loop diuretic (furosemide), and check STAT serum sodium and osmolality.',
+      ],
+      avoid: [
+        'Overly rapid sodium correction (> 8–10 mEq/L in 24 hours), which risks osmotic demyelination syndrome (central pontine myelinolysis); reserve 3% hypertonic saline strictly for severe symptomatic seizures/coma.',
+        'Heavy intraoperative sedation under neuraxial anesthesia that masks early restless CNS warning signs.',
+      ],
+      postop: [
+        'Monitor serum sodium every 2 to 4 hours in ICU/step-down until steady normalization and neurological clarity return.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'dic',
+    'Disseminated intravascular coagulation (DIC)',
+    'Hematology',
+    ['dic', 'disseminated intravascular coagulation', 'consumptive coagulopathy'],
+    {
+      preop: [
+        'Screen patients with high-risk obstetric disasters (abruption, AFE, fetal demise), severe sepsis, major trauma, massive transfusion, or acute hemolytic reactions.',
+        'Check baseline platelets, fibrinogen, PT/INR, aPTT, and D-dimer while ensuring blood bank activation readiness.',
+      ],
+      intraop: [
+        'Recognize simultaneous diffuse microvascular bleeding from IV sites/mucosa and microvascular organ thrombosis.',
+        'Definitively treat the underlying cause FIRST (evacuate uterus, control sepsis, stop incompatible transfusion) while replacing consumed factors aggressively (cryoprecipitate/fibrinogen, FFP, platelets, RBCs).',
+        'Follow serial TEG/ROTEM or standard coagulation panels frequently.',
+      ],
+      avoid: [
+        'Neuraxial anesthesia or deep non-compressible blocks in suspected DIC.',
+        'Administering isolated antifibrinolytics alone without treating the underlying trigger or replacing consumed clotting factors.',
+      ],
+      postop: [
+        'Admit to ICU for serial coagulation labs, organ perfusion monitoring (renal/hepatic), and microvascular thrombosis surveillance.',
+      ],
+    },
+  ),
+  subspecialtyEntry(
+    'hit-thrombocytopenia',
+    'Heparin-induced thrombocytopenia (HIT)',
+    'Hematology',
+    ['hit', 'heparin induced thrombocytopenia', 'pf4 antibodies'],
+    {
+      preop: [
+        'Recognize Type II immune HIT: > 50% platelet drop typically 5–14 days after heparin exposure (earlier if recent prior exposure) accompanied by paradoxical arterial or venous thrombosis ("white clot syndrome").',
+        'Verify non-heparin alternative anticoagulant strategy (argatroban, bivalirudin, fondaparinux) with hematology prior to surgery.',
+      ],
+      intraop: [
+        'Strictly eliminate ALL sources of heparin from the OR environment: flush arterial/central lines with normal saline only, remove heparin-coated Swan-Ganz/dialysis catheters, and confirm cell-salvage/CPB anticoagulation alternatives (bivalirudin).',
+        'Monitor anticoagulation with appropriate assays (ACT/ECT or dilute thrombin time for direct thrombin inhibitors).',
+      ],
+      avoid: [
+        'Unfractionated heparin, low-molecular-weight heparin, and heparinized saline line flushes in all forms.',
+        'Prophylactic platelet transfusions in HIT unless life-threatening bleeding is present ("adds fuel to thrombotic fire").',
+      ],
+      postop: [
+        'Maintain non-heparin systemic anticoagulation carefully in ICU and document heparin allergy prominently across the chart and band.',
+      ],
+    },
+  ),
 ];
