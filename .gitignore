@@ -38,3 +38,8 @@ dist-ssr
 agent/
 skills-lock.json
 .superpowers/
+
+# Playwright E2E output
+e2e-results.json
+e2e-artifacts/
+playwright-report/
