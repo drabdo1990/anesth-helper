@@ -97,3 +97,28 @@ export function emergencyEntry(
   }
   return rec;
 }
+
+export function subspecialtyEntry(
+  id: string,
+  name: string,
+  category: string,
+  aliases: string[],
+  plan: ConditionPlan,
+  options?: { crisis?: 'mh' | 'last'; checklistId?: CrisisChecklistId },
+): ConditionRecord {
+  const rec: ConditionRecord = {
+    id,
+    name,
+    aliases,
+    category,
+    plan,
+    sourceIds: ['anesthesia-considerations'],
+  };
+  if (options?.crisis !== undefined) {
+    rec.crisis = options.crisis;
+  }
+  if (options?.checklistId !== undefined) {
+    rec.checklistId = options.checklistId;
+  }
+  return rec;
+}

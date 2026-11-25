@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CONDITIONS, PLANNED_CONDITION_IDS, STOELTING_CHAPTERS, emergencyEntry } from '../conditions';
+import { CONDITIONS, PLANNED_CONDITION_IDS, STOELTING_CHAPTERS, emergencyEntry, subspecialtyEntry } from '../conditions';
 import { DATA_VERSION, SOURCE_BY_ID } from '../sources';
 
 describe('conditions', () => {
@@ -8,12 +8,12 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('holds all 110 Stoelting conditions plus 24 acute emergencies (134 total)', () => {
-    expect(CONDITIONS.length).toBe(134);
+  it('holds 110 Stoelting, 24 emergency, and 11 cardiac/vascular subspecialty conditions (145 total)', () => {
+    expect(CONDITIONS.length).toBe(145);
   });
 
-  it('uses updated data version 2026.11.25-draft26 and registers anesthesia-considerations', () => {
-    expect(DATA_VERSION).toBe('2026.11.25-draft26');
+  it('uses updated data version 2026.11.25-draft27 and registers anesthesia-considerations', () => {
+    expect(DATA_VERSION).toBe('2026.11.25-draft27');
     expect(SOURCE_BY_ID['anesthesia-considerations']).toBeDefined();
   });
 
@@ -54,6 +54,24 @@ describe('conditions', () => {
     expect(sample.sourceIds).toEqual(['anesthesia-considerations']);
     expect(sample.crisis).toBe('last');
     expect(sample.checklistId).toBe('crisis-anaphylaxis');
+  });
+
+  it('subspecialtyEntry assigns custom subspecialty category cleanly', () => {
+    const sample = subspecialtyEntry(
+      'sample-sub',
+      'Sample subspecialty',
+      'Cardiac',
+      ['sample card'],
+      {
+        preop: ['Preop line > 10 chars'],
+        intraop: ['Intraop line > 10 chars'],
+        avoid: ['Avoid line > 10 chars'],
+        postop: ['Postop line > 10 chars'],
+      },
+    );
+    expect(sample.category).toBe('Cardiac');
+    expect(sample.chapter).toBeUndefined();
+    expect(sample.sourceIds).toEqual(['anesthesia-considerations']);
   });
 
   it('carry a plan only for the planned ids, so an index entry never shows invented text', () => {
@@ -125,5 +143,13 @@ describe('condition plans', () => {
     expect(CONDITIONS.find((c) => c.id === 'anaphylaxis')?.checklistId).toBe('crisis-anaphylaxis');
     expect(CONDITIONS.find((c) => c.id === 'bronchospasm')?.checklistId).toBe('crisis-bronchospasm');
     expect(CONDITIONS.find((c) => c.id === 'laryngospasm')?.checklistId).toBe('crisis-laryngospasm');
+  });
+
+  it('keeps cardiac, vascular, and pulmonary hypertension safety lines', () => {
+    expect(text(plan('aortic-stenosis').avoid)).toMatch(/tachycardia/i);
+    expect(text(plan('hocm').avoid)).toMatch(/inotropes|epinephrine/i);
+    expect(text(plan('cardiac-tamponade').intraop)).toMatch(/spontaneous ventilation/i);
+    expect(text(plan('aortic-dissection').intraop)).toMatch(/beta-blocker/i);
+    expect(text(plan('pulmonary-hypertension').avoid)).toMatch(/hypoxia/i);
   });
 });

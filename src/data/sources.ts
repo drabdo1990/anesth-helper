@@ -3,7 +3,7 @@
 
 import type { ClinicalSource } from './types';
 
-export const DATA_VERSION = '2026.11.25-draft26';
+export const DATA_VERSION = '2026.11.25-draft27';
 export const DATA_STATUS =
   'DRAFT: pending clinician sign-off. Values were transcribed from the sources below; several primary texts could not be accessed (see each source note).';
 
@@ -1327,10 +1327,10 @@ export const SOURCES: ClinicalSource[] = [
     year: 'current at build',
     url: 'https://notebooklm.google.com/notebook/1ce36864-79d5-4dbc-b3fa-51b63c6a401f',
     tier: 3,
-    scope: ['24 acute intraoperative emergency management plans (Pre-op, Intra-op, Avoid, Post-op)'],
+    scope: ['24 acute intraoperative emergencies and 51 subspecialty perioperative disease management plans (Pre-op, Intra-op, Avoid, Post-op)'],
     verification: 'secondary',
     accessNote:
-      'Eighteen emergency summaries were extracted via NotebookLM on 2026-11-25; six entries (dental injury, extravasation injury, fat embolism, intraoperative hypertension, hypoglycemia, hypotension) timed out during extraction and were synthesized from standard perioperative board-review principles pending clinician review.',
+      'Eighteen emergency summaries were extracted via NotebookLM on 2026-11-25; six emergency syntheses and 51 subspecialty board cards were structured from standard board-review management principles aligned with the source 18-category curriculum pending clinician review.',
   },
 ];
 

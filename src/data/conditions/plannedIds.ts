@@ -141,4 +141,16 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'total-spinal',
   'transfusion-reaction',
   'venous-air-embolism',
+  // Batch 8: Subspecialty Part 1 (Cardiac, Vascular & Pulmonary HTN)
+  'aortic-stenosis',
+  'aortic-regurgitation',
+  'mitral-stenosis',
+  'mitral-regurgitation',
+  'hocm',
+  'cardiac-tamponade',
+  'cied-pacemaker-icd',
+  'aortic-aneurysm',
+  'aortic-dissection',
+  'carotid-endarterectomy',
+  'pulmonary-hypertension',
 ];
