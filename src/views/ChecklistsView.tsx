@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Check, ClipboardCopy, RotateCcw } from 'lucide-react';
 import { CHECKLISTS, CHECKLIST_GROUPS, HANDOFF_OPTIONS } from '../data/checklists';
 import type { ChecklistGroup, ChecklistRecord } from '../data/types';
@@ -191,6 +191,18 @@ export const ChecklistsView: React.FC<ChecklistsViewProps> = ({ phaseLists, extr
   const checks = useAppStore((s) => s.checks);
   const toggle = useAppStore((s) => s.toggleCheck);
   const resetChecks = useAppStore((s) => s.resetChecks);
+  const requestedChecklistId = useAppStore((s) => s.requestedChecklistId);
+  const clearRequestedChecklist = useAppStore((s) => s.clearRequestedChecklist);
+
+  useEffect(() => {
+    if (!requestedChecklistId) return;
+    const match = phaseLists.find((c) => c.id === requestedChecklistId);
+    if (match) {
+      setGroup(match.group);
+      setSub(match.id);
+      clearRequestedChecklist();
+    }
+  }, [requestedChecklistId, phaseLists, clearRequestedChecklist]);
 
   const lists = phaseLists.filter((c) => c.group === group);
   const list = lists.find((c) => c.id === sub) ?? lists[0];

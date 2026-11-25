@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, ExternalLink, Search, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ClipboardCheck, ExternalLink, Search, ShieldAlert } from 'lucide-react';
 import { CONDITIONS, PROJECT_NOTEBOOK_URL, STOELTING_CHAPTERS, type ConditionRecord } from '../data/conditions';
 import { searchConditions } from '../lib/conditionSearch';
 import { useAppStore } from '../store/useAppStore';
@@ -9,7 +9,7 @@ import { WarningBanner } from '../components/ui/WarningBanner';
 const chapterLine = (c: ConditionRecord): string =>
   c.chapter !== undefined
     ? `Stoelting's Anesthesia and Co-Existing Disease, 8th edition (2022), chapter ${c.chapter}: ${STOELTING_CHAPTERS[c.chapter]}.`
-    : `Anesthesia Considerations for Oral Board Exam: ${c.category}.`;
+    : `Anesthesia Considerations for Oral Board Exam — ${c.category ?? 'Clinical Reference'}.`;
 
 const SECTIONS: { key: 'preop' | 'intraop' | 'avoid' | 'postop'; label: string }[] = [
   { key: 'preop', label: 'Pre-op' },
@@ -34,6 +34,7 @@ const NotebookLink: React.FC = () => (
 
 const Detail: React.FC<{ c: ConditionRecord; onBack: () => void }> = ({ c, onBack }) => {
   const openEmergency = useAppStore((s) => s.openEmergency);
+  const openChecklist = useAppStore((s) => s.openChecklist);
   const { plan } = c;
   return (
     <div className="flex flex-col gap-3">
@@ -48,7 +49,7 @@ const Detail: React.FC<{ c: ConditionRecord; onBack: () => void }> = ({ c, onBac
         {c.aliases.length > 0 && <p className="text-xs text-slate-400">Also: {c.aliases.join(', ')}</p>}
         {plan ? (
           <>
-            <WarningBanner level="info" title="Textbook summary">
+            <WarningBanner level="info" title={c.chapter !== undefined ? 'Textbook summary' : 'Board emergency summary'}>
               A short summary of {chapterLine(c)} Check current society guidance and your local protocol.
             </WarningBanner>
             {SECTIONS.map(({ key, label }) => (
@@ -61,13 +62,22 @@ const Detail: React.FC<{ c: ConditionRecord; onBack: () => void }> = ({ c, onBac
                 </ul>
               </div>
             ))}
-            {c.crisis === 'mh' && (
+            {c.crisis && (
               <button
                 type="button"
-                onClick={() => openEmergency('mh')}
+                onClick={() => openEmergency(c.crisis)}
                 className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-red-500 px-3 text-sm font-black uppercase text-white touch-manipulation"
               >
-                <ShieldAlert className="h-5 w-5" /> Open MH crisis steps
+                <ShieldAlert className="h-5 w-5" /> {c.crisis === 'mh' ? 'Open MH crisis steps' : 'Open LAST crisis steps'}
+              </button>
+            )}
+            {c.checklistId && (
+              <button
+                type="button"
+                onClick={() => openChecklist(c.checklistId!)}
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-cyan-500/60 bg-clinical-card px-3 text-sm font-bold text-cyan-300 touch-manipulation"
+              >
+                <ClipboardCheck className="h-5 w-5" /> Open crisis checklist in Lists
               </button>
             )}
           </>
@@ -95,7 +105,7 @@ export const ConditionsView: React.FC = () => {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs text-slate-400">
-        Uncommon conditions from Stoelting's Anesthesia and Co-Existing Disease (8th edition). Each has a perioperative plan (Pre-op, Intra-op, Avoid, Post-op). Searching works offline and nothing you type is stored.
+        Conditions from Stoelting&apos;s Anesthesia and Co-Existing Disease (8th edition) and Acute Intraoperative Emergencies from Anesthesia Considerations. Each has a perioperative plan (Pre-op, Intra-op, Avoid, Post-op). Searching works offline and nothing you type is stored.
       </p>
       <label className="flex min-h-[48px] items-center gap-2 rounded-xl border border-clinical-border-light bg-clinical-card px-3 focus-within:border-cyan-500">
         <Search className="h-4 w-4 shrink-0 text-slate-400" />
@@ -130,10 +140,14 @@ export const ConditionsView: React.FC = () => {
                 <span>{c.name}</span>
                 <span
                   className={`shrink-0 rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase ${
-                    c.plan ? 'border-cyan-500/60 text-cyan-300' : 'border-clinical-border-light text-slate-400'
+                    c.category === 'Acute Intraoperative Emergencies'
+                      ? 'border-amber-500/60 text-amber-300'
+                      : c.plan
+                        ? 'border-cyan-500/60 text-cyan-300'
+                        : 'border-clinical-border-light text-slate-400'
                   }`}
                 >
-                  {c.plan ? 'Plan' : `Ch. ${c.chapter}`}
+                  {c.category === 'Acute Intraoperative Emergencies' ? 'Emergency' : c.plan ? 'Plan' : `Ch. ${c.chapter}`}
                 </span>
               </button>
             </li>

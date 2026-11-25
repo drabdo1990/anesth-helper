@@ -45,4 +45,15 @@ describe('audit fixes in the store', () => {
     expect(next.emergencyChecks['mh-help']).toBe(true);
     expect(next.timers.cico?.running).toBe(true);
   });
+
+  it('routes openChecklist to Intra-op Lists without persisting requestedChecklistId', () => {
+    useAppStore.getState().openChecklist('crisis-bronchospasm');
+    const state = useAppStore.getState();
+    expect(state.activeTab).toBe('intraop');
+    expect(state.intraopView).toBe('lists');
+    expect(state.requestedChecklistId).toBe('crisis-bronchospasm');
+
+    useAppStore.getState().clearRequestedChecklist();
+    expect(useAppStore.getState().requestedChecklistId).toBeNull();
+  });
 });

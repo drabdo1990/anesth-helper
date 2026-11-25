@@ -88,6 +88,7 @@ interface AppState extends PersistedPrefs {
   settingsOpen: boolean;
   referencesOpen: boolean;
   updateAvailable: boolean;
+  requestedChecklistId: string | null;
 
   doseValues: Record<string, number>;
   selectedDose: Record<string, string>;
@@ -118,6 +119,8 @@ interface AppState extends PersistedPrefs {
   setSettingsOpen: (open: boolean) => void;
   setReferencesOpen: (open: boolean) => void;
   setUpdateAvailable: (available: boolean) => void;
+  openChecklist: (checklistId: string) => void;
+  clearRequestedChecklist: () => void;
 
   setGuidelineSet: (set: GuidelineSet) => void;
   setPreferredScalar: (pref: ScalarPreference) => void;
@@ -214,6 +217,7 @@ export const useAppStore = create<AppState>()(
       settingsOpen: false,
       referencesOpen: false,
       updateAvailable: false,
+      requestedChecklistId: null,
 
       doseValues: {},
       selectedDose: {},
@@ -256,6 +260,7 @@ export const useAppStore = create<AppState>()(
           asaEmergency: false,
           fastingStatus: null,
           checks: {},
+          requestedChecklistId: null,
         }),
 
       setActiveTab: (activeTab) => set({ activeTab }),
@@ -267,6 +272,9 @@ export const useAppStore = create<AppState>()(
       setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
       setReferencesOpen: (referencesOpen) => set({ referencesOpen }),
       setUpdateAvailable: (updateAvailable) => set({ updateAvailable }),
+      openChecklist: (checklistId) =>
+        set({ activeTab: 'intraop', intraopView: 'lists', requestedChecklistId: checklistId }),
+      clearRequestedChecklist: () => set({ requestedChecklistId: null }),
 
       setGuidelineSet: (guidelineSet) => set({ guidelineSet }),
       setPreferredScalar: (preferredScalar) => set({ preferredScalar }),
