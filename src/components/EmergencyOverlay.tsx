@@ -78,8 +78,8 @@ export const EmergencyOverlay: React.FC = () => {
               keypadTitle="Enter actual weight"
             />
           )}
-          {kind === 'last' && (weight !== null ? <LastPanel weightKg={weight} /> : <NeedWeight />)}
-          {kind === 'mh' && (weight !== null ? <MhPanel weightKg={weight} /> : <NeedWeight />)}
+          {kind === 'last' && <LastPanel weightKg={weight} />}
+          {kind === 'mh' && <MhPanel weightKg={weight} />}
           {kind === 'cico' && <CicoPanel />}
           {kind !== 'cico' && cicoRunning && (
             <div className="hidden" aria-hidden="true">
@@ -102,9 +102,3 @@ export const EmergencyOverlay: React.FC = () => {
     document.body,
   );
 };
-
-const NeedWeight: React.FC = () => (
-  <p className="rounded-2xl border-2 border-dashed border-red-500 p-4 text-center text-lg font-bold text-red-200">
-    Enter actual body weight above to calculate doses.
-  </p>
-);

@@ -13,52 +13,25 @@ import { ChecklistItem } from '../ui/ChecklistItem';
 import { SourceBadge } from '../ui/SourceBadge';
 import { UnitValue } from '../ui/UnitValue';
 import { WarningBanner } from '../ui/WarningBanner';
+import { NeedWeight } from './NeedWeight';
 
 const telHref = (contact: string): string | null => {
   const digits = contact.replace(/[^0-9+]/g, '');
   return digits.replace(/\D/g, '').length >= 5 ? `tel:${digits}` : null;
 };
 
-export const MhPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
-  const checks = useAppStore((s) => s.emergencyChecks);
-  const toggle = useAppStore((s) => s.toggleEmergencyCheck);
+/** Weight-based dantrolene dosing and the cumulative tracker; only rendered once a weight is known. */
+const DantroleneDosing: React.FC<{ weightKg: number }> = ({ weightKg }) => {
   const given = useAppStore((s) => s.dantroleneGivenMg);
   const addDantrolene = useAppStore((s) => s.addDantrolene);
   const reset = useAppStore((s) => s.resetDantrolene);
-  const contact = useAppStore((s) => s.mhContact);
-  const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
 
   const initialMg = dantroleneDoseMg(weightKg);
   const repeatMg = dantroleneDoseMg(weightKg, 1);
   const cumulative = dantroleneCumulativeStatus(weightKg, given);
-  const href = telHref(contact);
 
   return (
-    <div className="flex flex-col gap-3">
-      <WarningBanner level="red" title="Malignant hyperthermia">
-        Stop volatile anesthetics and succinylcholine. Call for help. Hyperventilate with 100% oxygen at high flow. Give dantrolene.
-      </WarningBanner>
-
-      <section className="rounded-2xl border border-slate-700 bg-slate-950 p-3" aria-label="MH hotline">
-        {contact.trim() ? (
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">MH hotline / local MH contact</p>
-              <p className="text-xl font-black text-red-200">{contact}</p>
-            </div>
-            {href && (
-              <a href={href} className="flex min-h-[48px] items-center gap-1 rounded-xl bg-red-500 px-4 font-black uppercase text-white">
-                <Phone className="h-5 w-5" /> Call
-              </a>
-            )}
-          </div>
-        ) : (
-          <button type="button" onClick={() => setSettingsOpen(true)} className="min-h-[48px] w-full rounded-xl border border-dashed border-slate-600 text-sm font-semibold text-slate-300">
-            No MH hotline configured. Tap to set one in Settings.
-          </button>
-        )}
-      </section>
-
+    <>
       <section className="rounded-2xl border border-red-500/60 bg-slate-950 p-3" aria-label="Dantrolene dosing">
         <p className="text-xs font-bold uppercase tracking-wider text-red-300">Dantrolene · actual body weight {weightKg.toFixed(1)} kg</p>
         <div className="mt-2 grid grid-cols-2 gap-3">
@@ -118,6 +91,45 @@ export const MhPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
         </div>
         <p className="mt-1 text-xs text-slate-400">Repeat or continue dosing according to your MHAUS / EMHG workflow. Log each dose to track the cumulative total.</p>
       </section>
+    </>
+  );
+};
+
+/** First-response banner, hotline and steps always show; only the dose blocks wait for a weight. */
+export const MhPanel: React.FC<{ weightKg: number | null }> = ({ weightKg }) => {
+  const checks = useAppStore((s) => s.emergencyChecks);
+  const toggle = useAppStore((s) => s.toggleEmergencyCheck);
+  const contact = useAppStore((s) => s.mhContact);
+  const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
+  const href = telHref(contact);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <WarningBanner level="red" title="Malignant hyperthermia">
+        Stop volatile anesthetics and succinylcholine. Call for help. Hyperventilate with 100% oxygen at high flow. Give dantrolene.
+      </WarningBanner>
+
+      <section className="rounded-2xl border border-slate-700 bg-slate-950 p-3" aria-label="MH hotline">
+        {contact.trim() ? (
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">MH hotline / local MH contact</p>
+              <p className="text-xl font-black text-red-200">{contact}</p>
+            </div>
+            {href && (
+              <a href={href} className="flex min-h-[48px] items-center gap-1 rounded-xl bg-red-500 px-4 font-black uppercase text-white">
+                <Phone className="h-5 w-5" /> Call
+              </a>
+            )}
+          </div>
+        ) : (
+          <button type="button" onClick={() => setSettingsOpen(true)} className="min-h-[48px] w-full rounded-xl border border-dashed border-slate-600 text-sm font-semibold text-slate-300">
+            No MH hotline configured. Tap to set one in Settings.
+          </button>
+        )}
+      </section>
+
+      {weightKg !== null ? <DantroleneDosing weightKg={weightKg} /> : <NeedWeight />}
 
       <section className="flex flex-col gap-1.5" aria-label="MH steps">
         {MH_STEPS.map((s) => (

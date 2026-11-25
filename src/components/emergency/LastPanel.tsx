@@ -7,10 +7,10 @@ import { ChecklistItem } from '../ui/ChecklistItem';
 import { SourceBadge } from '../ui/SourceBadge';
 import { UnitValue } from '../ui/UnitValue';
 import { WarningBanner } from '../ui/WarningBanner';
+import { NeedWeight } from './NeedWeight';
 
-export const LastPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
-  const checks = useAppStore((s) => s.emergencyChecks);
-  const toggle = useAppStore((s) => s.toggleEmergencyCheck);
+/** Weight-based dosing and the cumulative tracker; only rendered once a weight is known. */
+const LipidDosing: React.FC<{ weightKg: number }> = ({ weightKg }) => {
   const given = useAppStore((s) => s.lipidGivenMl);
   const addLipid = useAppStore((s) => s.addLipid);
   const reset = useAppStore((s) => s.resetLipid);
@@ -20,11 +20,7 @@ export const LastPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
   const over70 = plan.stratum === 'at-or-over-70';
 
   return (
-    <div className="flex flex-col gap-3">
-      <WarningBanner level="red" title="Local anesthetic systemic toxicity">
-        Stop injecting. Call for help. Give 20% lipid emulsion. Do not rely on local anesthetic-related interventions alone.
-      </WarningBanner>
-
+    <>
       <section className="rounded-2xl border border-red-500/60 bg-slate-950 p-3" aria-label="Lipid emulsion dosing">
         <p className="text-xs font-bold uppercase tracking-wider text-red-300">
           20% lipid emulsion · actual weight {weightKg.toFixed(1)} kg · {over70 ? '70 kg or more' : 'under 70 kg'}
@@ -88,6 +84,22 @@ export const LastPanel: React.FC<{ weightKg: number }> = ({ weightKg }) => {
         </div>
         <p className="mt-1 text-xs text-slate-400">Log each bolus and infusion volume so the 12 mL/kg ceiling is tracked.</p>
       </section>
+    </>
+  );
+};
+
+/** First-response banner and steps always show; only the dose blocks wait for a weight. */
+export const LastPanel: React.FC<{ weightKg: number | null }> = ({ weightKg }) => {
+  const checks = useAppStore((s) => s.emergencyChecks);
+  const toggle = useAppStore((s) => s.toggleEmergencyCheck);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <WarningBanner level="red" title="Local anesthetic systemic toxicity">
+        Stop injecting. Call for help. Give 20% lipid emulsion. Do not rely on local anesthetic-related interventions alone.
+      </WarningBanner>
+
+      {weightKg !== null ? <LipidDosing weightKg={weightKg} /> : <NeedWeight />}
 
       <section className="flex flex-col gap-1.5" aria-label="LAST steps">
         {LAST_STEPS.map((s) => (
