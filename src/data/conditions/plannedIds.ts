@@ -153,4 +153,13 @@ export const PLANNED_CONDITION_IDS: string[] = [
   'aortic-dissection',
   'carotid-endarterectomy',
   'pulmonary-hypertension',
+  // Batch 9: Subspecialty Part 2 (Airway, Respiratory/Thoracics & Critical Care)
+  'ludwig-angina',
+  'epiglottitis',
+  'post-thyroidectomy-hematoma',
+  'copd-bullous-emphysema',
+  'bronchial-asthma',
+  'thoracic-olv',
+  'septic-shock',
+  'brain-death-donor',
 ];

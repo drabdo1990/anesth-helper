@@ -8,8 +8,8 @@ describe('conditions', () => {
     expect(new Set(CONDITIONS.map((c) => c.name.toLowerCase())).size).toBe(CONDITIONS.length);
   });
 
-  it('holds 110 Stoelting, 24 emergency, and 11 cardiac/vascular subspecialty conditions (145 total)', () => {
-    expect(CONDITIONS.length).toBe(145);
+  it('registers all 110 Stoelting entries + 24 acute emergencies + 19 subspecialty cards (153 total)', () => {
+    expect(CONDITIONS).toHaveLength(153);
   });
 
   it('uses updated data version 2026.11.25-draft27 and registers anesthesia-considerations', () => {
@@ -151,5 +151,13 @@ describe('condition plans', () => {
     expect(text(plan('cardiac-tamponade').intraop)).toMatch(/spontaneous ventilation/i);
     expect(text(plan('aortic-dissection').intraop)).toMatch(/beta-blocker/i);
     expect(text(plan('pulmonary-hypertension').avoid)).toMatch(/hypoxia/i);
+  });
+
+  it('keeps airway, thoracic OLV, and critical care safety lines', () => {
+    expect(text(plan('ludwig-angina').avoid)).toMatch(/spontaneous|NMBDs|neuromuscular/i);
+    expect(text(plan('post-thyroidectomy-hematoma').intraop)).toMatch(/sutures|staples|decompress/i);
+    expect(text(plan('copd-bullous-emphysema').avoid)).toMatch(/nitrous oxide|N2O/i);
+    expect(text(plan('thoracic-olv').intraop)).toMatch(/CPAP|PEEP/i);
+    expect(text(plan('brain-death-donor').intraop)).toMatch(/Rule of 100s|vasopressin/i);
   });
 });
